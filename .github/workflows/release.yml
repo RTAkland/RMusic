@@ -5,8 +5,8 @@ on:
     types: [published]
 
 jobs:
-  build-zip:
-    name: Build and Publish Extension Zip
+  build:
+    name: release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,5 +19,5 @@ jobs:
           allowUpdates: true
           omitName: true
           omitBody: true
-          artifacts: 'RMusic.jar' # 多个文件逗号分开
+          artifacts: 'RMusic.jar'
           token: ${{ secrets.TOKEN }}
