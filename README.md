@@ -1,3 +1,14 @@
+<div style="text-align: center">
+
+<img src="https://img.shields.io/badge/Kotlin-1.8.0-pink" alt="kotlin-version">
+<img src="https://img.shields.io/badge/JAVA-17-red" alt="java-version">
+<img src="https://img.shields.io/badge/Fabric-0.14.10-blue" alt="fabicloader-version">
+<img src="https://img.shields.io/badge/LICECSE-Apache 2.0-purple" alt="license">
+<img src="https://img.shields.io/badge/Release-v0.0.1-green" alt="release">
+<img src="https://img.shields.io/github/actions/workflow/status/RTAkland/RMusic/build.yml" alt="build">
+
+</div>
+
 # RMusic
 
 可以在游戏内播放自己想听的音乐！
@@ -16,7 +27,7 @@
 # 注意事项
 
 * 无论是客户端/服务器使用本mod的`login` `logout`命令时, 存储的`profile.json`都是在客户端本地, 但是音乐API时取决于配置文件内的地址
-* 如果想要让mod正常工作, 请在装有`fabric-language-kotlin` 版本 `>=1.9.0+kotlin.1.8.0` 和 `fabric-loader`
+* 如果想要让mod正常工作, 请在装有`fabric-language-kotlin >=1.9.0+kotlin.1.8.0` 和 `fabric-loader >=0.14.10`
   版本 `>=0.14.10` 的`服务器` `客户端` 同时安装
 
 # 构建
