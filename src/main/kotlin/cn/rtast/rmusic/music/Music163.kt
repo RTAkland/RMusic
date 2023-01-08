@@ -1,5 +1,6 @@
 package cn.rtast.rmusic.music
 
+import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.data.netease.ProfileModel
 import cn.rtast.rmusic.data.netease.login.LoginResponseModel
 import cn.rtast.rmusic.data.netease.search.SearchResponseModel
@@ -13,11 +14,11 @@ import java.net.URLEncoder
 
 class Music163 {
     private val gson = Gson()
-    private val rootApi = "https://api.163.rtast.cn"
+    private val rootApi163 = RMusic.API_ADDR_163
     private val cookie: String? = null
 
     fun login(email: String, password: String): Boolean {
-        val result = URL("$rootApi/login?email=$email&password=$password").readText()
+        val result = URL("$rootApi163/login?email=$email&password=$password").readText()
         val json = gson.fromJson(result, LoginResponseModel::class.java)
         if (json.code != 200) {
             return false
@@ -51,16 +52,16 @@ class Music163 {
     }
 
     fun search(keyword: String): List<Song> {
-        val result = URL("$rootApi/search?keywords=${URLEncoder.encode(keyword, "UTF-8")}").readText()
+        val result = URL("$rootApi163/search?keywords=${URLEncoder.encode(keyword, "UTF-8")}").readText()
         return gson.fromJson(result, SearchResponseModel::class.java).result.songs.subList(0, 10)
     }
 
     fun getSongUrl(id: Int): Data {
-        val result = URL("$rootApi/song/url?id=$id&cookie=$cookie").readText()
+        val result = URL("$rootApi163/song/url?id=$id&cookie=$cookie").readText()
         return gson.fromJson(result, UrlModel::class.java).data[0]
     }
 
     fun lyric(id: Int) {
-        val result = URL("$rootApi/lyric/id=$id&cookie=$cookie").readText()
+        val result = URL("$rootApi163/lyric/id=$id&cookie=$cookie").readText()
     }
 }
