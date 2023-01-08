@@ -1,36 +1,34 @@
 name: Build RMusic
-
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
-
+  - push
+  - pull_request
 jobs:
   build:
-
-    runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        java:
+          - 17
+        os:
+          - ubuntu-20.04
+          - windows-latest
+    runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up JDK 17
-      uses: actions/setup-java@v3
-      with:
-        java-version: '17'
-        distribution: 'microsoft'
-    - name: grant permssion fir gradle
-      run: chmod +x /home/runner/work/RMusic/RMusic/gradlew
-    - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
-      with:
-        arguments: build
-    - name: Upload Published Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: package
-        path: | 
-          /home/runner/work/RMusic/RMusic/build/libs/
-          
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Validate gradle wrapper
+        uses: gradle/wrapper-validation-action@v1
+      - name: Setup jdk ${{ matrix.java }}
+        uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Make Gradle wrapper executable
+        if: ${{ runner.os != 'Windows' }}
+        run: chmod +x ./gradlew
+      - name: Build
+        run: ./gradlew build
+      - name: Upload build artifacts
+        if: ${{ runner.os == 'Linux' && matrix.java == '17' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Artifacts
+          path: build/libs/
