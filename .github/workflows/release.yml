@@ -1,0 +1,23 @@
+name: release RMusic
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build-zip:
+    name: Build and Publish Extension Zip
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+      - name: Upload Release
+        uses: ncipollo/release-action@v1.10.0
+        with:
+          allowUpdates: true
+          omitName: true
+          omitBody: true
+          artifacts: 'RMusic.jar' # 多个文件逗号分开
+          token: ${{ secrets.TOKEN }}
