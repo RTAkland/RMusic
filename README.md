@@ -1,15 +1,10 @@
 <div style="text-align: center">
 
     <img src="https://img.shields.io/badge/Kotlin-1.8.0-pink" alt="kotlin-version">
-    
     <img src="https://img.shields.io/badge/JAVA-17-red" alt="java-version">
-    
     <img src="https://img.shields.io/badge/Fabric-0.14.10-blue" alt="fabicloader-version">
-    
     <img src="https://img.shields.io/badge/LICECSE-Apache 2.0-purple" alt="license">
-    
     <img src="https://img.shields.io/badge/Release-v0.0.1-green" alt="release">
-    
     <img src="https://img.shields.io/github/actions/workflow/status/RTAkland/RMusic/build.yml" alt="build">
 
 </div>
