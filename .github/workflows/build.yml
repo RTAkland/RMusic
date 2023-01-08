@@ -21,6 +21,8 @@ jobs:
       with:
         java-version: '17'
         distribution: 'microsoft'
+    - name: grant permssion fir gradle
+      run: chmod +x /home/runner/work/RMusic/RMusic/gradlew
     - name: Build with Gradle
       uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
       with:
