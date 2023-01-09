@@ -1,55 +1,143 @@
-/**
- * @Author: RTAkland
- * @EMail: rtakland@outlook.com
- * @Date: 2023/1/9 12:26
- */
-
 package cn.rtast.rmusic.commands
 
-import cn.rtast.rmusic.command.IRMusicCommand
-import cn.rtast.rmusic.network.S2CPacket
+import cn.rtast.rmusic.music.NeteaseMusic
+import cn.rtast.rmusic.utils.Message
+import cn.rtast.rmusic.utils.MusicPlayer
+import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.StringArgumentType.*
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.command.CommandManager.*
 
-class RMusicCommand : IRMusicCommand {
+class RMusicCommand {
+    private var music: MusicPlayer? = null
 
-    private fun send(msg: String, ctx: CommandContext<ServerCommandSource>) {
-        S2CPacket().send(msg, ctx.source.player!!)
+    fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
+        dispatcher.register(
+            literal("rmusic")
+                .then(
+                    literal("play")
+                        .then(
+                            literal("url")
+                                .then(
+                                    argument("url", string())
+                                        .executes { playMusic(it, getString(it, "url"));1 }
+                                )
+                        )
+                        .then(
+                            argument("id", string())
+                                .executes { playMusic(it, getString(it, "id"), "netease");1 }
+                        )
+                )
+                .then(
+                    literal("stop")
+                        .executes { stopMusic(it);1 }
+                )
+                .then(
+                    literal("resume")
+                        .executes { resumeMusic(it);1 }
+                )
+                .then(
+                    literal("pause")
+                        .executes { pauseMusic(it);1 }
+                )
+                .then(
+                    literal("search")
+                        .then(
+                            literal("netease")
+                                .then(
+                                    argument("keyword", string())
+                                        .executes { searchNetease(it, getString(it, "keyword"));1 }
+                                )
+                        )
+                )
+        )
     }
 
-    override fun playMusic(ctx: CommandContext<ServerCommandSource>, id: Int) {
-        send("play-$id", ctx)
+    private fun playMusic(ctx: CommandContext<ServerCommandSource>, id: String, platform: String) {
+        if (ctx.source.isExecutedByPlayer) {
+            if (music == null) {
+                music = MusicPlayer()
+                Message().m(ctx, "正在获取音乐源请稍后! 如果卡住请先stop再重试!")
+                Thread { music?.playMusic(id, platform) }.start()
+            } else {
+                Message().m(ctx, "已停止播放正在播放的音乐, 新的音乐ID: $id")
+                music?.stop()
+                Thread { music?.playMusic(id, platform) }.start()
+            }
+        } else {
+            Message().notClient(ctx)
+        }
     }
 
-    override fun stopMusic(ctx: CommandContext<ServerCommandSource>) {
-        send("stop", ctx)
+    private fun playMusic(ctx: CommandContext<ServerCommandSource>, url: String) {
+        if (ctx.source.isExecutedByPlayer) {
+            if (music == null) {
+                music = MusicPlayer()
+                Message().m(ctx, "正在请求URL")
+                Thread { music?.playMusic(url) }.start()
+            } else {
+                Message().m(ctx, "已停止播放正在播放的音乐, 正在播放新的URL音乐...")
+                music?.stop()
+                Thread { music?.playMusic(url) }.start()
+            }
+        } else {
+            Message().notClient(ctx)
+        }
     }
 
-    override fun resumeMusic(ctx: CommandContext<ServerCommandSource>) {
-        send("resume", ctx)
+    private fun stopMusic(ctx: CommandContext<ServerCommandSource>) {
+        if (ctx.source.isExecutedByPlayer) {
+            if (music != null) {
+                music?.stop()
+                music = null
+                Message().m(ctx, "已停止播放!")
+            } else {
+                Message().notPlayed(ctx)
+            }
+        } else {
+            Message().notClient(ctx)
+        }
     }
 
-    override fun pauseMusic(ctx: CommandContext<ServerCommandSource>) {
-        send("pause", ctx)
+    private fun resumeMusic(ctx: CommandContext<ServerCommandSource>) {
+        if (ctx.source.isExecutedByPlayer) {
+            if (music != null) {
+                music?.resume()
+                Message().m(ctx, "继续播放...")
+            } else {
+                Message().notPlayed(ctx)
+            }
+        } else {
+            Message().notClient(ctx)
+        }
     }
 
-    override fun muteMusic(ctx: CommandContext<ServerCommandSource>) {
-        send("mute", ctx)
+    private fun pauseMusic(ctx: CommandContext<ServerCommandSource>) {
+        if (ctx.source.isExecutedByPlayer) {
+            if (music != null) {
+                music?.pause()
+                Message().m(ctx, "已暂停!")
+            } else {
+                Message().notPlayed(ctx)
+            }
+        } else {
+            Message().notClient(ctx)
+        }
     }
 
-    override fun setGain(ctx: CommandContext<ServerCommandSource>, value: Float) {
-        send("volume-$value", ctx)
-    }
-
-    override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
-        send("search-$keyword", ctx)
-    }
-
-    override fun loginNetease(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
-        send("login-$email|$password", ctx)
-    }
-
-    override fun logoutNetease(ctx: CommandContext<ServerCommandSource>) {
-        send("logout", ctx)
+    private fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
+        Message().m(ctx, "正在搜索中请耐心等候...")
+        Thread {
+            val data = NeteaseMusic().search(keyword)
+            data.result.songs.forEach {
+                var res = "${it.name} "
+                it.artists.forEach { ar ->
+                    res += " ${ar.name} "
+                }
+                res += it.id
+                Message().m(ctx, res)
+            }
+        }.start()
     }
 }

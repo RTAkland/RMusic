@@ -2,25 +2,16 @@
   "schemaVersion": 1,
   "id": "rmusic",
   "version": "${version}",
-  "name": "Rmusic",
-  "description": "在游戏内听音乐捏",
+  "name": "RMusic",
+  "description": "在游戏内播放音乐! Powered by RTAkland.",
   "authors": [
     "RTAkland"
   ],
-  "contact": {
-    "website": "https://mod.rtast.cn/RMusic",
-    "repo": "https://github.com/RTAkland/RMusic"
-  },
-  "license": "Apache-2.0",
-  "icon": "assets/rmusic/icon.png",
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/RMusic/icon.png",
   "environment": "*",
   "entrypoints": {
-    "client": [
-      {
-        "adapter": "kotlin",
-        "value": "cn.rtast.rmusic.client.RMusicClient"
-      }
-    ],
     "main": [
       {
         "adapter": "kotlin",
@@ -29,10 +20,10 @@
     ]
   },
   "mixins": [
-    "rmusic.mixins.json"
+    "RMusic.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.10",
+    "fabricloader": ">=0.14.9",
     "fabric": "*",
     "minecraft": "1.19.2",
     "fabric-language-kotlin": ">=1.9.0+kotlin.1.8.0"
