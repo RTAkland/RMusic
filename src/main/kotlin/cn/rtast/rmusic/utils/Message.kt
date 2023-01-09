@@ -14,10 +14,6 @@ import net.minecraft.text.Text
 
 object Message {
 
-    fun actionBar(msg: String) {
-        TODO("send messages to action bar")
-    }
-
     fun sr(msg: String) {
         MinecraftClient.getInstance().player?.sendMessage(StyleUtil.resultStyle(msg))
     }
