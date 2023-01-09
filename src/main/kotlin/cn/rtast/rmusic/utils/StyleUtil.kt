@@ -1,3 +1,9 @@
+/**
+ * @Author: RTAkland
+ * @EMail: rtakland@outlook.com
+ * @Date: 2023/1/9 12:26
+ */
+
 package cn.rtast.rmusic.utils
 
 import net.minecraft.text.ClickEvent
@@ -9,6 +15,7 @@ import net.minecraft.util.Formatting
 object StyleUtil {
     fun resultStyle(msg: String): MutableText {
         val id = msg.split("|").last()
+        val songName = msg.split("|").first()
         val nameText = Text.literal(msg.split("|").first())
             .styled {
                 it.withColor(Formatting.YELLOW)
@@ -22,7 +29,10 @@ object StyleUtil {
                 .withClickEvent(
                     ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rmusic play $id")
                 ).withHoverEvent(
-                    HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("rmusic.chat.play.click", id))
+                    HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("rmusic.chat.play.click", songName)
+                        .styled { s ->
+                            s.withColor(Formatting.LIGHT_PURPLE)
+                        })
                 ).withInsertion(id)
         }
         return Text.translatable("rmusic.chat.songinfo", nameText, artistsText, playText)

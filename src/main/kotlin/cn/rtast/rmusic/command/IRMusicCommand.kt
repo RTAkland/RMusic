@@ -1,3 +1,9 @@
+/**
+ * @Author: RTAkland
+ * @EMail: rtakland@outlook.com
+ * @Date: 2023/1/9 12:26
+ */
+
 package cn.rtast.rmusic.command
 
 import com.mojang.brigadier.CommandDispatcher
@@ -69,12 +75,20 @@ interface IRMusicCommand {
     }
 
     fun playMusic(ctx: CommandContext<ServerCommandSource>, id: Int)
+
     fun stopMusic(ctx: CommandContext<ServerCommandSource>)
+
     fun resumeMusic(ctx: CommandContext<ServerCommandSource>)
+
     fun pauseMusic(ctx: CommandContext<ServerCommandSource>)
+
     fun muteMusic(ctx: CommandContext<ServerCommandSource>)
+
     fun setGain(ctx: CommandContext<ServerCommandSource>, value: Float)
+
     fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String)
+
     fun loginNetease(ctx: CommandContext<ServerCommandSource>, email: String, password: String)
+
     fun logoutNetease(ctx: CommandContext<ServerCommandSource>)
 }

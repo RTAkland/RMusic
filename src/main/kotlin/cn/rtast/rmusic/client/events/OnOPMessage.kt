@@ -5,10 +5,11 @@ import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.player.CommonPlayer
 import cn.rtast.rmusic.utils.Message
 import cn.rtast.rmusic.utils.SearchUtil
-import cn.rtast.rmusic.utils.SessionStateUtil
 import cn.rtast.rmusic.utils.StyleUtil
 import com.goxr3plus.streamplayer.enums.Status
 import net.minecraft.network.PacketByteBuf
+import java.io.File
+import kotlin.math.roundToInt
 
 class OnOPMessage {
 
@@ -16,21 +17,15 @@ class OnOPMessage {
         val message = buf.readString()
         if (message.startsWith("play")) {
             val id = message.split("-").last().toInt()
+            Message.translatable("rmusic.player.play.wait")
             if (RMusicClient.player == null) {
                 RMusicClient.player = CommonPlayer()
-                Thread {
-                    RMusicClient.player?.playMusic(id)
-                    Message.translatable("rmusic.player.play", StyleUtil.greenStyle(id.toString()))
-                }.start()
             } else {
                 RMusicClient.player!!.stop()
                 Message.translatable("rmusic.player.stop")
-                Thread {
-                    RMusicClient.player!!.playMusic(id)
-                    Message.translatable("rmusic.player.play", StyleUtil.greenStyle(id.toString()))
-                }.start()
             }
-            Message.translatable("rmusic.player.play.wait")
+            RMusicClient.player!!.playMusic(id)
+            Message.translatable("rmusic.player.play", StyleUtil.greenStyle(id.toString()))
         } else if (message.startsWith("stop")) {
             if (RMusicClient.player?.status != Status.STOPPED) {
                 RMusicClient.player?.stop()
@@ -67,7 +62,7 @@ class OnOPMessage {
             }.start()
         } else if (message.startsWith("logout")) {
             Message.translatable("rmusic.session.netease.logout.wait")
-            if (SessionStateUtil.netease()) {
+            if (File("./config/rmusic/profile.json").exists()) {
                 Music163().logout()
                 Message.translatable("rmusic.session.netease.login.success")
             } else {
@@ -75,7 +70,7 @@ class OnOPMessage {
             }
         } else if (message.startsWith("search")) {
             val keyword = message.split("-").last()
-            Message.translatable("rmusic.api.search.netease", keyword)
+            Message.translatable("rmusic.api.search.netease", StyleUtil.greenStyle(keyword))
             Thread {
                 val result = SearchUtil().searchNetease(keyword)
                 result.forEach {
@@ -87,7 +82,7 @@ class OnOPMessage {
             if (RMusicClient.player != null) {
                 val volume = message.split("-").last().toDouble()
                 RMusicClient.player?.setGain(volume)
-                Message.translatable("rmusic.player.setvolume", (volume * 10).toString())
+                Message.translatable("rmusic.player.setvolume", ((volume * 10).roundToInt()).toString())
             }
         } else if (message.startsWith("mute")) {
             if (RMusicClient.player != null) {

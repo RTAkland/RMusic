@@ -1,3 +1,9 @@
+/**
+ * @Author: RTAkland
+ * @EMail: rtakland@outlook.com
+ * @Date: 2023/1/9 12:26
+ */
+
 package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.music.Music163

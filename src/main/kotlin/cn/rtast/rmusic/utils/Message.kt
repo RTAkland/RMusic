@@ -1,3 +1,9 @@
+/**
+ * @Author: RTAkland
+ * @EMail: rtakland@outlook.com
+ * @Date: 2023/1/9 12:26
+ */
+
 package cn.rtast.rmusic.utils
 
 import com.mojang.brigadier.context.CommandContext
@@ -7,12 +13,9 @@ import net.minecraft.text.MutableText
 import net.minecraft.text.Text
 
 object Message {
-    fun m(msg: String) {
-        MinecraftClient.getInstance().player?.sendMessage(Text.literal(msg))
-    }
 
-    fun m(msg: String, s: CommandContext<ServerCommandSource>) {
-        s.source.sendFeedback(Text.literal("key"), false)
+    fun actionBar(msg: String) {
+        TODO("send messages to action bar")
     }
 
     fun sr(msg: String) {
