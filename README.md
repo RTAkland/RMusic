@@ -1,13 +1,15 @@
-<div style="text-align: center">
+<div style="text-align: center"><img src="https://static.rtast.cn/static/icon.png" alt="logo"></div>
 
-<img src="https://img.shields.io/badge/Kotlin-1.8.0-pink" alt="kotlin-version">
-<img src="https://img.shields.io/badge/JAVA-17-red" alt="java-version">
-<img src="https://img.shields.io/badge/Fabric-0.14.10-blue" alt="fabicloader-version">
-<img src="https://img.shields.io/badge/LICECSE-Apache 2.0-purple" alt="license">
-<img src="https://img.shields.io/badge/Release-v0.0.1-green" alt="release">
-<img src="https://img.shields.io/github/actions/workflow/status/RTAkland/RMusic/build.yml" alt="build">
+* Powered by RTAkland 2023
 
-</div>
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/RTAkland/RMusic/build.yml)
+![GitHub last commit](https://img.shields.io/github/last-commit/RTAkland/RMusic)
+![GitHub](https://img.shields.io/github/license/RTAkland/RMusic?label=license&logo=apache)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/RTAkland/RMusic?include_prereleases)
+![Kotlin version](https://img.shields.io/badge/Kotlin-1.8.0-blueviolet?logo=kotlin)
+![Java version](https://img.shields.io/badge/Java-17-brown)
+![Fabric version](https://img.shields.io/badge/FabricLoader-0.14.10-brown)
+![MC version](https://img.shields.io/badge/MC-1.19.2-pink?logo=minecraft)
 
 # RMusic
 
@@ -64,3 +66,9 @@ $ ./gradlew eclipse
 ```
 
 > 输出的构建文件在 [build/libs/*.jar](build/libs), 请运行文件名内没有`source`字样的jar文件
+
+# 开源
+
+- 本项目以[Apache-2.0](./LICENSE)许可开源, 即:
+    - 你可以直接使用该项目提供的功能, 无需任何授权
+    - 你可以在**注明来源版权信息**的情况下对源代码进行任意分发和修改以及衍生
