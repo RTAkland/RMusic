@@ -14,6 +14,13 @@ import net.minecraft.util.Identifier
 import java.io.File
 
 object RMusic : ModInitializer {
+    init {
+        val rmusicDir = File("./config/rmusic/")
+        if (!rmusicDir.exists()) {
+            rmusicDir.mkdirs()
+        }
+    }
+
     val RMUSIC_PACKET_ID = Identifier("rmusic", "op")
 
     val API_ADDR_163 = ConfigUtil().getApiAddr163()
@@ -21,11 +28,6 @@ object RMusic : ModInitializer {
     override fun onInitialize() {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             RMusicCommand().register(dispatcher)
-        }
-
-        val rmusicDir = File("./config/rmusic")
-        if (!rmusicDir.exists()) {
-            rmusicDir.mkdirs()
         }
     }
 }
