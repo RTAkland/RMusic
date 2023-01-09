@@ -31,3 +31,12 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
+      - name: Upload Release # 发布到 Release
+        uses: ncipollo/release-action@v1.10.0
+        with:
+          file: "./build/libs/*.jar"       
+          tag: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+          body: ""
