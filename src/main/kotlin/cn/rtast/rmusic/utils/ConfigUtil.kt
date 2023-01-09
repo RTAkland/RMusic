@@ -4,7 +4,7 @@
  * @Date: 2023/1/8 19:27
  */
 
-package cn.rtast.rmusic.config
+package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.data.config.ConfigModel
 import cn.rtast.rmusic.data.config.Platform

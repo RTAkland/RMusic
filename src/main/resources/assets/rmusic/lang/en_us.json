@@ -1,0 +1,21 @@
+{
+  "rmusic.api.search.netease": "[RMusic]Searching [ %s ] from Netease Music.",
+  "rmusic.chat.play.click": "Click to play: [ %s ].",
+  "rmusic.chat.songinfo": "[RMusic]Song Name: [ %s ] Artist: [ %s ] %s",
+  "rmusic.player.mute.off": "[RMusic]Unmuteed.",
+  "rmusic.player.mute.on": "[RMusic]Muted.",
+  "rmusic.player.notplaying": "[RMusic]Before play music, you can't do this operation.",
+  "rmusic.player.pause": "[RMusic]Paused.",
+  "rmusic.player.pause.off": "[RMusic]Use /rmusic resume to keep playing music.",
+  "rmusic.player.play": "[RMusic]Now playing: [ %s ].",
+  "rmusic.player.play.wait": "[RMusic]Getting song url, please wait...",
+  "rmusic.player.resume": "[RMusic]keep playing music.",
+  "rmusic.player.setvolume": "[RMusic]Set volume to %s (Range: from 0 to 2).",
+  "rmusic.player.stop": "[RMusic]Playing music stopped.",
+  "rmusic.session.netease.login.failure": "[RMusic]Login Failed! Please check your email and password is correct!",
+  "rmusic.session.netease.login.success": "[RMusic]Login Success!",
+  "rmusic.session.netease.login.wait": "[RMusic]Logging in...",
+  "rmusic.session.netease.logout.failure": "[RMusic]Before you logged in, you can't logout.",
+  "rmusic.session.netease.logout.success": "[RMusic]Logged out!",
+  "rmusic.session.netease.logout.wait": "[RMusic]Logging out..."
+}
