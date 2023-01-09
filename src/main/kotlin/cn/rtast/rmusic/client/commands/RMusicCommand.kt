@@ -1,7 +1,7 @@
 /**
  * @Author: RTAkland
  * @EMail: rtakland@outlook.com
- * @Date: 2023/1/9 12:26
+ * @Date: 2023/1/9 12:33
  */
 
 package cn.rtast.rmusic.client.commands
@@ -55,8 +55,7 @@ class RMusicCommand : IRMusicCommand {
             Message.translatable("rmusic.player.pause", ctx)
         } else if (RMusicClient.player?.status == Status.PAUSED) {
             Message.translatable("rmusic.player.pause.off", ctx)
-        }
-        else {
+        } else {
             Message.notPlaying(ctx)
         }
     }
