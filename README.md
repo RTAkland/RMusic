@@ -1,6 +1,8 @@
 <div style="text-align: center"><img src="https://static.rtast.cn/static/icon.png" alt="logo"></div>
 
-* Powered by RTAkland 2023
+* Powered by RTAkland
+
+# 暂时不可用!!
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/RTAkland/RMusic/build.yml)
 ![GitHub last commit](https://img.shields.io/github/last-commit/RTAkland/RMusic)
