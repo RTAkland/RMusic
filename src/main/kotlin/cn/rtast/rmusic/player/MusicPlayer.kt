@@ -6,17 +6,15 @@
 
 package cn.rtast.rmusic.player
 
-import cn.rtast.rmusic.music.Music163
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
 import java.net.URL
 
-class CommonPlayer : StreamPlayer(), StreamPlayerListener {
+class MusicPlayer : StreamPlayer(), StreamPlayerListener {
 
-    fun playMusic(id: Int) {
-        val info = Music163().getSongUrl(id)
-        open(URL(info.data[0].url))
+    fun playMusic(url: String) {
+        open(URL(url))
         play()
     }
 

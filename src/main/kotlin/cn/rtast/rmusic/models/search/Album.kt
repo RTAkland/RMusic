@@ -1,7 +1,7 @@
-package cn.rtast.rmusic.data.netease.search
+package cn.rtast.rmusic.models.search
 
 data class Album(
-    val artist: Artists,
+    val artist: ArtistX,
     val copyrightId: Int,
     val id: Int,
     val mark: Int,

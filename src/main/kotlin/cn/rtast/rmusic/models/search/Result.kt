@@ -1,4 +1,4 @@
-package cn.rtast.rmusic.data.netease.search
+package cn.rtast.rmusic.models.search
 
 data class Result(
     val hasMore: Boolean,

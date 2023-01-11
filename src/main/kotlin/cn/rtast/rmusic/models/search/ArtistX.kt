@@ -1,6 +1,6 @@
-package cn.rtast.rmusic.data.netease.search
+package cn.rtast.rmusic.models.search
 
-data class Artists(
+data class ArtistX(
     val albumSize: Int,
     val alias: List<Any>,
     val fansGroup: Any,

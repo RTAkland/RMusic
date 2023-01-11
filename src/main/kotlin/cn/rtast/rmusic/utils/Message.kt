@@ -11,6 +11,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.MutableText
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 
 object Message {
 
@@ -47,10 +48,13 @@ object Message {
     }
 
     fun notPlaying() {
-        MinecraftClient.getInstance().player?.sendMessage(Text.translatable("rmusic.player.notplaying"))
+        MinecraftClient.getInstance().player?.sendMessage(Text.translatable("rmusic.player.notplaying")
+            .styled { it.withColor(Formatting.RED) })
     }
 
     fun notPlaying(s: CommandContext<ServerCommandSource>) {
-        s.source.sendFeedback(Text.translatable("rmusic.player.notplaying"), false)
+        s.source.sendFeedback(Text.translatable("rmusic.player.notplaying")
+            .styled { it.withColor(Formatting.RED) }, false
+        )
     }
 }

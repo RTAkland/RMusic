@@ -14,17 +14,21 @@ import net.minecraft.util.Formatting
 
 object StyleUtil {
     fun resultStyle(msg: String): MutableText {
-        val id = msg.split("|").last()
-        val songName = msg.split("|").first()
-        val nameText = Text.literal(msg.split("|").first())
+        val songName = msg.split("^").first()
+        val artists = msg.split("^")[1]
+        val id = msg.split("^").last()
+        println(songName)
+        println(artists)
+        println(id)
+        val nameText = Text.literal(songName)
             .styled {
                 it.withColor(Formatting.YELLOW)
             }
-        val artistsText = Text.literal(msg.split("|")[1])
+        val artistsText = Text.literal(artists)
             .styled {
                 it.withColor(Formatting.AQUA)
             }
-        val playText = Text.literal("[▶]").styled {
+        val playButtonText = Text.literal("[▶]").styled {
             it.withColor(Formatting.GREEN)
                 .withClickEvent(
                     ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rmusic play $id")
@@ -35,10 +39,14 @@ object StyleUtil {
                         })
                 ).withInsertion(id)
         }
-        return Text.translatable("rmusic.chat.songinfo", nameText, artistsText, playText)
+        return Text.translatable("rmusic.chat.songinfo", nameText, artistsText, playButtonText)
     }
 
-    fun greenStyle(msg: String): MutableText {
-        return Text.literal(msg).styled { it.withColor(Formatting.GREEN) }
+    fun greenStyle(key: String): MutableText {
+        return Text.translatable(key).styled { it.withColor(Formatting.GREEN) }
+    }
+
+    fun redStyle(key: String): MutableText {
+        return Text.translatable(key).styled { it.withColor(Formatting.RED) }
     }
 }

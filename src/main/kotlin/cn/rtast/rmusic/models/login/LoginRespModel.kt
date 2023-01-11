@@ -1,6 +1,6 @@
-package cn.rtast.rmusic.data.netease.login
+package cn.rtast.rmusic.models.login
 
-data class LoginResponseModel(
+data class LoginRespModel(
     val account: Account,
     val bindings: List<Binding>,
     val code: Int,

@@ -1,4 +1,4 @@
-package cn.rtast.rmusic.data.netease.url
+package cn.rtast.rmusic.models.song
 
 data class Data(
     val br: Int,
@@ -17,7 +17,7 @@ data class Data(
     val level: String,
     val md5: String,
     val payed: Int,
-    val peak: Float,
+    val peak: Int,
     val podcastCtrp: Any,
     val rightSource: Int,
     val size: Int,

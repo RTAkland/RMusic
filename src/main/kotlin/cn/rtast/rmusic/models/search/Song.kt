@@ -1,15 +1,15 @@
-package cn.rtast.rmusic.data.netease.search
+package cn.rtast.rmusic.models.search
 
 data class Song(
     val album: Album,
     val alias: List<Any>,
-    val artists: List<Artists>,
+    val artists: List<ArtistX>,
     val copyrightId: Int,
     val duration: Int,
     val fee: Int,
     val ftype: Int,
     val id: Int,
-    val mark: Long,
+    val mark: Int,
     val mvid: Int,
     val name: String,
     val rUrl: Any,

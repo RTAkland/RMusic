@@ -1,6 +1,5 @@
 plugins {
     id 'fabric-loom' version '1.0.17'
-    id 'maven-publish'
     id 'org.jetbrains.kotlin.jvm' version '1.8.0'
 }
 
@@ -12,19 +11,16 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+
 dependencies {
-    implementation 'com.squareup.okhttp3:okhttp:4.10.0'
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "net.fabricmc:fabric-language-kotlin:1.9.0+kotlin.1.8.0"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation "com.github.goxr3plus:java-stream-player:10.0.2"
-    implementation 'com.google.code.gson:gson:2.10'
-    implementation 'com.googlecode.soundlibs:soundlibs:1.4'
-    implementation 'org.jflac:jflac-codec:1.5.2'
-    implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
+    include implementation('org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0')
+    include implementation('org.jflac:jflac-codec:1.5.2')
+    include implementation("com.github.goxr3plus:java-stream-player:10.0.2")
 }
 
 processResources {
@@ -50,6 +46,7 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
     archivesBaseName = project.archives_base_name
+    withSourcesJar()
 }
 
 jar {
@@ -58,23 +55,11 @@ jar {
     }
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-        }
-    }
 
-    repositories {
-    }
-}
 compileKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    kotlinOptions.jvmTarget = "17"
 }
 compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "17"
-    }
+    kotlinOptions.jvmTarget = "17"
 }
+

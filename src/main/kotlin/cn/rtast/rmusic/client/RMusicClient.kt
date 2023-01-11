@@ -8,7 +8,7 @@ package cn.rtast.rmusic.client
 
 import cn.rtast.rmusic.client.commands.RMusicCommand
 import cn.rtast.rmusic.client.network.S2CPacketReceiver
-import cn.rtast.rmusic.player.CommonPlayer
+import cn.rtast.rmusic.player.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
@@ -20,7 +20,7 @@ import net.minecraft.client.network.ClientPlayNetworkHandler
 @Environment(EnvType.CLIENT)
 object RMusicClient : ClientModInitializer {
 
-    var player: CommonPlayer? = null
+    var player: MusicPlayer? = null
 
     override fun onInitializeClient() {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->

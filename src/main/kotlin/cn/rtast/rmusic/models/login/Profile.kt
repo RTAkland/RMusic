@@ -1,4 +1,4 @@
-package cn.rtast.rmusic.data.netease.login
+package cn.rtast.rmusic.models.login
 
 data class Profile(
     val accountStatus: Int,

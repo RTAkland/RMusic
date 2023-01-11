@@ -1,4 +1,4 @@
-package cn.rtast.rmusic.data.netease.url
+package cn.rtast.rmusic.models.song
 
 data class FreeTrialPrivilege(
     val cannotListenReason: Any,

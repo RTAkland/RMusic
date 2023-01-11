@@ -2,96 +2,123 @@ package cn.rtast.rmusic.client.events
 
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.music.Music163
-import cn.rtast.rmusic.player.CommonPlayer
+import cn.rtast.rmusic.player.MusicPlayer
 import cn.rtast.rmusic.utils.Message
-import cn.rtast.rmusic.utils.SearchUtil
 import cn.rtast.rmusic.utils.StyleUtil
-import com.goxr3plus.streamplayer.enums.Status
 import net.minecraft.network.PacketByteBuf
-import java.io.File
-import kotlin.math.roundToInt
 
 class OnOPMessage {
 
     fun onMessage(buf: PacketByteBuf) {
-        val message = buf.readString()
-        if (message.startsWith("play")) {
-            val id = message.split("-").last().toInt()
-            Message.translatable("rmusic.player.play.wait")
-            if (RMusicClient.player == null) {
-                RMusicClient.player = CommonPlayer()
-            } else {
-                RMusicClient.player!!.stop()
-                Message.translatable("rmusic.player.stop")
-            }
-            RMusicClient.player!!.playMusic(id)
-            Message.translatable("rmusic.player.play", StyleUtil.greenStyle(id.toString()))
-        } else if (message.startsWith("stop")) {
-            if (RMusicClient.player?.status != Status.STOPPED) {
-                RMusicClient.player?.stop()
-            } else {
-                Message.notPlaying()
-            }
-        } else if (message.startsWith("pause")) {
-            if (RMusicClient.player != null) {
-                if (RMusicClient.player?.status != Status.PAUSED) {
-                    RMusicClient.player?.pause()
-                }
-            } else {
-                Message.notPlaying()
-            }
-        } else if (message.startsWith("resume")) {
-            if (RMusicClient.player != null) {
-                if (RMusicClient.player?.status == Status.PAUSED) {
-                    RMusicClient.player?.resume()
-                }
-            } else {
-                Message.notPlaying()
-            }
-        } else if (message.startsWith("login")) {
-            Message.translatable("rmusic.session.netease.login.wait")
-            Thread {
-                val email = message.split("-").last().split("|").first()
-                val password = message.split("-").last().split("|").last()
-                val state = Music163().login(email, password)
-                if (state) {
-                    Message.translatable("rmusic.session.netease.login.success")
+        val origin = buf.readString().split("]")
+        val cmd = origin.first().toInt()
+        val body = origin.last()
+        when (cmd) {
+            0 -> {
+                if (RMusicClient.player == null) {
+                    RMusicClient.player = MusicPlayer()
                 } else {
-                    Message.translatable("rmusic.session.netease.login.failure")
+                    RMusicClient.player?.stop()
                 }
-            }.start()
-        } else if (message.startsWith("logout")) {
-            Message.translatable("rmusic.session.netease.logout.wait")
-            if (File("./config/rmusic/profile.json").exists()) {
-                Music163().logout()
-                Message.translatable("rmusic.session.netease.login.success")
-            } else {
-                Message.translatable("rmusic.session.netease.logout.failure")
+                val url = body.split("^").first()
+                val id = body.split("^").last()
+                RMusicClient.player?.playMusic(url)
+                Message.translatable("rmusic.player.playing", id)
             }
-        } else if (message.startsWith("search")) {
-            val keyword = message.split("-").last()
-            Message.translatable("rmusic.api.search.netease", StyleUtil.greenStyle(keyword))
-            Thread {
-                val result = SearchUtil().searchNetease(keyword)
-                result.forEach {
-                    Message.sr(it)
-                }
-            }.start()
 
-        } else if (message.startsWith("volume")) {
-            if (RMusicClient.player != null) {
-                val volume = message.split("-").last().toDouble()
-                RMusicClient.player?.setGain(volume)
-                Message.translatable("rmusic.player.setvolume", ((volume * 10).roundToInt()).toString())
-            }
-        } else if (message.startsWith("mute")) {
-            if (RMusicClient.player != null) {
-                if (RMusicClient.player?.mute == true) {
-                    RMusicClient.player?.mute = false
-                    Message.translatable("rmusic.player.mute.off")
+            1 -> {
+                val player = RMusicClient.player
+                if (player != null) {
+                    RMusicClient.player?.stop()
                 } else {
-                    RMusicClient.player?.mute = true
-                    Message.translatable("rmusic.player.mute.on")
+                    Message.notPlaying()
+                }
+            }
+
+            2 -> {
+                val player = RMusicClient.player
+                if (player != null) {
+                    if (player.isPaused) {
+                        RMusicClient.player?.resume()
+                    } else {
+                        Message.translatable(
+                            "rmusic.player.resume.not", StyleUtil.redStyle("rmusic.player.resume.not")
+                        )
+                    }
+                } else {
+                    Message.notPlaying()
+                }
+            }
+
+            3 -> {
+                val player = RMusicClient.player
+                if (player != null) {
+                    if (player.isPaused) {
+                        RMusicClient.player?.resume() // pause 命令可以暂停也可以继续播放
+                    } else {
+                        RMusicClient.player?.pause()
+                    }
+                } else {
+                    Message.notPlaying()
+                }
+            }
+
+            4 -> {
+                val player = RMusicClient.player
+                if (player != null) {
+                    if (player.mute) {
+                        RMusicClient.player?.mute = false
+                        Message.translatable("rmusic.player.mute.off")
+                    } else {
+                        RMusicClient.player?.mute = true
+                        Message.translatable("rmusic.player.mute.on")
+                    }
+                } else {
+                    Message.notPlaying()
+                }
+            }
+
+            5 -> {
+                Message.translatable("rmusic.api.search.netease", body)
+                Thread {
+                    val result = Music163().search(body)
+                    result.forEach {
+                        Message.sr(it)
+                    }
+                    Message.translatable("rmusic.api.search.tip", result.size.toString())
+                }.start()
+            }
+
+            6 -> {
+                val player = RMusicClient.player
+                if (player != null) {
+                    RMusicClient.player?.setGain(body.toDouble())
+                } else {
+                    Message.notPlaying()
+                }
+            }
+
+            7 -> {
+                val email = body.split("^").first()
+                val password = body.split("^").last()
+                Message.translatable("rmusic.session.netease.login.wait")
+                Thread {  // 耗时操作单独启动线程
+                    val code = Music163().login(email, password)
+                    if (code) {
+                        Message.translatable("rmusic.session.netease.login.success")
+                    } else {
+                        Message.translatable("rmusic.session.netease.login.failure")
+                    }
+                }.start()
+            }
+
+            8 -> {
+                Message.translatable("rmusic.session.netease.logout.wait")
+                val code = Music163().logout()
+                if (code) {
+                    Message.translatable("rmusic.session.netease.logout.success")
+                } else {
+                    Message.translatable("rmusic.session.netease.logout.failure")
                 }
             }
         }

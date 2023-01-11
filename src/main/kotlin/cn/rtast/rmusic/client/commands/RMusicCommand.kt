@@ -7,32 +7,33 @@
 package cn.rtast.rmusic.client.commands
 
 import cn.rtast.rmusic.client.RMusicClient
-import cn.rtast.rmusic.command.IRMusicCommand
+import cn.rtast.rmusic.common.command.IRMusicCommand
 import cn.rtast.rmusic.music.Music163
-import cn.rtast.rmusic.player.CommonPlayer
+import cn.rtast.rmusic.player.MusicPlayer
 import cn.rtast.rmusic.utils.Message
-import cn.rtast.rmusic.utils.SearchUtil
 import cn.rtast.rmusic.utils.StyleUtil
 import com.goxr3plus.streamplayer.enums.Status
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
-import kotlin.math.roundToInt
 
 class RMusicCommand : IRMusicCommand {
 
-    override fun playMusic(ctx: CommandContext<ServerCommandSource>, id: Int) {
+    override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
         Message.translatable("rmusic.player.play.wait", ctx)
         if (RMusicClient.player == null) {
-            RMusicClient.player = CommonPlayer()
+            RMusicClient.player = MusicPlayer()
         } else {
-            RMusicClient.player!!.stop()
+            RMusicClient.player?.stop()
             Message.translatable("rmusic.player.stop", ctx)
         }
-        RMusicClient.player?.playMusic(id)
-        Message.translatable("rmusic.player.play", StyleUtil.greenStyle(id.toString()), ctx)
+        Thread {
+            val res = Music163().getSongUrl(id).data[0]
+            RMusicClient.player?.playMusic(res.url)
+            Message.translatable("rmusic.player.play", StyleUtil.greenStyle(res.id.toString()), ctx)
+        }.start()
     }
 
-    override fun stopMusic(ctx: CommandContext<ServerCommandSource>) {
+    override fun stop(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player?.status != Status.STOPPED) {
             RMusicClient.player?.stop()
             RMusicClient.player = null
@@ -42,14 +43,14 @@ class RMusicCommand : IRMusicCommand {
         }
     }
 
-    override fun resumeMusic(ctx: CommandContext<ServerCommandSource>) {
+    override fun resume(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player?.status == Status.PAUSED) {
             RMusicClient.player?.resume()
             Message.translatable("rmusic.player.resume", ctx)
         }
     }
 
-    override fun pauseMusic(ctx: CommandContext<ServerCommandSource>) {
+    override fun pause(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player?.status != Status.PAUSED) {
             RMusicClient.player?.pause()
             Message.translatable("rmusic.player.pause", ctx)
@@ -60,7 +61,7 @@ class RMusicCommand : IRMusicCommand {
         }
     }
 
-    override fun muteMusic(ctx: CommandContext<ServerCommandSource>) {
+    override fun mute(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player?.status == Status.PLAYING) {
             if (RMusicClient.player?.mute == true) {
                 RMusicClient.player?.mute = false
@@ -74,18 +75,19 @@ class RMusicCommand : IRMusicCommand {
         }
     }
 
-    override fun setGain(ctx: CommandContext<ServerCommandSource>, value: Float) {
-        RMusicClient.player?.setGain(value.toDouble())
-        Message.translatable("rmusic.player.setvolume", ((value * 10).roundToInt()).toString(), ctx)
+    override fun setVolume(ctx: CommandContext<ServerCommandSource>, value: Double) {
+        RMusicClient.player?.setGain(value)
+        Message.translatable("rmusic.player.setvolume", (value).toString(), ctx)
     }
 
     override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
         Message.translatable("rmusic.api.search.netease", StyleUtil.greenStyle(keyword), ctx)
         Thread {
-            val result = SearchUtil().searchNetease(keyword)
+            val result = Music163().search(keyword)
             result.forEach {
-                Message.sr(it, ctx)
+                Message.sr(it)
             }
+            Message.translatable("rmusic.api.search.tip", result.size.toString(), ctx)
         }.start()
     }
 
