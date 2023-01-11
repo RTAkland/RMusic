@@ -2,7 +2,7 @@
 
 * Powered by RTAkland
 
-# 暂时不可用!!
+# 至少暂时可以打开游戏了.... 虽然还是不能用, 但还是提交代码吧...
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/RTAkland/RMusic/build.yml)
 ![GitHub last commit](https://img.shields.io/github/last-commit/RTAkland/RMusic)
