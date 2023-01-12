@@ -9,3 +9,5 @@
 7. `6` -> `volume` with body: [volume]
 8. `7` -> `login` with body: [email, password]
 9. `8` -> `logout` without body
+
+> `body`的数据使用 `^` 符号分割
