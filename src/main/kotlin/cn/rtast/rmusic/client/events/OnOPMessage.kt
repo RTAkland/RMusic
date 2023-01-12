@@ -67,7 +67,6 @@ class OnOPMessage {
                 val player = RMusicClient.player
                 if (player != null) {
                     if (player.isPaused) {
-                        RMusicClient.player?.resume() // pause 命令可以暂停也可以继续播放
                         msg.sendMessage(Text.translatable("rmusic.player.pause.off")
                             .styled { it.withColor(Formatting.GREEN) })
                     } else {
