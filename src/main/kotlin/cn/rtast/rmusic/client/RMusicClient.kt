@@ -7,7 +7,7 @@
 package cn.rtast.rmusic.client
 
 import cn.rtast.rmusic.client.commands.RMusicCommand
-import cn.rtast.rmusic.client.network.S2CPacketReceiver
+import cn.rtast.rmusic.client.network.S2CPacketHandler
 import cn.rtast.rmusic.player.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.api.EnvType
@@ -26,7 +26,7 @@ object RMusicClient : ClientModInitializer {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             RMusicCommand().register(dispatcher)
         }
-        S2CPacketReceiver().register()
+        S2CPacketHandler().register()
         ClientPlayConnectionEvents.DISCONNECT.register { _: ClientPlayNetworkHandler,
                                                          _: MinecraftClient ->
             // 玩家退出游戏或者断开连接自动停止播放
