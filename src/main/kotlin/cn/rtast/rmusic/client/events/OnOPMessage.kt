@@ -6,6 +6,7 @@ import cn.rtast.rmusic.player.MusicPlayer
 import cn.rtast.rmusic.utils.Message
 import cn.rtast.rmusic.utils.StyleUtil
 import net.minecraft.network.PacketByteBuf
+import java.net.URL
 
 class OnOPMessage {
 
@@ -22,7 +23,7 @@ class OnOPMessage {
                 }
                 val url = body.split("^").first()
                 val id = body.split("^").last()
-                RMusicClient.player?.playMusic(url)
+                RMusicClient.player?.play(URL(url))
                 Message.translatable("rmusic.player.playing", id)
             }
 

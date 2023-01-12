@@ -9,12 +9,18 @@ package cn.rtast.rmusic.player
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
+import java.io.File
 import java.net.URL
 
 class MusicPlayer : StreamPlayer(), StreamPlayerListener {
 
-    fun playMusic(url: String) {
-        open(URL(url))
+    fun play(url: URL) {
+        open(url)
+        play()
+    }
+
+    fun play(file: File) {
+        open(file)
         play()
     }
 

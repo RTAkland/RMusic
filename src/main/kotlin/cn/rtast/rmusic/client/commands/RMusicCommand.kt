@@ -15,6 +15,7 @@ import cn.rtast.rmusic.utils.StyleUtil
 import com.goxr3plus.streamplayer.enums.Status
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
+import java.net.URL
 
 class RMusicCommand : IRMusicCommand {
 
@@ -28,7 +29,7 @@ class RMusicCommand : IRMusicCommand {
         }
         Thread {
             val res = Music163().getSongUrl(id).data[0]
-            RMusicClient.player?.playMusic(res.url)
+            RMusicClient.player?.play(URL(res.url))
             Message.translatable("rmusic.player.play", StyleUtil.greenStyle(res.id.toString()), ctx)
         }.start()
     }
