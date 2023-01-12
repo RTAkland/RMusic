@@ -52,6 +52,8 @@ class OnOPMessage {
                 if (player != null) {
                     if (player.isPaused) {
                         RMusicClient.player?.resume()
+                        msg.sendMessage(Text.translatable("rmusic.player.resume")
+                            .styled { it.withColor(Formatting.GREEN) })
                     } else {
                         msg.sendMessage(
                             Text.translatable("rmusic.player.resume.not")
