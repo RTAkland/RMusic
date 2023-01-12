@@ -51,8 +51,7 @@ java {
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
-    archivesBaseName = project.archives_base_name
-    withSourcesJar()
+    archivesBaseName = project.archives_base_name + "-" + project.fabric_version
 }
 
 jar {
