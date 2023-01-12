@@ -23,7 +23,9 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "net.fabricmc:fabric-language-kotlin:1.9.0+kotlin.1.8.0"
     implementation("com.github.goxr3plus:java-stream-player:10.0.2")
+    implementation("org.jflac:jflac-codec:1.5.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
+    implementation("com.googlecode.soundlibs:soundlibs:1.4")
     embed(api("com.github.goxr3plus:java-stream-player:10.0.2"))
 }
 
