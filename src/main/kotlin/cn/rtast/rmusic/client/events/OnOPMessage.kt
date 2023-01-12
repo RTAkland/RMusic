@@ -3,12 +3,15 @@ package cn.rtast.rmusic.client.events
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.player.MusicPlayer
-import cn.rtast.rmusic.utils.Message
-import cn.rtast.rmusic.utils.StyleUtil
+import net.minecraft.client.MinecraftClient
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import java.net.URL
 
 class OnOPMessage {
+
+    private val msg = MinecraftClient.getInstance().player!!
 
     fun onMessage(buf: PacketByteBuf) {
         val origin = buf.readString().split("]")
@@ -23,16 +26,24 @@ class OnOPMessage {
                 }
                 val url = body.split("^").first()
                 val id = body.split("^").last()
-                RMusicClient.player?.play(URL(url))
-                Message.translatable("rmusic.player.playing", id)
+                Thread {
+                    val songName = Music163().songName(id.toInt())
+                    RMusicClient.player?.play(URL(url))
+                    msg.sendMessage(Text.translatable("rmusic.player.playing", Text.literal(songName)
+                        .styled { it.withColor(Formatting.AQUA) })
+                        .styled { it.withColor(Formatting.GREEN) })
+                }.start()
             }
 
             1 -> {
                 val player = RMusicClient.player
                 if (player != null) {
                     RMusicClient.player?.stop()
+                    msg.sendMessage(Text.translatable("rmusic.player.stop")
+                        .styled { it.withColor(Formatting.GREEN) })
                 } else {
-                    Message.notPlaying()
+                    msg.sendMessage(Text.translatable("rmusic.player.notplaying")
+                        .styled { it.withColor(Formatting.RED) })
                 }
             }
 
@@ -42,12 +53,13 @@ class OnOPMessage {
                     if (player.isPaused) {
                         RMusicClient.player?.resume()
                     } else {
-                        Message.translatable(
-                            "rmusic.player.resume.not", StyleUtil.redStyle("rmusic.player.resume.not")
-                        )
+                        msg.sendMessage(
+                            Text.translatable("rmusic.player.resume.not")
+                                .styled { it.withColor(Formatting.RED) })
                     }
                 } else {
-                    Message.notPlaying()
+                    msg.sendMessage(Text.translatable("rmusic.player.notplaying")
+                        .styled { it.withColor(Formatting.RED) })
                 }
             }
 
@@ -56,11 +68,15 @@ class OnOPMessage {
                 if (player != null) {
                     if (player.isPaused) {
                         RMusicClient.player?.resume() // pause 命令可以暂停也可以继续播放
+                        msg.sendMessage(Text.translatable("rmusic.player.pause")
+                            .styled { it.withColor(Formatting.GREEN) })
                     } else {
-                        RMusicClient.player?.pause()
+                        msg.sendMessage(Text.translatable("rmusic.player.pause.off")
+                            .styled { it.withColor(Formatting.RED) })
                     }
                 } else {
-                    Message.notPlaying()
+                    msg.sendMessage(Text.translatable("rmusic.player.notplaying")
+                        .styled { it.withColor(Formatting.RED) })
                 }
             }
 
@@ -69,57 +85,57 @@ class OnOPMessage {
                 if (player != null) {
                     if (player.mute) {
                         RMusicClient.player?.mute = false
-                        Message.translatable("rmusic.player.mute.off")
+                        msg.sendMessage(Text.translatable("rmusic.player.mute.off")
+                            .styled { it.withColor(Formatting.GREEN) })
                     } else {
                         RMusicClient.player?.mute = true
-                        Message.translatable("rmusic.player.mute.on")
+                        msg.sendMessage(Text.translatable("rmusic.player.mute.on")
+                            .styled { it.withColor(Formatting.GREEN) })
                     }
                 } else {
-                    Message.notPlaying()
+                    msg.sendMessage(Text.translatable("rmusic.player.notplaying")
+                        .styled { it.withColor(Formatting.RED) })
                 }
             }
 
             5 -> {
-                Message.translatable("rmusic.api.search.netease", body)
-                Thread {
-                    val result = Music163().search(body)
-                    result.forEach {
-                        Message.sr(it)
-                    }
-                    Message.translatable("rmusic.api.search.tip", result.size.toString())
-                }.start()
-            }
-
-            6 -> {
                 val player = RMusicClient.player
                 if (player != null) {
                     RMusicClient.player?.setGain(body.toDouble())
                 } else {
-                    Message.notPlaying()
+                    msg.sendMessage(Text.translatable("rmusic.player.notplaying")
+                        .styled { it.withColor(Formatting.RED) }
+                    )
                 }
             }
 
-            7 -> {
+            6 -> {
                 val email = body.split("^").first()
                 val password = body.split("^").last()
-                Message.translatable("rmusic.session.netease.login.wait")
+                msg.sendMessage(Text.translatable("rmusic.session.netease.login.wait")
+                    .styled { it.withColor(Formatting.GREEN) })
                 Thread {  // 耗时操作单独启动线程
                     val code = Music163().login(email, password)
                     if (code) {
-                        Message.translatable("rmusic.session.netease.login.success")
+                        msg.sendMessage(Text.translatable("rmusic.session.netease.login.success")
+                            .styled { it.withColor(Formatting.GREEN) })
                     } else {
-                        Message.translatable("rmusic.session.netease.login.failure")
+                        msg.sendMessage(Text.translatable("rmusic.session.netease.login.failure")
+                            .styled { it.withColor(Formatting.RED) })
                     }
                 }.start()
             }
 
-            8 -> {
-                Message.translatable("rmusic.session.netease.logout.wait")
+            7 -> {
+                msg.sendMessage(Text.translatable("rmusic.session.netease.logout.wait")
+                    .styled { it.withColor(Formatting.GREEN) })
                 val code = Music163().logout()
                 if (code) {
-                    Message.translatable("rmusic.session.netease.logout.success")
+                    msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
+                        .styled { it.withColor(Formatting.GREEN) })
                 } else {
-                    Message.translatable("rmusic.session.netease.logout.failure")
+                    msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
+                        .styled { it.withColor(Formatting.GREEN) })
                 }
             }
         }
