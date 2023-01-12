@@ -14,7 +14,8 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.network.PacketByteBuf
 
-class S2CPacketReceiver {
+class S2CPacketHandler {
+    // 接收服务端发送的数据包
     fun register() {
         ClientPlayNetworking.registerGlobalReceiver(RMusic.RMUSIC_PACKET_ID)
         { _: MinecraftClient,
