@@ -19,6 +19,6 @@
   "rmusic.session.netease.login.success": "[RMusic]登陆成功!",
   "rmusic.session.netease.login.wait": "[RMusic]正在登陆中...",
   "rmusic.session.netease.logout.failure": "[RMusic]无法退出, 你还没有登录!",
-  "rmusic.session.netease.logout.success": "[RMusic]已退出!",
+  "rmusic.session.netease.logout.success": "[RMusic]已登出!",
   "rmusic.session.netease.logout.wait": "[RMusic]退出登陆中..."
 }
