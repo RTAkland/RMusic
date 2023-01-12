@@ -17,9 +17,6 @@ object StyleUtil {
         val songName = msg.split("^").first()
         val artists = msg.split("^")[1]
         val id = msg.split("^").last()
-        println(songName)
-        println(artists)
-        println(id)
         val nameText = Text.literal(songName)
             .styled {
                 it.withColor(Formatting.YELLOW)
@@ -40,13 +37,5 @@ object StyleUtil {
                 ).withInsertion(id)
         }
         return Text.translatable("rmusic.chat.songinfo", nameText, artistsText, playButtonText)
-    }
-
-    fun greenStyle(key: String): MutableText {
-        return Text.translatable(key).styled { it.withColor(Formatting.GREEN) }
-    }
-
-    fun redStyle(key: String): MutableText {
-        return Text.translatable(key).styled { it.withColor(Formatting.RED) }
     }
 }
