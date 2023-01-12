@@ -12,6 +12,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.server.network.ServerPlayerEntity
 
 class S2CPacket {
+    // 向客户端发送数据包
     fun send(msg: String, player: ServerPlayerEntity) {
         ServerPlayNetworking.send(
             player, RMusic.RMUSIC_PACKET_ID,
