@@ -9,10 +9,12 @@ package cn.rtast.rmusic.commands
 import cn.rtast.rmusic.common.command.IRMusicCommand
 import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.network.S2CPacket
-import cn.rtast.rmusic.utils.Message
+import cn.rtast.rmusic.utils.SearchUtil
 import cn.rtast.rmusic.utils.StyleUtil
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 
 class RMusicCommand : IRMusicCommand {
 
@@ -21,14 +23,19 @@ class RMusicCommand : IRMusicCommand {
     }
 
     override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
-        Message.translatable("rmusic.player.play.waiting", ctx)
+        ctx.source.sendFeedback(
+            Text.translatable("rmusic.player.play.waiting", Text.literal(id.toString())
+                .styled { it.withColor(Formatting.AQUA) })
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
         Thread {
             try {
                 val info = Music163().getSongUrl(id)
                 send(0, "${info.data[0].url}^${info.data[0].id}", ctx)
             } catch (_: IndexOutOfBoundsException) {
-                Message.translatable(
-                    "rmusic.player.play.get.failure", StyleUtil.redStyle("rmusic.player.play.get"), ctx
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.player.play.get.failure")
+                        .styled { it.withColor(Formatting.RED) }, false
                 )
             }
         }.start()
@@ -55,14 +62,7 @@ class RMusicCommand : IRMusicCommand {
     }
 
     override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
-        Message.translatable("rmusic.api.search.netease", keyword, ctx)
-        Thread {
-            val result = Music163().search(keyword)
-            result.forEach {
-                Message.sr(it, ctx)
-            }
-            Message.translatable("rmusic.api.search.tip", result.size.toString(), ctx)
-        }.start()
+        SearchUtil().search(ctx, keyword)
     }
 
     override fun loginNetease(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
