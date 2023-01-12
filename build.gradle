@@ -24,9 +24,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-language-kotlin:1.9.0+kotlin.1.8.0"
     implementation("com.github.goxr3plus:java-stream-player:10.0.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
-    implementation("org.jflac:jflac-codec:1.5.2")
-    implementation("com.googlecode.soundlibs:soundlibs:1.4")
-    embed("com.github.goxr3plus:java-stream-player:10.0.2")
+    embed(api("com.github.goxr3plus:java-stream-player:10.0.2"))
 }
 
 processResources {
@@ -52,6 +50,7 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
     archivesBaseName = project.archives_base_name
+    withSourcesJar()
 }
 
 jar {
@@ -71,4 +70,3 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "17"
 }
-
