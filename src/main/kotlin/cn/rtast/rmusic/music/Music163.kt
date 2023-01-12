@@ -6,6 +6,7 @@
 
 package cn.rtast.rmusic.music
 
+import cn.rtast.rmusic.models.detail.DetailModel
 import cn.rtast.rmusic.models.login.LoginRespModel
 import cn.rtast.rmusic.models.search.SearchRespModel
 import cn.rtast.rmusic.models.song.SongUrlModel
@@ -38,12 +39,13 @@ class Music163 {
 
     fun logout(): Boolean {
         val file = File("./config/rmusic/cookie.json")
-        return if (file.exists()) {
+        val status: Boolean = if (file.exists()) {
             file.delete()
             true
         } else {
             false
         }
+        return status
     }
 
     fun search(keyword: String): MutableList<String> {
@@ -73,5 +75,11 @@ class Music163 {
         }
         val result = URL(searchApi).readText()
         return gson.fromJson(result, SongUrlModel::class.java)
+    }
+
+    fun songName(id: Int): String {
+        val result = URL("$rootApi163/song/detail?ids=$id").readText()
+        val json = gson.fromJson(result, DetailModel::class.java)
+        return json.songs[0].name
     }
 }
