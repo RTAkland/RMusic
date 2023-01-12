@@ -10,27 +10,36 @@ import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.common.command.IRMusicCommand
 import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.player.MusicPlayer
-import cn.rtast.rmusic.utils.Message
-import cn.rtast.rmusic.utils.StyleUtil
+import cn.rtast.rmusic.utils.SearchUtil
 import com.goxr3plus.streamplayer.enums.Status
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import java.net.URL
 
 class RMusicCommand : IRMusicCommand {
 
     override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
-        Message.translatable("rmusic.player.play.wait", ctx)
+        ctx.source.sendFeedback(Text.translatable("rmusic.player.play.waiting"), false)
         if (RMusicClient.player == null) {
             RMusicClient.player = MusicPlayer()
         } else {
             RMusicClient.player?.stop()
-            Message.translatable("rmusic.player.stop", ctx)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.stop")
+                    .styled { it.withColor(Formatting.GREEN) }, false
+            )
         }
         Thread {
             val res = Music163().getSongUrl(id).data[0]
             RMusicClient.player?.play(URL(res.url))
-            Message.translatable("rmusic.player.play", StyleUtil.greenStyle(res.id.toString()), ctx)
+            val songName = Music163().songName(id)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.playing", Text.literal(songName)
+                    .styled { it.withColor(Formatting.AQUA) })
+                    .styled { it.withColor(Formatting.GREEN) }, false
+            )
         }.start()
     }
 
@@ -38,27 +47,52 @@ class RMusicCommand : IRMusicCommand {
         if (RMusicClient.player?.status != Status.STOPPED) {
             RMusicClient.player?.stop()
             RMusicClient.player = null
-            Message.translatable("rmusic.player.stop", ctx)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.stop")
+                    .styled { it.withColor(Formatting.GREEN) }, false
+            )
         } else {
-            Message.notPlaying(ctx)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.notplaying")
+                    .styled { it.withColor(Formatting.RED) }, false
+            )
         }
     }
 
     override fun resume(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player?.status == Status.PAUSED) {
             RMusicClient.player?.resume()
-            Message.translatable("rmusic.player.resume", ctx)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.resume")
+                    .styled { it.withColor(Formatting.GREEN) }, false
+            )
+        } else {
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.notplaying")
+                    .styled { it.withColor(Formatting.RED) }, false
+            )
         }
     }
 
     override fun pause(ctx: CommandContext<ServerCommandSource>) {
-        if (RMusicClient.player?.status != Status.PAUSED) {
-            RMusicClient.player?.pause()
-            Message.translatable("rmusic.player.pause", ctx)
-        } else if (RMusicClient.player?.status == Status.PAUSED) {
-            Message.translatable("rmusic.player.pause.off", ctx)
+        if (RMusicClient.player?.status != null) {
+            if (RMusicClient.player?.status == Status.PAUSED) {
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.player.pause.off")
+                        .styled { it.withColor(Formatting.GREEN) }, false
+                )
+            } else {
+                RMusicClient.player?.pause()
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.player.pause")
+                        .styled { it.withColor(Formatting.GREEN) }, false
+                )
+            }
         } else {
-            Message.notPlaying(ctx)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.notplaying")
+                    .styled { it.withColor(Formatting.RED) }, false
+            )
         }
     }
 
@@ -66,49 +100,72 @@ class RMusicCommand : IRMusicCommand {
         if (RMusicClient.player?.status == Status.PLAYING) {
             if (RMusicClient.player?.mute == true) {
                 RMusicClient.player?.mute = false
-                Message.translatable("rmusic.player.mute.off", ctx)
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.player.mute.off")
+                        .styled { it.withColor(Formatting.GREEN) }, false
+                )
             } else {
                 RMusicClient.player?.mute = true
-                Message.translatable("rmusic.player.mute.on", ctx)
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.player.mute.on")
+                        .styled { it.withColor(Formatting.GREEN) }, false
+                )
             }
         } else {
-            Message.notPlaying(ctx)
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.player.notplaying")
+                    .styled { it.withColor(Formatting.RED) }, false
+            )
         }
     }
 
     override fun setVolume(ctx: CommandContext<ServerCommandSource>, value: Double) {
         RMusicClient.player?.setGain(value)
-        Message.translatable("rmusic.player.setvolume", (value).toString(), ctx)
+        ctx.source.sendFeedback(
+            Text.translatable("rmusic.player.setvolume", Text.literal(value.toString())
+                .styled { it.withColor(Formatting.AQUA) })
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
     }
 
     override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
-        Message.translatable("rmusic.api.search.netease", StyleUtil.greenStyle(keyword), ctx)
-        Thread {
-            val result = Music163().search(keyword)
-            result.forEach {
-                Message.sr(it)
-            }
-            Message.translatable("rmusic.api.search.tip", result.size.toString(), ctx)
-        }.start()
+        SearchUtil().search(ctx, keyword)
     }
 
     override fun loginNetease(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
-        Message.translatable("rmusic.session.netease.login.wait", ctx)
+        ctx.source.sendFeedback(Text.translatable("rmusic.session.netease.login.wait", ctx), false)
         Thread {
-            val key = when (Music163().login(email, password)) {
-                true -> "rmusic.session.netease.login.success"
-                else -> "rmusic.session.netease.login.failure"
+            if (Music163().login(email, password)) {
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.session.netease.login.success")
+                        .styled { it.withColor(Formatting.GREEN) }, false
+                )
+            } else {
+                ctx.source.sendFeedback(
+                    Text.translatable("rmusic.session.netease.login.failure")
+                        .styled { it.withColor(Formatting.RED) }, false
+                )
             }
-            Message.translatable(key, ctx)
         }.start()
     }
 
     override fun logoutNetease(ctx: CommandContext<ServerCommandSource>) {
-        Message.translatable("rmusic.session.netease.logout.wait", ctx)
-        val key = when (Music163().logout()) {
-            true -> "rmusic.session.netease.logout.success"
-            else -> "rmusic.session.netease.logout.failure"
+        ctx.source.sendFeedback(
+            Text.translatable("rmusic.session.netease.logout.wait")
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
+        if (Music163().logout()) {
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.session.netease.logout.success")
+                    .styled { it.withColor(Formatting.GREEN) },
+                false
+            )
+        } else {
+            ctx.source.sendFeedback(
+                Text.translatable("rmusic.session.netease.logout.failure")
+                    .styled { it.withColor(Formatting.RED) },
+                false
+            )
         }
-        Message.translatable(key, ctx)
     }
 }
