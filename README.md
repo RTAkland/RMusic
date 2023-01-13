@@ -25,10 +25,9 @@
   * [使用例](#使用例)
 * [开发](#开发)
   * [克隆项目](#克隆项目)
-  * [手动编译 (Linux/Unix/Mac OS X)](#手动编译--linuxunixmac-os-x-)
-  * [手动编译 (Windows 平台)](#手动编译--windows-平台-)
-  * [使用`VS code`](#使用-vs-code)
-  * [使用`Eclipse`](#使用-eclipse)
+  * [手动编译](#手动编译)
+  * [VS code](#vs-code)
+  * [Eclipse](#eclipse)
 * [开源](#开源)
 * [鸣谢](#鸣谢)
 <!-- TOC -->
@@ -91,14 +90,16 @@
 $ git clone https://github.com/RTAkland/RMusic.git
 ```
 
-## 手动编译 (Linux/Unix/Mac OS X)
+## 手动编译
+
+> Linux/Unix/Mac OS
 
 ```shell
 $ chmod +x ./gradlew
 $ ./gradlew build
 ```
 
-## 手动编译 (Windows 平台)
+> Windows
 
 ```shell
 $ .\gradlew.bat build
@@ -106,7 +107,7 @@ $ .\gradlew.bat build
 
 > 使用`Intellij IDEA`打开项目, IDEA会自动构建项目并设置好运行配置
 
-## 使用`VS code`
+## VS code
 
 ```shell
 $ cd RMusic
@@ -114,7 +115,7 @@ $ code .
 $ ./gradlew vscode
 ```
 
-## 使用`Eclipse`
+## Eclipse
 
 ```shell
 $ cd RMusic
