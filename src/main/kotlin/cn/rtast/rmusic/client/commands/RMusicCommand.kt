@@ -20,8 +20,7 @@ import java.net.URL
 
 class RMusicCommand : IRMusicCommand {
 
-    override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
-        ctx.source.sendFeedback(Text.translatable("rmusic.player.play.waiting"), false)
+    private fun checkout(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player == null) {
             RMusicClient.player = MusicPlayer()
         } else {
@@ -31,6 +30,15 @@ class RMusicCommand : IRMusicCommand {
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
         }
+    }
+
+    override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
+        // 默认从网易云播放
+        ctx.source.sendFeedback(
+            Text.translatable("rmusic.player.play.waiting")
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
+        checkout(ctx)  // 检查是否正在播放
         Thread {
             val res = Music163().getSongUrl(id).data[0]
             RMusicClient.player?.play(URL(res.url))
