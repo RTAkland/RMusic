@@ -6,10 +6,11 @@
 
 package cn.rtast.rmusic.music
 
-import cn.rtast.rmusic.models.detail.DetailModel
-import cn.rtast.rmusic.models.login.LoginRespModel
-import cn.rtast.rmusic.models.search.SearchRespModel
-import cn.rtast.rmusic.models.song.SongUrlModel
+import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.models.netease.detail.DetailModel
+import cn.rtast.rmusic.models.netease.login.LoginRespModel
+import cn.rtast.rmusic.models.netease.search.SearchRespModel
+import cn.rtast.rmusic.models.netease.song.SongUrlModel
 import com.google.gson.Gson
 import java.io.File
 import java.net.URL
@@ -17,7 +18,7 @@ import java.net.URLEncoder
 
 class Music163 {
     private val gson = Gson()
-    private val rootApi163 = "https://api.163.rtast.cn"
+    private val rootApi163 = RMusic.API_URL_163
     private val cookie: String? = null
 
     fun login(email: String, password: String): Boolean {
@@ -26,7 +27,7 @@ class Music163 {
         if (json.code != 200) {
             return false
         }
-        val file = File("./config/rmusic/cookie.txt")
+        val file = File("./config/rmusic/cookie.json")
         if (!file.exists()) {
             file.createNewFile()
         } else {
