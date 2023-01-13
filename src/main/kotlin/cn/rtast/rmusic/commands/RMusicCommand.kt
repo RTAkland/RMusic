@@ -7,14 +7,10 @@
 package cn.rtast.rmusic.commands
 
 import cn.rtast.rmusic.common.command.IRMusicCommand
-import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.network.S2CPacket
 import cn.rtast.rmusic.utils.SearchUtil
-import cn.rtast.rmusic.utils.StyleUtil
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
-import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 
 class RMusicCommand : IRMusicCommand {
 
@@ -23,22 +19,7 @@ class RMusicCommand : IRMusicCommand {
     }
 
     override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
-        ctx.source.sendFeedback(
-            Text.translatable("rmusic.player.play.waiting", Text.literal(id.toString())
-                .styled { it.withColor(Formatting.AQUA) })
-                .styled { it.withColor(Formatting.GREEN) }, false
-        )
-        Thread {
-            try {
-                val info = Music163().getSongUrl(id)
-                send(0, "${info.data[0].url}^${info.data[0].id}", ctx)
-            } catch (_: IndexOutOfBoundsException) {
-                ctx.source.sendFeedback(
-                    Text.translatable("rmusic.player.play.get.failure")
-                        .styled { it.withColor(Formatting.RED) }, false
-                )
-            }
-        }.start()
+        send(0, id.toString(), ctx)
     }
 
     override fun stop(ctx: CommandContext<ServerCommandSource>) {
@@ -58,7 +39,7 @@ class RMusicCommand : IRMusicCommand {
     }
 
     override fun setVolume(ctx: CommandContext<ServerCommandSource>, value: Double) {
-        send(5, "$value", ctx)
+        send(5, value.toString(), ctx)
     }
 
     override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
