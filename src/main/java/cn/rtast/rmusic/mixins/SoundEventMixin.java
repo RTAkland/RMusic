@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class SoundEventMixin {
     // 如果当前正在播放音乐取消播放游戏背景音乐
     @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At("HEAD"), cancellable = true)
-    public void sound(SoundInstance sound, CallbackInfo ci) {
+    public void play(SoundInstance sound, CallbackInfo ci) {
         if (RMusicClient.INSTANCE.getPlayer() != null) {
             if (RMusicClient.INSTANCE.getPlayer().getStatus() == Status.PLAYING) {
                 SoundCategory category = sound.getCategory();
