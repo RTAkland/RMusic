@@ -13,41 +13,49 @@ class OnOPMessage {
 
     private val msg = MinecraftClient.getInstance().player!!
 
+    private fun checkout() {
+        if (RMusicClient.player == null) {
+            RMusicClient.player = MusicPlayer()
+        } else {
+            RMusicClient.player?.stop()
+            msg.sendMessage(
+                Text.translatable("rmusic.player.stop").styled { it.withColor(Formatting.GREEN) }, false
+            )
+        }
+    }
+
     fun onMessage(buf: PacketByteBuf) {
         val origin = buf.readString().split("]")
         val cmd = origin.first().toInt()
         val body = origin.last()
         when (cmd) {
-            0 -> {
-                if (RMusicClient.player == null) {
-                    RMusicClient.player = MusicPlayer()
-                } else {
-                    RMusicClient.player?.stop()
-                }
-                val url = body.split("^").first()
-                val id = body.split("^").last()
+            0 -> {  // 播放音乐
+                msg.sendMessage(
+                    Text.translatable("rmusic.player.play.waiting").styled { it.withColor(Formatting.GREEN) }, false
+                )
+                checkout()
                 Thread {
-                    val songName = Music163().songName(id.toInt())
-                    RMusicClient.player?.play(URL(url))
-                    msg.sendMessage(Text.translatable("rmusic.player.playing", Text.literal(songName)
-                        .styled { it.withColor(Formatting.AQUA) })
+                    val info = Music163().getSongUrl(body.toInt()).data[0]
+                    val songName = Music163().songName(body.toInt())
+                    RMusicClient.player?.play(URL(info.url))
+                    msg.sendMessage(Text.translatable("rmusic.player.playing",
+                        Text.literal(songName).styled { it.withColor(Formatting.AQUA) })
                         .styled { it.withColor(Formatting.GREEN) })
                 }.start()
             }
 
-            1 -> {
+            1 -> {  // 停止播放
                 val player = RMusicClient.player
                 if (player != null) {
                     RMusicClient.player?.stop()
-                    msg.sendMessage(Text.translatable("rmusic.player.stop")
-                        .styled { it.withColor(Formatting.GREEN) })
+                    msg.sendMessage(Text.translatable("rmusic.player.stop").styled { it.withColor(Formatting.GREEN) })
                 } else {
                     msg.sendMessage(Text.translatable("rmusic.player.notplaying")
                         .styled { it.withColor(Formatting.RED) })
                 }
             }
 
-            2 -> {
+            2 -> {  // 继续播放
                 val player = RMusicClient.player
                 if (player != null) {
                     if (player.isPaused) {
@@ -56,8 +64,7 @@ class OnOPMessage {
                             .styled { it.withColor(Formatting.GREEN) })
                     } else {
                         msg.sendMessage(
-                            Text.translatable("rmusic.player.resume.not")
-                                .styled { it.withColor(Formatting.RED) })
+                            Text.translatable("rmusic.player.resume.not").styled { it.withColor(Formatting.RED) })
                     }
                 } else {
                     msg.sendMessage(Text.translatable("rmusic.player.notplaying")
@@ -65,12 +72,12 @@ class OnOPMessage {
                 }
             }
 
-            3 -> {
+            3 -> {  // 暂停播放
                 val player = RMusicClient.player
                 if (player != null) {
                     if (player.isPaused) {
-                        msg.sendMessage(Text.translatable("rmusic.player.pause.off")
-                            .styled { it.withColor(Formatting.GREEN) })
+                        msg.sendMessage(
+                            Text.translatable("rmusic.player.pause.off").styled { it.withColor(Formatting.GREEN) })
                     } else {
                         RMusicClient.player?.pause()
                         msg.sendMessage(Text.translatable("rmusic.player.pause")
@@ -82,7 +89,7 @@ class OnOPMessage {
                 }
             }
 
-            4 -> {
+            4 -> {  // 静音
                 val player = RMusicClient.player
                 if (player != null) {
                     if (player.mute) {
@@ -100,18 +107,17 @@ class OnOPMessage {
                 }
             }
 
-            5 -> {
+            5 -> {  // 设置音量
                 val player = RMusicClient.player
                 if (player != null) {
                     RMusicClient.player?.setGain(body.toDouble())
                 } else {
                     msg.sendMessage(Text.translatable("rmusic.player.notplaying")
-                        .styled { it.withColor(Formatting.RED) }
-                    )
+                        .styled { it.withColor(Formatting.RED) })
                 }
             }
 
-            6 -> {
+            6 -> {  // 登录
                 val email = body.split("^").first()
                 val password = body.split("^").last()
                 msg.sendMessage(Text.translatable("rmusic.session.netease.login.wait")
@@ -128,7 +134,7 @@ class OnOPMessage {
                 }.start()
             }
 
-            7 -> {
+            7 -> {  // 登出
                 msg.sendMessage(Text.translatable("rmusic.session.netease.logout.wait")
                     .styled { it.withColor(Formatting.GREEN) })
                 val code = Music163().logout()
