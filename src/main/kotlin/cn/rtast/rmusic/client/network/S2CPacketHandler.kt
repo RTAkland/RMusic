@@ -7,7 +7,7 @@
 package cn.rtast.rmusic.client.network
 
 import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.client.events.OnOPMessage
+import cn.rtast.rmusic.client.events.OnOPPacket
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketSender
 import net.minecraft.client.MinecraftClient
@@ -22,7 +22,7 @@ class S2CPacketHandler {
           _: ClientPlayNetworkHandler,
           buf: PacketByteBuf,
           _: PacketSender ->
-            OnOPMessage().onMessage(buf)
+            OnOPPacket().onMessage(buf)
         }
     }
 }

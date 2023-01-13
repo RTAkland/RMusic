@@ -9,7 +9,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.net.URL
 
-class OnOPMessage {
+class OnOPPacket {
 
     private val msg = MinecraftClient.getInstance().player!!
 
