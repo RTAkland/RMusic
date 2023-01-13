@@ -14,9 +14,9 @@
 <img src="https://img.shields.io/github/v/release/RTAkland/RMusic?include_prereleases" alt="release">
 <img src="https://img.shields.io/badge/MC-1.19.2-pink?logo=minecraft" alt="mcVersion">
 
-</div>
+<h3>当前正处于早期正式版, 如果有bug或者需求请务必提交 issue !</h3>
 
-> 当前正处于早期正式版, 如果有bug或者需求请务必提交 issue !
+</div>
 
 <!-- TOC -->
 * [注意事项](#注意事项)
@@ -132,4 +132,4 @@ $ ./gradlew eclipse
 
 # 鸣谢
 
-* [JetBrains](https://www.jetbrains.com/opensource/) Open Source 项目提供IDE支持
+* [JetBrains Open Source](https://www.jetbrains.com/opensource/) 项目提供IDE支持
