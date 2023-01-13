@@ -55,12 +55,12 @@ java {
 }
 
 jar {
-    from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
-    }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from configurations.embed.collect {
         it.isDirectory() ? it : zipTree(it)
+    }
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
     }
 }
 
