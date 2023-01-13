@@ -21,25 +21,45 @@ import net.minecraft.server.command.ServerCommandSource
 interface IRMusicCommand {
     fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         dispatcher.register(literal("rmusic").requires { it.hasPermissionLevel(0) }
-            .then(literal("play").then(argument("id", integer()).executes { play(it, getInteger(it, "id"));1 }))
-            .then(literal("stop").executes { stop(it);1 }).then(literal("resume").executes { resume(it);1 })
-            .then(literal("pause").executes { pause(it);1 }).then(literal("mute").executes { mute(it);1 })
-            .then(literal("volume").then(argument("value", doubleArg()).executes {
-                setVolume(
-                    it,
-                    getDouble(it, "value") / 10
-                );1
-            })).then(literal("search").then(argument("keyword", string()).executes {
-                searchNetease(
-                    it,
-                    getString(it, "keyword")
-                );1
-            }))
-            .then(literal("login").then(argument("email", string()).then(argument("password", string()).executes {
-                loginNetease(
-                    it, getString(it, "email"), getString(it, "password")
-                );1
-            }))).then(literal("logout").executes { logoutNetease(it);1 })
+            .then(
+                literal("play")
+                    .then(
+                        argument("id", integer())
+                            .executes { play(it, getInteger(it, "id"));1 }
+                    )
+            )
+            .then(
+                literal("stop")
+                    .executes { stop(it);1 }).then(literal("resume").executes { resume(it);1 }
+                    )
+            .then(
+                literal("pause")
+                    .executes { pause(it);1 }).then(literal("mute").executes { mute(it);1 }
+                    )
+            .then(
+                literal("volume")
+                    .then(argument("value", doubleArg())
+                        .executes { setVolume(it, getDouble(it, "value") / 10);1 }
+                    )
+            )
+            .then(
+                literal("search")
+                    .then(argument("keyword", string())
+                        .executes { searchNetease(it, getString(it, "keyword"));1 }
+                    )
+            )
+            .then(
+                literal("login")
+                    .then(argument("email", string())
+                        .then(argument("password", string())
+                            .executes { loginNetease(it, getString(it, "email"), getString(it, "password"));1 }
+                        )
+                    )
+            )
+            .then(
+                literal("logout")
+                    .executes { logoutNetease(it);1 }
+            )
         )
     }
 
