@@ -3,6 +3,7 @@ package cn.rtast.rmusic.client.events
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.player.MusicPlayer
+import cn.rtast.rmusic.utils.SearchUtil
 import net.minecraft.client.MinecraftClient
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.text.Text
@@ -145,6 +146,10 @@ class OnOPPacket {
                     msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
                         .styled { it.withColor(Formatting.GREEN) })
                 }
+            }
+
+            8 -> {  // 搜索
+                SearchUtil().search(msg, body)
             }
         }
     }

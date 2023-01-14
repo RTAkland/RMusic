@@ -31,11 +31,11 @@ interface IRMusicCommand {
             .then(
                 literal("stop")
                     .executes { stop(it);1 }).then(literal("resume").executes { resume(it);1 }
-                    )
+            )
             .then(
                 literal("pause")
                     .executes { pause(it);1 }).then(literal("mute").executes { mute(it);1 }
-                    )
+            )
             .then(
                 literal("volume")
                     .then(argument("value", doubleArg())

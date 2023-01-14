@@ -43,7 +43,7 @@ class RMusicCommand : IRMusicCommand {
     }
 
     override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
-        SearchUtil().search(ctx, keyword)
+        send(8, "$keyword", ctx)
     }
 
     override fun loginNetease(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
