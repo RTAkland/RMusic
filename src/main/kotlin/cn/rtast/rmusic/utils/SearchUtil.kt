@@ -8,11 +8,32 @@ package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.music.Music163
 import com.mojang.brigadier.context.CommandContext
+import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 class SearchUtil {
+    fun search(msg: ClientPlayerEntity, keyword: String) {
+        msg.sendMessage(
+            Text.translatable("rmusic.api.search.netease", Text.literal(keyword)
+                .styled { it.withColor(Formatting.AQUA) })
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
+        Thread {
+            val result = Music163().search(keyword)
+            result.forEach {
+                msg.sendMessage(StyleUtil.resultStyle(it), false)
+            }
+            msg.sendMessage(
+                Text.translatable("rmusic.api.search.tip", Text.literal(result.size.toString())
+                    .styled { it.withColor(Formatting.AQUA) })
+                    .styled { it.withColor(Formatting.GREEN) }, false
+            )
+        }.start()
+
+    }
+
     fun search(ctx: CommandContext<ServerCommandSource>, keyword: String) {
         ctx.source.sendFeedback(
             Text.translatable("rmusic.api.search.netease", Text.literal(keyword)
