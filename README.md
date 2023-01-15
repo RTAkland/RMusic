@@ -21,7 +21,6 @@
 <!-- TOC -->
 * [注意事项](#注意事项)
 * [已经支持的功能](#已经支持的功能)
-* [使用](#使用)
   * [使用例](#使用例)
 * [开发](#开发)
   * [克隆项目](#克隆项目)
@@ -34,7 +33,7 @@
 
 # 注意事项
 
-> `RMusic Mod` 只支持 `Fabric 1.19.2 +` 版本
+> `RMusic Mod` 仅支持 `Fabric 1.19.2` 版本, 后续会支持更高版本, 也可以自行 Clone 仓库到本地修改版本后自行编译使用, 详见 [开发](#开发)
 
 * 无论是客户端/服务器使用本mod的`login` `logout`命令时, 存储的`cookie.json`都是在客户端本地, 但是音乐API时取决于配置文件内的地址
 * 如果想要让mod正常工作, 请在装有`fabric-language-kotlin >=1.9.0+kotlin.1.8.0` 和 `fabric-loader >=0.14.10`
@@ -49,11 +48,9 @@
 2. [x] 对音乐播放的各种操作
 3. ~~歌词显示~~ (暂时鸽了)
 
-# 使用
+> 所有子命令都以 `/rmusic` 或 `/rm` 命令开头
 
-> 所有子命令都以 `/rmusic` 命令开头
-
-- `/rmusic`
+- `/rm`
     - `play`
         - `<id>`  播放网易云的音乐
     - `stop`  停止播放, 无法继续播放
@@ -64,20 +61,25 @@
     - `search`
         - `<keyword>`  从网易云搜索音乐
     - `login`
-      - `<platform>`
-          - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
+        - `<platform>`
+            - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
     - `logout`  登出, 登出将删除本地cookie.json文件
+    - `set-url` 设置新的API地址 ***仅管理员/单人可用***
+    - `reload` 重新载入修改后的配置文件 ***仅管理员/单人可用***
+      ***注: 此命令适用于手动修改配置文件内的API地址后进行重载, 使用set-url修改后会自动重新载入***
 
 ## 使用例
 
-* `/rmusic play 114514`
-* `/rmusic pause`
-* `/rmusic resume`
-* `/rmusic mute`
-* `/rmusic stop`
-* `/rmusic search "恶臭的野兽先辈"`   ***如果是中文或者其他特殊符号请使用双引号/单引号括起来***
-* `/rmusic login 163 "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
-* `/rmusic logout`
+* `/rm play 114514`
+* `/rm pause`
+* `/rm resume`
+* `/rm mute`
+* `/rm stop`
+* `/rm search "恶臭的野兽先辈"`   ***如果是中文或者其他特殊符号请使用双引号/单引号括起来***
+* `/rm login 163 "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
+* `/rm logout`
+* `/rm set-url "https://114514.space"`  ***地址使用引号括起来***
+* `/rm reload`
 
 > ***暂时没办法快进或者快退音乐***
 
@@ -133,4 +135,4 @@ $ ./gradlew eclipse
 
 # 鸣谢
 
-* [JetBrains Open Source](https://www.jetbrains.com/opensource/) 项目提供IDE支持
+* [JetBrains Open Source](https://www.jetbrains.com/opensource/) 项目提供的IDE支持.

@@ -39,7 +39,7 @@
 
 # 注意事项
 
-> `RMusic Mod` 只支持 `Fabric 1.19.2 +` 版本
+> `RMusic Mod` 仅支持 `Fabric 1.19.2` 版本, 后续会支持更高版本, 也可以自行 Clone 仓库到本地修改版本后自行编译使用, 详见 [开发](#开发)
 
 * 无论是客户端/服务器使用本mod的`login` `logout`命令时, 存储的`cookie.json`都是在客户端本地, 但是音乐API时取决于配置文件内的地址
 * 如果想要让mod正常工作, 请在装有`fabric-language-kotlin >=1.9.0+kotlin.1.8.0` 和 `fabric-loader >=0.14.10`
@@ -56,9 +56,9 @@
 
 # 使用
 
-> 所有子命令都以 `/rmusic` 命令开头
+> 所有子命令都以 `/rmusic` 或 `/rm` 命令开头
 
-- `/rmusic`
+- `/rm`
     - `play`
         - `<id>`  播放网易云的音乐
     - `stop`  停止播放, 无法继续播放
@@ -69,20 +69,25 @@
     - `search`
         - `<keyword>`  从网易云搜索音乐
     - `login`
-      - `<platform>`
-          - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
+        - `<platform>`
+            - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
     - `logout`  登出, 登出将删除本地cookie.json文件
+    - `set-url` 设置新的API地址 ***仅管理员/单人可用***
+    - `reload` 重新载入修改后的配置文件 ***仅管理员/单人可用***
+      ***注: 此命令适用于手动修改配置文件内的API地址后进行重载, 使用set-url修改后会自动重新载入***
 
 ## 使用例
 
-* `/rmusic play 114514`
-* `/rmusic pause`
-* `/rmusic resume`
-* `/rmusic mute`
-* `/rmusic stop`
-* `/rmusic search "恶臭的野兽先辈"`   ***如果是中文或者其他特殊符号请使用双引号/单引号括起来***
-* `/rmusic login 163 "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
-* `/rmusic logout`
+* `/rm play 114514`
+* `/rm pause`
+* `/rm resume`
+* `/rm mute`
+* `/rm stop`
+* `/rm search "恶臭的野兽先辈"`   ***如果是中文或者其他特殊符号请使用双引号/单引号括起来***
+* `/rm login 163 "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
+* `/rm logout`
+* `/rm set-url "https://114514.space"`  ***地址使用引号括起来***
+* `/rm reload`
 
 > ***暂时没办法快进或者快退音乐***
 
@@ -149,13 +154,14 @@ $ ./gradlew eclipse
 ## 实现
 
 - 客户端
-    -
-    客户端对音乐的操作均在[RMusicCommand.kt](https://github.com/RTAkland/RMusic/blob/main/src/main/kotlin/cn/rtast/rmusic/commands/RMusicCommand.kt)
+  -
+  客户端对音乐的操作均在[RMusicCommand.kt](https://github.com/RTAkland/RMusic/blob/main/src/main/kotlin/cn/rtast/rmusic/commands/RMusicCommand.kt)
 
 -客户端加入服务端执行命令
 
 - 玩家执行服务端`RMusic`注册的命令, 命令内容是, 上方操作码定义的内容, 客户端接收到数据包之后会根据操作码做出不同的相应
 -
+
 对音乐的操作均在[OnOPPacket.kt](https://github.com/RTAkland/RMusic/blob/main/src/main/kotlin/cn/rtast/rmusic/client/events/OnOPPacket.kt)
 
 > 注: 每次使用命令都会创建一个对象, 所以将[RMusicClient.kt](../src/main/kotlin/cn/rtast/rmusic/client/RMusicClient.kt)
@@ -167,6 +173,7 @@ $ ./gradlew eclipse
 
 * 使用 `Fabric Mixin` 把对应的代码插入到`play`方法中, 如果`RMusic`正在播放音乐, 则会取消播放背景音乐的事件
 *
+
 具体代码见[SoundEventMixin.java](https://github.com/RTAkland/RMusic/blob/main/src/main/java/cn/rtast/rmusic/mixins/SoundEventMixin.java)
 
 ## 播放音乐
@@ -175,10 +182,10 @@ $ ./gradlew eclipse
 
 # 开源
 
-- 本项目以[Apache-2.0](./LICENSE)许可开源, 即:
+- 本项目以[Apache-2.0](https://github.com/RTAkland/RMusic/blob/main/LICENSE)许可开源, 即:
     - 你可以直接使用该项目提供的功能, 无需任何授权
     - 你可以在**注明来源版权信息**的情况下对源代码进行任意分发和修改以及衍生
 
 # 鸣谢
 
-* [JetBrains Open Source](https://www.jetbrains.com/opensource/) 项目提供IDE支持
+* [JetBrains Open Source](https://www.jetbrains.com/opensource/) 项目提供的IDE支持.
