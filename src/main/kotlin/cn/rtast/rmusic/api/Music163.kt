@@ -8,6 +8,7 @@ package cn.rtast.rmusic.api
 
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.models.CommonSongUrl
+import cn.rtast.rmusic.models.CookieModel
 import cn.rtast.rmusic.models.netease.detail.DetailModel
 import cn.rtast.rmusic.models.netease.login.LoginRespModel
 import cn.rtast.rmusic.models.netease.search.SearchRespModel
@@ -35,7 +36,7 @@ open class Music163 {
             file.delete()
             file.createNewFile()
         }
-        file.writeText(json.cookie)
+        file.writeText(gson.toJson(CookieModel(json.cookie)))
         return true
     }
 
