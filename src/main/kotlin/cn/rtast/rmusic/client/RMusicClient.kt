@@ -27,8 +27,7 @@ object RMusicClient : ClientModInitializer {
             RMusicCommand().register(dispatcher)
         }
         S2CPacketHandler().register()
-        ClientPlayConnectionEvents.DISCONNECT.register { _: ClientPlayNetworkHandler,
-                                                         _: MinecraftClient ->
+        ClientPlayConnectionEvents.DISCONNECT.register { _: ClientPlayNetworkHandler, _: MinecraftClient ->
             // 玩家退出游戏或者断开连接自动停止播放
             if (player != null) {
                 player?.stop()
