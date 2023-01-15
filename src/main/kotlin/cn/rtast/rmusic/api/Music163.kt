@@ -4,9 +4,10 @@
  * @Date: 2023/1/9 12:26
  */
 
-package cn.rtast.rmusic.music
+package cn.rtast.rmusic.api
 
 import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.models.CommonSongUrl
 import cn.rtast.rmusic.models.netease.detail.DetailModel
 import cn.rtast.rmusic.models.netease.login.LoginRespModel
 import cn.rtast.rmusic.models.netease.search.SearchRespModel
@@ -16,12 +17,12 @@ import java.io.File
 import java.net.URL
 import java.net.URLEncoder
 
-class Music163 {
+open class Music163 {
     private val gson = Gson()
     private val rootApi163 = RMusic.API_URL_163
     private val cookie: String? = null
 
-    fun login(email: String, password: String): Boolean {
+    open fun login(email: String, password: String): Boolean {
         val result = URL("$rootApi163/login?email=$email&password=$password").readText()
         val json = gson.fromJson(result, LoginRespModel::class.java)
         if (json.code != 200) {
@@ -38,7 +39,7 @@ class Music163 {
         return true
     }
 
-    fun logout(): Boolean {
+    open fun logout(): Boolean {
         val file = File("./config/rmusic/cookie.json")
         val status: Boolean = if (file.exists()) {
             file.delete()
@@ -49,7 +50,7 @@ class Music163 {
         return status
     }
 
-    fun search(keyword: String): MutableList<String> {
+    open fun search(keyword: String): MutableList<String> {
         val result = URL("$rootApi163/search?keywords=${URLEncoder.encode(keyword, "UTF-8")}").readText()
         var songs = gson.fromJson(result, SearchRespModel::class.java).result.songs
         songs = if (songs.size <= 10) {
@@ -69,16 +70,17 @@ class Music163 {
         return lst
     }
 
-    fun getSongUrl(id: Int): SongUrlModel {
+    open fun getSongUrl(id: Int): CommonSongUrl {
         var searchApi = "$rootApi163/song/url?id=$id"
         if (cookie != null) {
             searchApi += "&cookie=${URLEncoder.encode(cookie, "UTF-8")}"
         }
         val result = URL(searchApi).readText()
-        return gson.fromJson(result, SongUrlModel::class.java)
+        val json = gson.fromJson(result, SongUrlModel::class.java)
+        return CommonSongUrl(json.data[0].url, songName(id))
     }
 
-    fun songName(id: Int): String {
+    open fun songName(id: Int): String {
         val result = URL("$rootApi163/song/detail?ids=$id").readText()
         val json = gson.fromJson(result, DetailModel::class.java)
         return json.songs[0].name
