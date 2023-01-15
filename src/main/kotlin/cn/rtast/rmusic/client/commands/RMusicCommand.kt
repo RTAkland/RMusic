@@ -7,8 +7,8 @@
 package cn.rtast.rmusic.client.commands
 
 import cn.rtast.rmusic.client.RMusicClient
-import cn.rtast.rmusic.common.command.IRMusicCommand
-import cn.rtast.rmusic.music.Music163
+import cn.rtast.rmusic.commands.RMusicCommand
+import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.player.MusicPlayer
 import cn.rtast.rmusic.utils.SearchUtil
 import com.goxr3plus.streamplayer.enums.Status
@@ -18,7 +18,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.net.URL
 
-class RMusicCommand : IRMusicCommand {
+class RMusicCommand : RMusicCommand() {
 
     private fun checkout(ctx: CommandContext<ServerCommandSource>) {
         if (RMusicClient.player == null) {
@@ -40,11 +40,10 @@ class RMusicCommand : IRMusicCommand {
         )
         checkout(ctx)  // 检查是否正在播放
         Thread {
-            val res = Music163().getSongUrl(id).data[0]
+            val res = Music163().getSongUrl(id)
             RMusicClient.player?.play(URL(res.url))
-            val songName = Music163().songName(id)
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.playing", Text.literal(songName)
+                Text.translatable("rmusic.player.playing", Text.literal(res.songName)
                     .styled { it.withColor(Formatting.AQUA) })
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
@@ -136,11 +135,11 @@ class RMusicCommand : IRMusicCommand {
         )
     }
 
-    override fun searchNetease(ctx: CommandContext<ServerCommandSource>, keyword: String) {
-        SearchUtil().search(ctx, keyword)
+    override fun search163(ctx: CommandContext<ServerCommandSource>, keyword: String) {
+        SearchUtil("163").search(ctx, keyword)
     }
 
-    override fun loginNetease(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
+    override fun login163(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
         ctx.source.sendFeedback(Text.translatable("rmusic.session.netease.login.wait", ctx), false)
         Thread {
             if (Music163().login(email, password)) {
@@ -157,7 +156,7 @@ class RMusicCommand : IRMusicCommand {
         }.start()
     }
 
-    override fun logoutNetease(ctx: CommandContext<ServerCommandSource>) {
+    override fun logout163(ctx: CommandContext<ServerCommandSource>) {
         ctx.source.sendFeedback(
             Text.translatable("rmusic.session.netease.logout.wait")
                 .styled { it.withColor(Formatting.GREEN) }, false
