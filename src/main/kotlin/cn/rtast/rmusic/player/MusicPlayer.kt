@@ -6,6 +6,8 @@
 
 package cn.rtast.rmusic.player
 
+import cn.rtast.rmusic.client.RMusicClient
+import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
@@ -29,5 +31,9 @@ class MusicPlayer : StreamPlayer(), StreamPlayerListener {
     ) {
     }
 
-    override fun statusUpdated(event: StreamPlayerEvent?) {}
+    override fun statusUpdated(event: StreamPlayerEvent?) {
+        if (event?.playerStatus!! == Status.STOPPED) {
+            RMusicClient.player = null
+        }
+    }
 }
