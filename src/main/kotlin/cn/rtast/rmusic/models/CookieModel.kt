@@ -1,6 +1,5 @@
-package cn.rtast.rmusic.models.cookie
+package cn.rtast.rmusic.models
 
-data class Cookie(
-    val cookie: String,
-    val platform: String
+data class CookieModel(
+    val cookie: String
 )

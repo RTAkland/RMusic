@@ -14,7 +14,7 @@ import net.minecraft.util.Identifier
 
 object RMusic : ModInitializer {
     val RMUSIC_PACKET_ID = Identifier("rmusic", "op")
-    val API_URL_163 = ConfigUtil().getURL("163")
+    var API_URL_163 = ConfigUtil().get163URL()
 
     override fun onInitialize() {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
