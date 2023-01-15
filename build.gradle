@@ -60,7 +60,7 @@ jar {
         it.isDirectory() ? it : zipTree(it)
     }
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { it }
     }
 }
 
