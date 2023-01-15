@@ -6,9 +6,9 @@
 
 package cn.rtast.rmusic.client.commands
 
+import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.commands.RMusicCommand
-import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.player.MusicPlayer
 import cn.rtast.rmusic.utils.SearchUtil
 import com.goxr3plus.streamplayer.enums.Status
@@ -26,7 +26,7 @@ class RMusicCommand : RMusicCommand() {
         } else {
             RMusicClient.player?.stop()
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.stop")
+                Text.translatable("player.stop")
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
         }
@@ -35,7 +35,7 @@ class RMusicCommand : RMusicCommand() {
     override fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
         // 默认从网易云播放
         ctx.source.sendFeedback(
-            Text.translatable("rmusic.player.play.waiting")
+            Text.translatable("player.play.waiting")
                 .styled { it.withColor(Formatting.GREEN) }, false
         )
         checkout(ctx)  // 检查是否正在播放
@@ -43,7 +43,7 @@ class RMusicCommand : RMusicCommand() {
             val res = Music163().getSongUrl(id)
             RMusicClient.player?.play(URL(res.url))
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.playing", Text.literal(res.songName)
+                Text.translatable("player.playing", Text.literal(res.songName)
                     .styled { it.withColor(Formatting.AQUA) })
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
@@ -55,12 +55,12 @@ class RMusicCommand : RMusicCommand() {
             RMusicClient.player?.stop()
             RMusicClient.player = null
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.stop")
+                Text.translatable("player.stop")
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
         } else {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.notplaying")
+                Text.translatable("player.notplaying")
                     .styled { it.withColor(Formatting.RED) }, false
             )
         }
@@ -70,12 +70,12 @@ class RMusicCommand : RMusicCommand() {
         if (RMusicClient.player?.status == Status.PAUSED) {
             RMusicClient.player?.resume()
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.resume")
+                Text.translatable("player.resume")
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
         } else {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.notplaying")
+                Text.translatable("player.notplaying")
                     .styled { it.withColor(Formatting.RED) }, false
             )
         }
@@ -85,19 +85,19 @@ class RMusicCommand : RMusicCommand() {
         if (RMusicClient.player?.status != null) {
             if (RMusicClient.player?.status == Status.PAUSED) {
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.player.pause.off")
+                    Text.translatable("player.pause.off")
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
             } else {
                 RMusicClient.player?.pause()
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.player.pause")
+                    Text.translatable("player.pause")
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
             }
         } else {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.notplaying")
+                Text.translatable("player.notplaying")
                     .styled { it.withColor(Formatting.RED) }, false
             )
         }
@@ -108,19 +108,19 @@ class RMusicCommand : RMusicCommand() {
             if (RMusicClient.player?.mute == true) {
                 RMusicClient.player?.mute = false
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.player.mute.off")
+                    Text.translatable("player.mute.off")
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
             } else {
                 RMusicClient.player?.mute = true
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.player.mute.on")
+                    Text.translatable("player.mute.on")
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
             }
         } else {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.player.notplaying")
+                Text.translatable("player.notplaying")
                     .styled { it.withColor(Formatting.RED) }, false
             )
         }
@@ -129,7 +129,7 @@ class RMusicCommand : RMusicCommand() {
     override fun setVolume(ctx: CommandContext<ServerCommandSource>, value: Double) {
         RMusicClient.player?.setGain(value)
         ctx.source.sendFeedback(
-            Text.translatable("rmusic.player.setvolume", Text.literal(value.toString())
+            Text.translatable("player.setvolume", Text.literal(value.toString())
                 .styled { it.withColor(Formatting.AQUA) })
                 .styled { it.withColor(Formatting.GREEN) }, false
         )
@@ -140,16 +140,16 @@ class RMusicCommand : RMusicCommand() {
     }
 
     override fun login163(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
-        ctx.source.sendFeedback(Text.translatable("rmusic.session.netease.login.wait", ctx), false)
+        ctx.source.sendFeedback(Text.translatable("session.netease.login.wait", ctx), false)
         Thread {
             if (Music163().login(email, password)) {
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.session.netease.login.success")
+                    Text.translatable("session.netease.login.success")
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
             } else {
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.session.netease.login.failure")
+                    Text.translatable("session.netease.login.failure")
                         .styled { it.withColor(Formatting.RED) }, false
                 )
             }
@@ -158,18 +158,18 @@ class RMusicCommand : RMusicCommand() {
 
     override fun logout163(ctx: CommandContext<ServerCommandSource>) {
         ctx.source.sendFeedback(
-            Text.translatable("rmusic.session.netease.logout.wait")
+            Text.translatable("session.netease.logout.wait")
                 .styled { it.withColor(Formatting.GREEN) }, false
         )
         if (Music163().logout()) {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.session.netease.logout.success")
+                Text.translatable("session.netease.logout.success")
                     .styled { it.withColor(Formatting.GREEN) },
                 false
             )
         } else {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.session.netease.logout.failure")
+                Text.translatable("session.netease.logout.failure")
                     .styled { it.withColor(Formatting.RED) },
                 false
             )
