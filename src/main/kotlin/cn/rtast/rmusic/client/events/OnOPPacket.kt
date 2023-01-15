@@ -1,7 +1,7 @@
 package cn.rtast.rmusic.client.events
 
+import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.client.RMusicClient
-import cn.rtast.rmusic.music.Music163
 import cn.rtast.rmusic.player.MusicPlayer
 import cn.rtast.rmusic.utils.SearchUtil
 import net.minecraft.client.MinecraftClient
@@ -31,18 +31,23 @@ class OnOPPacket {
         val body = origin.last()
         when (cmd) {
             0 -> {  // 播放音乐
-                msg.sendMessage(
-                    Text.translatable("rmusic.player.play.waiting").styled { it.withColor(Formatting.GREEN) }, false
-                )
-                checkout()
-                Thread {
-                    val info = Music163().getSongUrl(body.toInt()).data[0]
-                    val songName = Music163().songName(body.toInt())
-                    RMusicClient.player?.play(URL(info.url))
-                    msg.sendMessage(Text.translatable("rmusic.player.playing",
-                        Text.literal(songName).styled { it.withColor(Formatting.AQUA) })
-                        .styled { it.withColor(Formatting.GREEN) })
-                }.start()
+                when (body.split("^").first()) {
+                    "163" -> {
+                        msg.sendMessage(
+                            Text.translatable("rmusic.player.play.waiting").styled { it.withColor(Formatting.GREEN) },
+                            false
+                        )
+                        checkout()
+                        Thread {
+                            val id = body.split("^").last().toInt()
+                            val info = Music163().getSongUrl(id)
+                            RMusicClient.player?.play(URL(info.url))
+                            msg.sendMessage(Text.translatable("rmusic.player.playing",
+                                Text.literal(info.songName).styled { it.withColor(Formatting.AQUA) })
+                                .styled { it.withColor(Formatting.GREEN) })
+                        }.start()
+                    }
+                }
             }
 
             1 -> {  // 停止播放
@@ -119,37 +124,48 @@ class OnOPPacket {
             }
 
             6 -> {  // 登录
-                val email = body.split("^").first()
-                val password = body.split("^").last()
-                msg.sendMessage(Text.translatable("rmusic.session.netease.login.wait")
-                    .styled { it.withColor(Formatting.GREEN) })
-                Thread {  // 耗时操作单独启动线程
-                    val code = Music163().login(email, password)
-                    if (code) {
-                        msg.sendMessage(Text.translatable("rmusic.session.netease.login.success")
+                when (body.split("^").first()) {
+                    "163" -> {
+                        val email = body.split("^")[1]
+                        val password = body.split("^").last()
+                        msg.sendMessage(Text.translatable("rmusic.session.netease.login.wait")
                             .styled { it.withColor(Formatting.GREEN) })
-                    } else {
-                        msg.sendMessage(Text.translatable("rmusic.session.netease.login.failure")
-                            .styled { it.withColor(Formatting.RED) })
+                        Thread {  // 耗时操作单独启动线程
+                            val code = Music163().login(email, password)
+                            if (code) {
+                                msg.sendMessage(Text.translatable("rmusic.session.netease.login.success")
+                                    .styled { it.withColor(Formatting.GREEN) })
+                            } else {
+                                msg.sendMessage(Text.translatable("rmusic.session.netease.login.failure")
+                                    .styled { it.withColor(Formatting.RED) })
+                            }
+                        }.start()
                     }
-                }.start()
+                }
             }
 
             7 -> {  // 登出
-                msg.sendMessage(Text.translatable("rmusic.session.netease.logout.wait")
-                    .styled { it.withColor(Formatting.GREEN) })
-                val code = Music163().logout()
-                if (code) {
-                    msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
-                        .styled { it.withColor(Formatting.GREEN) })
-                } else {
-                    msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
-                        .styled { it.withColor(Formatting.GREEN) })
+                when (body.split("^").first()) {
+                    "163" -> {  // extends for future
+                        msg.sendMessage(Text.translatable("rmusic.session.netease.logout.wait")
+                            .styled { it.withColor(Formatting.GREEN) })
+                        val code = Music163().logout()
+
+                        if (code) {
+                            msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
+                                .styled { it.withColor(Formatting.GREEN) })
+                        } else {
+                            msg.sendMessage(Text.translatable("rmusic.session.netease.logout.success")
+                                .styled { it.withColor(Formatting.GREEN) })
+                        }
+                    }
                 }
             }
 
             8 -> {  // 搜索
-                SearchUtil().search(msg, body)
+                when (body.split("^").first()) {
+                    "163" -> SearchUtil("163").search(msg, body.split("^").last())
+                }
             }
         }
     }
