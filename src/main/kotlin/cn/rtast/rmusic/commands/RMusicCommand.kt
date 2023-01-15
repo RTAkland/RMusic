@@ -6,7 +6,11 @@
 
 package cn.rtast.rmusic.commands
 
+import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.models.ConfigModel
 import cn.rtast.rmusic.network.S2CPacket
+import cn.rtast.rmusic.utils.ConfigUtil
+import com.google.gson.Gson
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg
 import com.mojang.brigadier.arguments.DoubleArgumentType.getDouble
@@ -18,10 +22,14 @@ import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.CommandManager.argument
 import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
+import java.io.File
+import java.net.URL
 
-open class RMusicCommand{
+open class RMusicCommand {
     fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
-        val literalBuilder = literal("rmusic")
+        val rmusicNode = dispatcher.register(literal("rmusic")
             .requires { it.hasPermissionLevel(0) }
             .then(
                 literal("play")
@@ -46,7 +54,7 @@ open class RMusicCommand{
                 literal("volume")
                     .then(
                         argument("volume", doubleArg())
-                            .executes { setVolume(it, getDouble(it, "volume"));1 }
+                            .executes { setVolume(it, getDouble(it, "volume") / 10);1 }
                     )
             )
             .then(
@@ -79,7 +87,21 @@ open class RMusicCommand{
                 literal("logout")
                     .executes { logout163(it);1 }
             )
-        dispatcher.register(literalBuilder)
+            .then(
+                literal("set-url")
+                    .requires { it.hasPermissionLevel(3) }
+                    .then(
+                        argument("url", string())
+                            .executes { setUrl(it, getString(it, "url"));1 }
+                    )
+            )
+            .then(
+                literal("reload")
+                    .requires { it.hasPermissionLevel(3) }
+                    .executes { reload(it);1 }
+            )
+        )
+        dispatcher.register(literal("rm").redirect(rmusicNode))
     }
 
     private fun send(cmd: Int, body: String, ctx: CommandContext<ServerCommandSource>) {
@@ -120,5 +142,50 @@ open class RMusicCommand{
 
     open fun logout163(ctx: CommandContext<ServerCommandSource>) {
         send(7, "163^logout", ctx)
+    }
+
+    open fun setUrl(ctx: CommandContext<ServerCommandSource>, url: String) {
+        // 适用于使用命令修改api地址, 执行后会自动重载
+        ctx.source.sendFeedback(
+            Text.translatable("config.modify.wait")
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
+        Thread {
+            try {
+                URL(ConfigUtil().get163URL())
+                reload(ctx) // 自动重载
+                ctx.source.sendFeedback(
+                    Text.translatable("config.modify.new", Text.literal(url)
+                        .styled { it.withColor(Formatting.AQUA) })
+                        .styled { it.withColor(Formatting.GREEN) }, false
+                )
+            } catch (_: Exception) {
+                ctx.source.sendFeedback(
+                    Text.translatable("config.modify.failure")
+                        .styled { it.withColor(Formatting.RED) }, false
+                )
+            }
+        }.start()
+    }
+
+    open fun reload(ctx: CommandContext<ServerCommandSource>) {
+        // 适用于手动修改配置文件后进行重载
+        ctx.source.sendFeedback(
+            Text.translatable("config.reload.wait")
+                .styled { it.withColor(Formatting.GREEN) }, false
+        )
+        try {
+            val config = Gson().fromJson(File("./config/rmusic/config.json").readText(), ConfigModel::class.java)
+            RMusic.API_URL_163 = config.netease
+            ctx.source.sendFeedback(
+                Text.translatable("config.reload.success")
+                    .styled { it.withColor(Formatting.YELLOW) }, false
+            )
+        } catch (_: Exception) {
+            ctx.source.sendFeedback(
+                Text.translatable("config.reload.failure")
+                    .styled { it.withColor(Formatting.RED) }, false
+            )
+        }
     }
 }
