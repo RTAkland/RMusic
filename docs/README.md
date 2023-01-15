@@ -69,7 +69,8 @@
     - `search`
         - `<keyword>`  从网易云搜索音乐
     - `login`
-        - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
+      - `<platform>`
+          - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
     - `logout`  登出, 登出将删除本地cookie.json文件
 
 ## 使用例
@@ -80,7 +81,7 @@
 * `/rmusic mute`
 * `/rmusic stop`
 * `/rmusic search "恶臭的野兽先辈"`   ***如果是中文或者其他特殊符号请使用双引号/单引号括起来***
-* `/rmusic login "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
+* `/rmusic login 163 "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
 * `/rmusic logout`
 
 > ***暂时没办法快进或者快退音乐***
