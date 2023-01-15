@@ -30,12 +30,12 @@ object StyleUtil {
                 .withClickEvent(
                     ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rmusic play $id")
                 ).withHoverEvent(
-                    HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("rmusic.chat.play.click", songName)
+                    HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.translatable("chat.play.click", songName)
                         .styled { s ->
                             s.withColor(Formatting.LIGHT_PURPLE)
                         })
                 ).withInsertion(id)
         }
-        return Text.translatable("rmusic.chat.songinfo", nameText, artistsText, playButtonText)
+        return Text.translatable("chat.songinfo", nameText, artistsText, playButtonText)
     }
 }

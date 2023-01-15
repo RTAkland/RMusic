@@ -17,7 +17,7 @@ class SearchUtil(private val platform: String) {
     fun search(msg: ClientPlayerEntity, keyword: String) {
         if (platform == "163") {
             msg.sendMessage(
-                Text.translatable("rmusic.api.search.netease", Text.literal(keyword)
+                Text.translatable("api.search.netease", Text.literal(keyword)
                     .styled { it.withColor(Formatting.AQUA) })
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
@@ -27,7 +27,7 @@ class SearchUtil(private val platform: String) {
                     msg.sendMessage(StyleUtil.resultStyle(it), false)
                 }
                 msg.sendMessage(
-                    Text.translatable("rmusic.api.search.tip", Text.literal(result.size.toString())
+                    Text.translatable("api.search.tip", Text.literal(result.size.toString())
                         .styled { it.withColor(Formatting.AQUA) })
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
@@ -38,7 +38,7 @@ class SearchUtil(private val platform: String) {
     fun search(ctx: CommandContext<ServerCommandSource>, keyword: String) {
         if (platform == "163") {
             ctx.source.sendFeedback(
-                Text.translatable("rmusic.api.search.netease", Text.literal(keyword)
+                Text.translatable("api.search.netease", Text.literal(keyword)
                     .styled { it.withColor(Formatting.AQUA) })
                     .styled { it.withColor(Formatting.GREEN) }, false
             )
@@ -48,7 +48,7 @@ class SearchUtil(private val platform: String) {
                     ctx.source.sendFeedback(StyleUtil.resultStyle(it), false)
                 }
                 ctx.source.sendFeedback(
-                    Text.translatable("rmusic.api.search.tip", Text.literal(result.size.toString())
+                    Text.translatable("api.search.tip", Text.literal(result.size.toString())
                         .styled { it.withColor(Formatting.AQUA) })
                         .styled { it.withColor(Formatting.GREEN) }, false
                 )
