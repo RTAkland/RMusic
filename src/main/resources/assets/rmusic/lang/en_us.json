@@ -17,7 +17,7 @@
   "rmusic.player.setvolume": "[RMusic]Set volume size to [ %s ] (Range: 0-2).",
   "rmusic.player.stop": "[RMusic]Playing music stopped.",
   "rmusic.session.netease.login.failure": "[RMusic]Login failed! Please check whether the account or password is correct!",
-  "rmusic.session.netease.login.success": "[RMusic]Successful landing!",
+  "rmusic.session.netease.login.success": "[RMusic]Logged in!",
   "rmusic.session.netease.login.wait": "[RMusic]logging in...",
   "rmusic.session.netease.logout.failure": "[RMusic]Unable to log out, you are not logged in!",
   "rmusic.session.netease.logout.success": "[RMusic]logged out!",
