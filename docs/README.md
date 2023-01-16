@@ -28,11 +28,6 @@
   * [手动编译](#手动编译)
   * [VS code](#vs-code)
   * [Eclipse](#eclipse)
-* [操作码](#操作码)
-* [技术点](#技术点)
-  * [实现](#实现)
-  * [取消播放原版音乐事件](#取消播放原版音乐事件)
-  * [播放音乐](#播放音乐)
 * [开源](#开源)
 * [鸣谢](#鸣谢)
 <!-- TOC -->
@@ -72,9 +67,8 @@
         - `<platform>`
             - `<email>` `<password>`  登录, 暂时只能使用 `邮箱` 登录
     - `logout`  登出, 登出将删除本地cookie.json文件
-    - `set-url` 设置新的API地址 ***仅管理员/单人可用***
-    - `reload` 重新载入修改后的配置文件 ***仅管理员/单人可用***
-      ***注: 此命令适用于手动修改配置文件内的API地址后进行重载, 使用set-url修改后会自动重新载入***
+    - `set-url` 设置新的API地址 ***仅管理员/单人可用, 使用后自动重新加载配置文件***
+    - `reload`  手动修改配置文件后使用此命令来重新加载配置文件内的api地址  ***仅管理员/单人可用***
 
 ## 使用例
 
@@ -87,7 +81,6 @@
 * `/rm login 163 "114514@114514.com" "1145141919810"`  ***账号密码必须用引号括起来***
 * `/rm logout`
 * `/rm set-url "https://114514.space"`  ***地址使用引号括起来***
-* `/rm reload`
 
 > ***暂时没办法快进或者快退音乐***
 
@@ -134,51 +127,6 @@ $ ./gradlew eclipse
 ```
 
 > 输出的构建文件在 [build/libs/*.jar](build/libs), 请运行文件名内没有`source`字样的jar文件
-
-# 操作码
-
-1. `0` -> `play` with body: [name, url, artists]
-2. `1` -> `stop` without body
-3. `2` -> `resume` without body
-4. `3` -> `pause` without body
-5. `4` -> `mute` without body
-6. `5` -> `search` with body: [keyword]
-7. `6` -> `volume` with body: [volume]
-8. `7` -> `login` with body: [email, password]
-9. `8` -> `logout` without body
-
-> `body`的数据使用 `^` 符号分割
-
-# 技术点
-
-## 实现
-
-- 客户端
-  -
-  客户端对音乐的操作均在[RMusicCommand.kt](https://github.com/RTAkland/RMusic/blob/main/src/main/kotlin/cn/rtast/rmusic/commands/RMusicCommand.kt)
-
--客户端加入服务端执行命令
-
-- 玩家执行服务端`RMusic`注册的命令, 命令内容是, 上方操作码定义的内容, 客户端接收到数据包之后会根据操作码做出不同的相应
--
-
-对音乐的操作均在[OnOPPacket.kt](https://github.com/RTAkland/RMusic/blob/main/src/main/kotlin/cn/rtast/rmusic/client/events/OnOPPacket.kt)
-
-> 注: 每次使用命令都会创建一个对象, 所以将[RMusicClient.kt](../src/main/kotlin/cn/rtast/rmusic/client/RMusicClient.kt)
-> 以及
-> [RMusic.kt](https://github.com/RTAkland/RMusic/blob/main/src/main/kotlin/cn/rtast/rmusic/RMusic.kt) 定义为静态类,
-> 在初始化是创建一个对象, 后续访问无需创建新的对象
-
-## 取消播放原版音乐事件
-
-* 使用 `Fabric Mixin` 把对应的代码插入到`play`方法中, 如果`RMusic`正在播放音乐, 则会取消播放背景音乐的事件
-*
-
-具体代码见[SoundEventMixin.java](https://github.com/RTAkland/RMusic/blob/main/src/main/java/cn/rtast/rmusic/mixins/SoundEventMixin.java)
-
-## 播放音乐
-
-* 使用了 Java 音频库 `com.github.goxr3plus:java-stream-player` `10.0.2`
 
 # 开源
 
