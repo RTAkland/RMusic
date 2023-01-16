@@ -26,7 +26,7 @@ dependencies {
     implementation("org.jflac:jflac-codec:1.5.2")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0")
     implementation("com.googlecode.soundlibs:soundlibs:1.4")
-    implementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
     embed(api("com.github.goxr3plus:java-stream-player:10.0.2"))
 }
 
@@ -47,6 +47,10 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+//test {
+//    include("**")
+//}
+
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
     if (JavaVersion.current() < javaVersion) {
@@ -64,7 +68,6 @@ jar {
         rename { it }
     }
 }
-
 
 compileKotlin {
     kotlinOptions.jvmTarget = "17"
