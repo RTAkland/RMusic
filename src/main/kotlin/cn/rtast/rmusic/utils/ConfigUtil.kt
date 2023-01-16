@@ -19,7 +19,7 @@ class ConfigUtil {
         }
         if (!configFile.exists()) {
             configFile.createNewFile()
-            configFile.writeText("https://music.api.rtast.cn:444")
+            configFile.writeText("https://api.163.rtast.cn")
         }
     }
 
