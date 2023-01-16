@@ -3,7 +3,6 @@ package cn.rtast.rmusic.client.events
 import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.player.MusicPlayer
-import cn.rtast.rmusic.utils.SearchUtil
 import net.minecraft.client.MinecraftClient
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.text.Text
@@ -33,17 +32,13 @@ class OnOPPacket {
             0 -> {  // 播放音乐
                 when (body.split("^").first()) {
                     "163" -> {
-                        msg.sendMessage(
-                            Text.translatable("player.play.waiting").styled { it.withColor(Formatting.GREEN) },
-                            false
-                        )
                         checkout()
+                        val name = body.split("^")[1]
+                        val url = body.split("^").last()
                         Thread {
-                            val id = body.split("^").last().toInt()
-                            val info = Music163().getSongUrl(id)
-                            RMusicClient.player?.play(URL(info.url))
+                            RMusicClient.player?.play(URL(url))
                             msg.sendMessage(Text.translatable("player.playing",
-                                Text.literal(info.songName).styled { it.withColor(Formatting.AQUA) })
+                                Text.literal(name).styled { it.withColor(Formatting.AQUA) })
                                 .styled { it.withColor(Formatting.GREEN) })
                         }.start()
                     }
@@ -129,20 +124,7 @@ class OnOPPacket {
             6 -> {  // 登录
                 when (body.split("^").first()) {
                     "163" -> {
-                        val email = body.split("^")[1]
-                        val password = body.split("^").last()
-                        msg.sendMessage(Text.translatable("session.netease.login.wait")
-                            .styled { it.withColor(Formatting.GREEN) })
-                        Thread {  // 耗时操作单独启动线程
-                            val code = Music163().login(email, password)
-                            if (code) {
-                                msg.sendMessage(Text.translatable("session.netease.login.success")
-                                    .styled { it.withColor(Formatting.GREEN) })
-                            } else {
-                                msg.sendMessage(Text.translatable("session.netease.login.failure")
-                                    .styled { it.withColor(Formatting.RED) })
-                            }
-                        }.start()
+                        Music163().writeCookie(body.split("^").last())
                     }
                 }
             }
@@ -162,12 +144,6 @@ class OnOPPacket {
                                 .styled { it.withColor(Formatting.GREEN) })
                         }
                     }
-                }
-            }
-
-            8 -> {  // 搜索
-                when (body.split("^").first()) {
-                    "163" -> SearchUtil("163").search(msg, body.split("^").last())
                 }
             }
         }
