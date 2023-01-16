@@ -11,7 +11,6 @@ import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import org.junit.jupiter.api.Test
 import java.net.URL
-import java.util.Random
 
 
 class ApiUrlTest {
