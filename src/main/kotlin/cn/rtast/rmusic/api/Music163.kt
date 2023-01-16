@@ -18,29 +18,44 @@ import java.io.File
 import java.net.URL
 import java.net.URLEncoder
 
-open class Music163 {
+class Music163 {
     private val gson = Gson()
-    private val rootApi163 = RMusic.API_URL_163
-    private val cookie: String? = null
+    private val rootApi163 = RMusic.MUSIC_API_163
+    private var cookie: String? = null
 
-    open fun login(email: String, password: String): Boolean {
+    init {
+        val cookieFile = File("./config/rmusic/cookie.json")
+        if (cookieFile.exists()) {
+            cookie = gson.fromJson(cookieFile.readText(), CookieModel::class.java).cookie
+        }
+    }
+
+    private fun songName(id: Int): String {
+        val result = URL("$rootApi163/song/detail?ids=$id").readText()
+        val json = gson.fromJson(result, DetailModel::class.java)
+        return json.songs[0].name
+    }
+
+    fun login(email: String, password: String): Boolean {
         val result = URL("$rootApi163/login?email=$email&password=$password").readText()
         val json = gson.fromJson(result, LoginRespModel::class.java)
         if (json.code != 200) {
             return false
         }
-        val file = File("./config/rmusic/cookie.json")
-        if (!file.exists()) {
-            file.createNewFile()
-        } else {
-            file.delete()
-            file.createNewFile()
-        }
-        file.writeText(gson.toJson(CookieModel(json.cookie)))
+        writeCookie(json.cookie)
         return true
     }
 
-    open fun logout(): Boolean {
+    fun getCookie(email: String, password: String): String? {
+        return try {
+            val result = URL("$rootApi163/login?email=$email&password=$password").readText()
+            gson.fromJson(result, LoginRespModel::class.java).cookie
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun logout(): Boolean {
         val file = File("./config/rmusic/cookie.json")
         val status: Boolean = if (file.exists()) {
             file.delete()
@@ -51,7 +66,7 @@ open class Music163 {
         return status
     }
 
-    open fun search(keyword: String): MutableList<String> {
+    fun search(keyword: String): MutableList<String> {
         val result = URL("$rootApi163/search?keywords=${URLEncoder.encode(keyword, "UTF-8")}").readText()
         var songs = gson.fromJson(result, SearchRespModel::class.java).result.songs
         songs = if (songs.size <= 10) {
@@ -71,8 +86,8 @@ open class Music163 {
         return lst
     }
 
-    open fun getSongUrl(id: Int): CommonSongUrl {
-        var searchApi = "$rootApi163/song/url?id=$id"
+    fun getSongUrl(id: Int): CommonSongUrl {
+        var searchApi = "$rootApi163/song/url?id=$id&br=320000"
         if (cookie != null) {
             searchApi += "&cookie=${URLEncoder.encode(cookie, "UTF-8")}"
         }
@@ -81,9 +96,14 @@ open class Music163 {
         return CommonSongUrl(json.data[0].url, songName(id))
     }
 
-    open fun songName(id: Int): String {
-        val result = URL("$rootApi163/song/detail?ids=$id").readText()
-        val json = gson.fromJson(result, DetailModel::class.java)
-        return json.songs[0].name
+    fun writeCookie(cookie: String) {
+        val file = File("./config/rmusic/cookie.json")
+        if (!file.exists()) {
+            file.createNewFile()
+        } else {
+            file.delete()
+            file.createNewFile()
+        }
+        file.writeText(gson.toJson(CookieModel(cookie)))
     }
 }
