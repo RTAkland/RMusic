@@ -1,3 +1,9 @@
+/**
+ * @Author: RTAkland
+ * @EMail: rtakland@outlook.com
+ * @Date: 2023/1/15 23:11
+ */
+
 package cn.rtast.rmusic.models.netease.song
 
 data class Data(
@@ -17,7 +23,7 @@ data class Data(
     val level: String,
     val md5: String,
     val payed: Int,
-    val peak: Int,
+    val peak: Any,
     val podcastCtrp: Any,
     val rightSource: Int,
     val size: Int,
