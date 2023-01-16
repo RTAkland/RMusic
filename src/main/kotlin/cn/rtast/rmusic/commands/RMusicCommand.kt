@@ -7,9 +7,10 @@
 package cn.rtast.rmusic.commands
 
 import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.models.ConfigModel
+import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.network.S2CPacket
 import cn.rtast.rmusic.utils.ConfigUtil
+import cn.rtast.rmusic.utils.SearchUtil
 import com.google.gson.Gson
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg
@@ -24,10 +25,11 @@ import net.minecraft.server.command.CommandManager.literal
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import java.io.File
-import java.net.URL
 
 open class RMusicCommand {
+
+    private val gson = Gson()
+
     fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         val rmusicNode = dispatcher.register(literal("rmusic")
             .requires { it.hasPermissionLevel(0) }
@@ -109,7 +111,14 @@ open class RMusicCommand {
     }
 
     open fun play(ctx: CommandContext<ServerCommandSource>, id: Int) {
-        send(0, "163^$id", ctx)
+        ctx.source.sendFeedback(
+            Text.translatable("player.play.waiting").styled { it.withColor(Formatting.GREEN) },
+            false
+        )
+        Thread {
+            val info = Music163().getSongUrl(id)
+            send(0, "163^${info.songName}^${info.url}", ctx)
+        }.start()
     }
 
     open fun pause(ctx: CommandContext<ServerCommandSource>) {
@@ -133,15 +142,54 @@ open class RMusicCommand {
     }
 
     open fun search163(ctx: CommandContext<ServerCommandSource>, keyword: String) {
-        send(8, "163^$keyword", ctx)
+        SearchUtil("163").search(ctx, keyword)
     }
 
     open fun login163(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
-        send(6, "163^$email^$password", ctx)
+        if (ctx.source.isExecutedByPlayer) {
+            ctx.source.sendFeedback(Text.translatable("session.netease.login.wait")
+                .styled { it.withColor(Formatting.GREEN) }, false
+            )
+            Thread {
+                val result = Music163().getCookie(email, password)
+                if (result != null) {
+                    ctx.source.sendFeedback(
+                        Text.translatable("session.netease.login.success")
+                            .styled { it.withColor(Formatting.GREEN) }, false
+                    )
+                    send(6, "163^$result", ctx)
+                } else {
+                    ctx.source.sendFeedback(
+                        Text.translatable("session.netease.login.failure")
+                            .styled { it.withColor(Formatting.RED) }, false
+                    )
+                }
+            }.start()
+        } else {
+            println("[RMusic]控制台使用此命令将会把cookie.json缓存到服务器上, 但仅限控制台使用此cookie.")
+            println("[RMusic]正在登录中...")
+            Thread {
+                if (Music163().login(email, password)) {
+                    println("[RMusic]登陆成功, cookie.json已被保存到./config/rmusic/cookie.json内.")
+                } else {
+                    println("[RMusic]登陆失败, 请检查账号或密码是否正确!")
+                }
+            }.start()
+        }
     }
 
     open fun logout163(ctx: CommandContext<ServerCommandSource>) {
-        send(7, "163^logout", ctx)
+        if (ctx.source.isExecutedByPlayer) {
+            send(7, "163^logout", ctx)
+        } else {
+            println("[RMusic]控制台使用此命令, 仅会删除服务器上的cookie.json文件, 无法操作客户端.")
+            println("[RMusic]正在登出...")
+            if (Music163().logout()) {
+                println("[RMusic]登出成功, 已删除cookie.json")
+            } else {
+                println("[RMusic]登出失败!")
+            }
+        }
     }
 
     open fun setUrl(ctx: CommandContext<ServerCommandSource>, url: String) {
@@ -152,8 +200,8 @@ open class RMusicCommand {
         )
         Thread {
             try {
-                URL(ConfigUtil().get163URL())
-                reload(ctx) // 自动重载
+                ConfigUtil().set163URL(url)
+                RMusic.MUSIC_API_163 = url
                 ctx.source.sendFeedback(
                     Text.translatable("config.modify.new", Text.literal(url)
                         .styled { it.withColor(Formatting.AQUA) })
@@ -175,8 +223,8 @@ open class RMusicCommand {
                 .styled { it.withColor(Formatting.GREEN) }, false
         )
         try {
-            val config = Gson().fromJson(File("./config/rmusic/config.json").readText(), ConfigModel::class.java)
-            RMusic.API_URL_163 = config.netease
+            val url = ConfigUtil().get163URL()
+            RMusic.MUSIC_API_163 = url
             ctx.source.sendFeedback(
                 Text.translatable("config.reload.success")
                     .styled { it.withColor(Formatting.YELLOW) }, false
