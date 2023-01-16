@@ -6,14 +6,12 @@
 
 package cn.rtast.rmusic.utils
 
-import cn.rtast.rmusic.models.ConfigModel
-import com.google.gson.Gson
 import java.io.File
 
 class ConfigUtil {
-    private val gson = Gson()
-    private val configFile = File("./config/rmusic/config.json")
-    private val dir = File("./config/rmusic")
+    private val path = "./config/rmusic"
+    private val configFile = File("$path/config.txt")
+    private val dir = File(path)
 
     init {
         if (!dir.exists()) {
@@ -21,12 +19,17 @@ class ConfigUtil {
         }
         if (!configFile.exists()) {
             configFile.createNewFile()
-            val config = ConfigModel("https://api.163.rtast.cn")
-            configFile.writeText(gson.toJson(config).toString())
+            configFile.writeText("https://music.api.rtast.cn:444")
         }
     }
 
     fun get163URL(): String {
-        return gson.fromJson(configFile.readText(), ConfigModel::class.java).netease
+        return configFile.readText()
+    }
+
+    fun set163URL(url: String) {
+        configFile.delete()
+        configFile.createNewFile()
+        configFile.writeText(url)
     }
 }
