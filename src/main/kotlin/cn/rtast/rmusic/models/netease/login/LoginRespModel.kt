@@ -11,7 +11,7 @@ data class LoginRespModel(
     val bindings: List<Binding>,
     val code: Int,
     val cookie: String,
-    val loginType: Int,
+    val loginType: Long,
     val profile: Profile,
     val token: String
 )
