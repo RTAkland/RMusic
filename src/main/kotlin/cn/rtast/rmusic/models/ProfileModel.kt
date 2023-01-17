@@ -6,6 +6,7 @@
 
 package cn.rtast.rmusic.models
 
-data class CookieModel(
-    val cookie: String
+data class ProfileModel(
+    val cookie: String,
+    val uid: Long
 )
