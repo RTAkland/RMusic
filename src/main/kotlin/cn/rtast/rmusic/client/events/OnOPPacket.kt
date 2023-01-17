@@ -124,7 +124,9 @@ class OnOPPacket {
             6 -> {  // 登录
                 when (body.split("^").first()) {
                     "163" -> {
-                        Music163().writeCookie(body.split("^").last())
+                        val cookie = body.split("^")[1]
+                        val uid = body.split("^").last().toLong()
+                        Music163().writeProfile(cookie, uid)
                     }
                 }
             }
