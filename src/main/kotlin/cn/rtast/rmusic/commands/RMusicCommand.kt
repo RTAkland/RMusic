@@ -11,7 +11,6 @@ import cn.rtast.rmusic.api.Music163
 import cn.rtast.rmusic.network.S2CPacket
 import cn.rtast.rmusic.utils.ConfigUtil
 import cn.rtast.rmusic.utils.SearchUtil
-import com.google.gson.Gson
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.DoubleArgumentType.doubleArg
 import com.mojang.brigadier.arguments.DoubleArgumentType.getDouble
@@ -27,8 +26,6 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 open class RMusicCommand {
-
-    private val gson = Gson()
 
     fun register(dispatcher: CommandDispatcher<ServerCommandSource>) {
         val rmusicNode = dispatcher.register(literal("rmusic")
@@ -147,8 +144,9 @@ open class RMusicCommand {
 
     open fun login163(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
         if (ctx.source.isExecutedByPlayer) {
-            ctx.source.sendFeedback(Text.translatable("session.netease.login.wait")
-                .styled { it.withColor(Formatting.GREEN) }, false
+            ctx.source.sendFeedback(
+                Text.translatable("session.netease.login.wait")
+                    .styled { it.withColor(Formatting.GREEN) }, false
             )
             Thread {
                 val result = Music163().getCookie(email, password)
