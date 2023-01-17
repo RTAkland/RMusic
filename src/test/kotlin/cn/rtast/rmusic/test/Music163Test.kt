@@ -44,7 +44,7 @@ class Music163Test {
     fun testWriteCookie() {
         assertDoesNotThrow {
             val cookie = Utils().genRandom(100)
-            Music163().writeCookie(cookie)
+            Music163().writeProfile(cookie, 1145141919810L)
         }
     }
 
