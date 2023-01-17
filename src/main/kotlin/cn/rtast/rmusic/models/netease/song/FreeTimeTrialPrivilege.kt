@@ -7,8 +7,8 @@
 package cn.rtast.rmusic.models.netease.song
 
 data class FreeTimeTrialPrivilege(
-    val remainTime: Int,
+    val remainTime: Long,
     val resConsumable: Boolean,
-    val type: Int,
+    val type: Long,
     val userConsumable: Boolean
 )

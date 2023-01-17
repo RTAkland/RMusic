@@ -8,12 +8,12 @@ package cn.rtast.rmusic.models.netease.search
 
 data class Album(
     val artist: ArtistX,
-    val copyrightId: Int,
-    val id: Int,
-    val mark: Int,
+    val copyrightId: Long,
+    val id: Long,
+    val mark: Long,
     val name: String,
     val picId: Long,
     val publishTime: Long,
-    val size: Int,
-    val status: Int
+    val size: Long,
+    val status: Long
 )

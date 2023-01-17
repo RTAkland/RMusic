@@ -7,11 +7,11 @@
 package cn.rtast.rmusic.models.netease.search
 
 data class ArtistX(
-    val albumSize: Int,
+    val albumSize: Long,
     val alias: List<Any>,
     val fansGroup: Any,
-    val id: Int,
-    val img1v1: Int,
+    val id: Long,
+    val img1v1: Long,
     val img1v1Url: String,
     val name: String,
     val picId: Int,

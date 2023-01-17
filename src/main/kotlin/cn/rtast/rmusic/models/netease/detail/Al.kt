@@ -7,7 +7,7 @@
 package cn.rtast.rmusic.models.netease.detail
 
 data class Al(
-    val id: Int,
+    val id: Long,
     val name: String,
     val pic: Long,
     val picUrl: String,
