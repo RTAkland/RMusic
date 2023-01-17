@@ -8,7 +8,7 @@ package cn.rtast.rmusic.api
 
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.models.CommonSongUrl
-import cn.rtast.rmusic.models.CookieModel
+import cn.rtast.rmusic.models.ProfileModel
 import cn.rtast.rmusic.models.netease.detail.DetailModel
 import cn.rtast.rmusic.models.netease.login.LoginRespModel
 import cn.rtast.rmusic.models.netease.search.SearchRespModel
@@ -26,7 +26,7 @@ class Music163 {
     init {
         val cookieFile = File("./config/rmusic/cookie.json")
         if (cookieFile.exists()) {
-            cookie = gson.fromJson(cookieFile.readText(), CookieModel::class.java).cookie
+            cookie = gson.fromJson(cookieFile.readText(), ProfileModel::class.java).cookie
         }
     }
 
@@ -36,20 +36,32 @@ class Music163 {
         return json.songs[0].name
     }
 
+    fun writeProfile(cookie: String, uid: Long) {
+        val file = File("./config/rmusic/cookie.json")
+        if (!file.exists()) {
+            file.createNewFile()
+        } else {
+            file.delete()
+            file.createNewFile()
+        }
+        file.writeText(gson.toJson(ProfileModel(cookie, uid)))
+    }
+
     fun login(email: String, password: String): Boolean {
         val result = URL("$rootApi163/login?email=$email&password=$password").readText()
         val json = gson.fromJson(result, LoginRespModel::class.java)
         if (json.code != 200) {
             return false
         }
-        writeCookie(json.cookie)
+        writeProfile(json.cookie, json.account.id)
         return true
     }
 
     fun getCookie(email: String, password: String): String? {
         return try {
             val result = URL("$rootApi163/login?email=$email&password=$password").readText()
-            gson.fromJson(result, LoginRespModel::class.java).cookie
+            val json = gson.fromJson(result, LoginRespModel::class.java)
+            "${json.cookie}^${json.account.id}"
         } catch (_: Exception) {
             null
         }
@@ -94,16 +106,5 @@ class Music163 {
         val result = URL(searchApi).readText()
         val json = gson.fromJson(result, SongUrlModel::class.java)
         return CommonSongUrl(json.data[0].url, songName(id))
-    }
-
-    fun writeCookie(cookie: String) {
-        val file = File("./config/rmusic/cookie.json")
-        if (!file.exists()) {
-            file.createNewFile()
-        } else {
-            file.delete()
-            file.createNewFile()
-        }
-        file.writeText(gson.toJson(CookieModel(cookie)))
     }
 }
