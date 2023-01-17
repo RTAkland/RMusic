@@ -36,7 +36,7 @@ class OnOPPacket {
                         val name = body.split("^")[1]
                         val url = body.split("^").last()
                         Thread {
-                            RMusicClient.player?.play(URL(url))
+                            RMusicClient.player?.play(url)
                             msg.sendMessage(Text.translatable("player.playing",
                                 Text.literal(name).styled { it.withColor(Formatting.AQUA) })
                                 .styled { it.withColor(Formatting.GREEN) })

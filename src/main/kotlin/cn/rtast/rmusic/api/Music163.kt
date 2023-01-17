@@ -11,8 +11,10 @@ import cn.rtast.rmusic.models.CommonSongUrl
 import cn.rtast.rmusic.models.CookieModel
 import cn.rtast.rmusic.models.netease.detail.DetailModel
 import cn.rtast.rmusic.models.netease.login.LoginRespModel
+import cn.rtast.rmusic.models.netease.lyric.ext.Lyric
 import cn.rtast.rmusic.models.netease.search.SearchRespModel
 import cn.rtast.rmusic.models.netease.song.SongUrlModel
+import cn.rtast.rmusic.utils.LyricUtil
 import com.google.gson.Gson
 import java.io.File
 import java.net.URL
@@ -105,5 +107,10 @@ class Music163 {
             file.createNewFile()
         }
         file.writeText(gson.toJson(CookieModel(cookie)))
+    }
+
+    fun lyric(id: Int): List<Lyric> {
+        val result = URL("$rootApi163/lyric?id=$id").readText()
+        return LyricUtil().parse(result)
     }
 }

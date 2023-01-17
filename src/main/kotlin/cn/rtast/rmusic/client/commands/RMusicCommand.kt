@@ -16,7 +16,6 @@ import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
-import java.net.URL
 
 class RMusicCommand : RMusicCommand() {
 
@@ -41,7 +40,8 @@ class RMusicCommand : RMusicCommand() {
         checkout(ctx)  // 检查是否正在播放
         Thread {
             val res = Music163().getSongUrl(id)
-            RMusicClient.player?.play(URL(res.url))
+            RMusicClient.player?.play(res.url)
+            RMusicClient.player?.lyric = Music163().lyric(id)
             ctx.source.sendFeedback(
                 Text.translatable("player.playing", Text.literal(res.songName)
                     .styled { it.withColor(Formatting.AQUA) })

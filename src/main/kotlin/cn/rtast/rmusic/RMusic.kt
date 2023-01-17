@@ -10,17 +10,20 @@ import cn.rtast.rmusic.commands.RMusicCommand
 import cn.rtast.rmusic.utils.ConfigUtil
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Identifier
 
 object RMusic : ModInitializer {
     val RMUSIC_PACKET_ID = Identifier("rmusic", "op")
     var MUSIC_API_163 = ConfigUtil().get163URL()
+    var LYRIC_TOGGLE = false
+    val CLIENT = MinecraftClient.getInstance()
 
     override fun onInitialize() {
         CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
             RMusicCommand().register(dispatcher)
         }
-        println("RMusic Startup! Powered by RTAkland")
+        println("RMusic Startup! RTAkland copyright 2022-2023.")
         println("Github: https://github.com/RTAkland")
         println("Mod Site: https://mod.rtast.cn/RMusic")
     }
