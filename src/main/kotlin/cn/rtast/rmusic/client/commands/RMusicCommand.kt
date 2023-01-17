@@ -140,7 +140,9 @@ class RMusicCommand : RMusicCommand() {
     }
 
     override fun login163(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
-        ctx.source.sendFeedback(Text.translatable("session.netease.login.wait", ctx), false)
+        ctx.source.sendFeedback(Text.translatable("session.netease.login.wait", ctx)
+            .styled { it.withColor(Formatting.GREEN) }, false
+        )
         Thread {
             if (Music163().login(email, password)) {
                 ctx.source.sendFeedback(
