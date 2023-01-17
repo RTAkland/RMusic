@@ -15,6 +15,10 @@ import java.net.URL
 
 class MusicPlayer : StreamPlayer(), StreamPlayerListener {
 
+    init {
+        addStreamPlayerListener(this)
+    }
+
     fun play(url: URL) {
         open(url)
         play()
