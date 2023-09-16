@@ -6,6 +6,7 @@
   "mixins": [
   ],
   "client": [
+    "SoundSystemMixin"
   ],
   "injectors": {
     "defaultRequire": 1

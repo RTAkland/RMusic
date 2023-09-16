@@ -13,20 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.rtast.rmusic
 
-import cn.rtast.rmusic.commands.RMusicCommand
-import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+package cn.rtast.rmusic.exceptions
 
-class RMusic : ModInitializer {
-
-    companion object {
-        const val DEFAULT_CONF_PATH = "./config/rmusic"
-        var API_HOST = "https://zm.armoe.cn"
-    }
-
-    override fun onInitialize() {
-        CommandRegistrationCallback.EVENT.register(RMusicCommand())
-    }
-}
+class CaptchaException(message: String?) : Throwable(message)

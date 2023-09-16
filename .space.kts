@@ -14,10 +14,6 @@
  *    limitations under the License.
  */
 
-package cn.rtast.rmusic.models
-
-data class ConfigModel(
-    var apiHost: String,
-    var cookie: String?,
-    var sessionStatus: Boolean
-)
+job("Build and run tests") {
+    gradlew("amazoncorretto:17-alpine", "build")
+}

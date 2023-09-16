@@ -17,10 +17,10 @@
 package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.models.Minute
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import java.io.File
-import java.util.Base64
 
 fun String.openFile(): File {
     return File("${RMusic.DEFAULT_CONF_PATH}$this")
@@ -36,4 +36,9 @@ inline fun <reified T> String.fromJson(): T {
 
 inline fun <reified T> String.fromArrayJson(): T {
     return Gson().fromJson(this, object : TypeToken<T>() {}.type)
+}
+
+
+fun Int.toMinutes(): Minute {
+    return Minute(this / 60, this % 60)
 }

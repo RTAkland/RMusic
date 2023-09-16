@@ -18,7 +18,7 @@ package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.exceptions.SessionException
-import cn.rtast.rmusic.models.ConfigModel
+import cn.rtast.rmusic.models.Config
 
 class SessionManager {
 
@@ -26,15 +26,15 @@ class SessionManager {
 
     init {
         if (!conf.exists()) {
-            conf.writeText(ConfigModel(RMusic.API_HOST, null, false).toJson())
+            conf.writeText(Config(RMusic.API_HOST, null, false).toJson())
         }
     }
 
-    private fun readConfJson(): ConfigModel {
-        return this.conf.readText().fromJson<ConfigModel>()
+    private fun readConfJson(): Config {
+        return this.conf.readText().fromJson<Config>()
     }
 
-    private fun writeConfJson(conf: ConfigModel) {
+    private fun writeConfJson(conf: Config) {
         this.conf.writeText(conf.toJson())
     }
 

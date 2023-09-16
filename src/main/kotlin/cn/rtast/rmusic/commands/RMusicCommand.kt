@@ -16,18 +16,108 @@
 
 package cn.rtast.rmusic.commands
 
-import com.mojang.brigadier.CommandDispatcher
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
-import net.minecraft.command.CommandRegistryAccess
-import net.minecraft.server.command.CommandManager
+import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
 
-class RMusicCommand : CommandRegistrationCallback {
-    override fun register(
-        dispatcher: CommandDispatcher<ServerCommandSource>,
-        registryAccess: CommandRegistryAccess,
-        environment: CommandManager.RegistrationEnvironment
+class RMusicCommand : BaseCommand {
+
+    override fun executePlay(source: CommandContext<ServerCommandSource>, songId: String) {
+        println("a")
+    }
+
+    override fun executeStop(source: CommandContext<ServerCommandSource>) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executePause(source: CommandContext<ServerCommandSource>) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeResume(source: CommandContext<ServerCommandSource>) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeSeek(source: CommandContext<ServerCommandSource>, value: Int) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeVolume(source: CommandContext<ServerCommandSource>, value: Double) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeLoginWithEmail(source: CommandContext<ServerCommandSource>, email: String, passwd: String) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeLoginWithQRCode(source: CommandContext<ServerCommandSource>) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeLoginWithCellphone(
+        source: CommandContext<ServerCommandSource>,
+        cellphone: Long,
+        passwd: String?
     ) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeLogout(source: CommandContext<ServerCommandSource>) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeVerifyQRCode(source: CommandContext<ServerCommandSource>, key: String) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, captcha: String) {
+        if (source.source.isExecutedByPlayer) {
+
+        } else {
+
+        }
+    }
+
+    override fun executeSetAPIHost(source: CommandContext<ServerCommandSource>, newHost: String) {
 
     }
 }

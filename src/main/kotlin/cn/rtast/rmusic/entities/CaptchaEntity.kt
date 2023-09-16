@@ -14,10 +14,8 @@
  *    limitations under the License.
  */
 
-package cn.rtast.rmusic.models
+package cn.rtast.rmusic.entities
 
-data class QRCodeImageModel(
-    val qrcodeUrl: String,
-    val qrcodeImage: String,
-    val key: String
+data class CaptchaEntity(
+    val code: Int
 )
