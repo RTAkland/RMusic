@@ -14,9 +14,10 @@
  *    limitations under the License.
  */
 
-package cn.rtast.rmusic.utils
+package cn.rtast.rmusic.utils.player
 
-import cn.rtast.rmusic.music.CloudMusic
+import cn.rtast.rmusic.utils.CloudMusic
+import cn.rtast.rmusic.utils.toMinutes
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
@@ -29,7 +30,7 @@ class MusicPlayer : StreamPlayer(), StreamPlayerListener {
         this.addStreamPlayerListener(this)
     }
 
-    suspend fun open(songId: Long) {
+    fun play(songId: Long) {
         val result = CloudMusic().getSongUrl(songId)
         this.open(URL(result))
         this.play()

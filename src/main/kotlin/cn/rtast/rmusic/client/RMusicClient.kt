@@ -16,8 +16,10 @@
 
 package cn.rtast.rmusic.client
 
-import cn.rtast.rmusic.utils.MusicPlayer
+import cn.rtast.rmusic.client.commands.RMusicClientCommand
+import cn.rtast.rmusic.utils.player.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 
 class RMusicClient : ClientModInitializer {
 
@@ -26,6 +28,6 @@ class RMusicClient : ClientModInitializer {
     }
 
     override fun onInitializeClient() {
-
+        CommandRegistrationCallback.EVENT.register(RMusicClientCommand())
     }
 }

@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-package cn.rtast.rmusic.utils
+package cn.rtast.rmusic.utils.player
 
 import cn.rtast.rmusic.models.Minute
 

@@ -16,10 +16,16 @@
 
 package cn.rtast.rmusic.utils
 
-import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
+import com.mojang.brigadier.context.CommandContext
+import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.text.Text
 
-object Status {
-    fun onStatusChanged(event: StreamPlayerEvent) {
+class Message(private val source: CommandContext<ServerCommandSource>) {
+    fun sendMessage(message: Text) {
+        source.source.sendMessage(message)
+    }
 
+    fun sendToActionBar(message: Text) {
+        source.source.player!!.sendMessage(message, true)
     }
 }

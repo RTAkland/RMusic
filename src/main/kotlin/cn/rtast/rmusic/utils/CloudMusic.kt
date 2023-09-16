@@ -14,24 +14,21 @@
  *    limitations under the License.
  */
 
-package cn.rtast.rmusic.music
+package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.entities.*
 import cn.rtast.rmusic.exceptions.CaptchaException
 import cn.rtast.rmusic.exceptions.RequestFailedException
 import cn.rtast.rmusic.models.QRCodeImage
 import cn.rtast.rmusic.models.Song
-import cn.rtast.rmusic.utils.Http
-import cn.rtast.rmusic.utils.fromJson
-import cn.rtast.rmusic.utils.mappingQRCodeAuth
 
 class CloudMusic {
 
-    private suspend fun getQRCodeKey(): String {
+    fun getQRCodeKey(): String {
         return Http.get("/login/qr/key").body.string()
     }
 
-    private suspend fun getQRCodeImage(key: String): QRCodeImage {
+    fun getQRCodeImage(key: String): QRCodeImage {
         try {
             val resp = Http.get(
                 "/login/qr/create?qrimg=true", mapOf("key" to key)
@@ -42,7 +39,7 @@ class CloudMusic {
         }
     }
 
-    suspend fun checkStatus(key: String): String? {
+    fun checkStatus(key: String): String? {
         try {
             val resp = Http.get(
                 "/login/qr/check", mapOf("key" to key)
@@ -54,7 +51,7 @@ class CloudMusic {
         }
     }
 
-    suspend fun searchMusic(keyword: String, limit: Int): List<Song> {
+    fun searchMusic(keyword: String, limit: Int): List<Song> {
         try {
             val resp = Http.get(
                 "/search", mapOf("keywords" to keyword, "limit" to limit.toString())
@@ -67,8 +64,7 @@ class CloudMusic {
                 it.artists.forEach { art ->
                     artists.append("${art.name} | ")
                 }
-                artists.deleteRange(artistsString.length - 2, artistsString.length)
-                songs.add(Song(it.name, it.id, artists.toString()))
+                songs.add(Song(it.name, it.id, artists.toString().removeLast2()))
             }
             return songs
 
@@ -77,18 +73,18 @@ class CloudMusic {
         }
     }
 
-    suspend fun getSongUrl(id: Long): String {
+    fun getSongUrl(id: Long): String {
         try {
             return Http.get(
                 "/song/url", mapOf("id" to id.toString())
-            ).body.string().fromJson<SongUrlEntity>().data.url
+            ).body.string().fromJson<SongUrlEntity>().data.first().url
 
         } catch (_: NullPointerException) {
             throw RequestFailedException("Request was failed! Maybe something wrong with API?")
         }
     }
 
-    suspend fun getLyric(id: Long): LyricEntity {
+    fun getLyric(id: Long): LyricEntity {
         try {
             return Http.get("/lyric", mapOf("id" to id.toString())).body.string().fromJson<LyricEntity>()
         } catch (_: NullPointerException) {
@@ -96,13 +92,11 @@ class CloudMusic {
         }
     }
 
-    suspend fun sendCaptcha(cellphone: Long) {
+    fun sendCaptcha(cellphone: Long) {
         try {
             val resp = Http.get(
-                "/captcha/sent",
-                mapOf("phone" to cellphone.toString())
-            ).body.string()
-                .fromJson<CaptchaEntity>()
+                "/captcha/sent", mapOf("phone" to cellphone.toString())
+            ).body.string().fromJson<CaptchaEntity>()
             if (resp.code != 200) {
                 throw CaptchaException("The phone number is invalid!")
             }
@@ -112,11 +106,15 @@ class CloudMusic {
         }
     }
 
-    suspend fun verifyCaptcha(cellphone: Long, captcha: String): Boolean {
+    fun verifyCaptcha(cellphone: Long, captcha: String): Boolean {
         try {
             val resp = Http.get(
                 "/captcha/verify",
-                mapOf("phone" to cellphone.toString(), "captcha" to captcha)
+                mapOf(
+                    "phone" to cellphone.toString(),
+                    "captcha" to captcha,
+                    "timestamp" to currentTime().toString()
+                )
             ).body.string().fromJson<CaptchaEntity>()
             return resp.code == 200
 
@@ -124,5 +122,17 @@ class CloudMusic {
             throw RequestFailedException("Request was failed! Maybe something wrong with API?")
 
         }
+    }
+
+    fun loginWithEmail(email: String, password: String) {
+
+    }
+
+    fun loginWithPhoneCaptcha(cellphone: Long, captcha: String) {
+
+    }
+
+    fun loginWithPhone(cellphone: Long, password: String) {
+
     }
 }

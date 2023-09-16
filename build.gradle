@@ -36,11 +36,13 @@ dependencies {
     implementation 'org.jflac:jflac-codec:1.5.2'
     implementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
     implementation 'com.google.code.gson:gson:2.10.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
     implementation 'com.github.goxr3plus:java-stream-player:10.0.2'
     implementation 'com.googlecode.soundlibs:soundlibs:1.4'
+    implementation 'com.google.zxing:core:3.5.2'
+    implementation 'com.google.zxing:javase:3.5.2'
 
     embed(api('com.github.goxr3plus:java-stream-player:10.0.2'))
+    embed(api('com.google.zxing:core:3.5.2'))
 }
 
 processResources {

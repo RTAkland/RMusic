@@ -49,14 +49,6 @@ class RMusicCommand : BaseCommand {
         }
     }
 
-    override fun executeSeek(source: CommandContext<ServerCommandSource>, value: Int) {
-        if (source.source.isExecutedByPlayer) {
-
-        } else {
-
-        }
-    }
-
     override fun executeVolume(source: CommandContext<ServerCommandSource>, value: Double) {
         if (source.source.isExecutedByPlayer) {
 

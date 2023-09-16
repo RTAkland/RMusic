@@ -26,7 +26,8 @@ class SessionManager {
 
     init {
         if (!conf.exists()) {
-            conf.writeText(Config(RMusic.API_HOST, null, false).toJson())
+            conf.createNewFile()
+            conf.writeText(Config(RMusic.API_HOST, "", false).toJson())
         }
     }
 

@@ -17,7 +17,7 @@
 package cn.rtast.rmusic.entities
 
 data class SongUrlEntity(
-    val data: SongData
+    val data: List<SongData>
 )
 
 data class SongData(

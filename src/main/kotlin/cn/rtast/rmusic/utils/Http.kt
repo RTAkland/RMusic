@@ -17,8 +17,6 @@
 package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.RMusic
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -29,14 +27,14 @@ object Http {
 
     private val client = OkHttpClient()
 
-    suspend fun get(url: String, params: Map<String, String>? = null, headers: Map<String, String>? = null): Response {
+    fun get(url: String, params: Map<String, String>? = null, headers: Map<String, String>? = null): Response {
         val urlWithParams = buildUrlWithParams("${RMusic.API_HOST}$url", params)
         val request = buildRequest(urlWithParams, headers)
 
         return executeRequest(request)
     }
 
-    suspend fun post(url: String, requestBody: RequestBody, headers: Map<String, String>? = null): Response {
+    fun post(url: String, requestBody: RequestBody, headers: Map<String, String>? = null): Response {
         val request = buildRequest("${RMusic.API_HOST}$url", headers).post(requestBody)
 
         return executeRequest(request)
@@ -69,9 +67,7 @@ object Http {
         return requestBuilder
     }
 
-    private suspend fun executeRequest(request: Request.Builder): Response {
-        return withContext(Dispatchers.IO) {
-            client.newCall(request.build()).execute()
-        }
+    private fun executeRequest(request: Request.Builder): Response {
+        return client.newCall(request.build()).execute()
     }
 }

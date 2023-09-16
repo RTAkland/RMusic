@@ -18,7 +18,6 @@ package cn.rtast.rmusic.commands
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.DoubleArgumentType
-import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
@@ -35,15 +34,12 @@ interface BaseCommand : CommandRegistrationCallback {
     ) {
         val rootCommandNode = dispatcher.register(CommandManager.literal("rmusic").then(
             CommandManager.literal("play").then(CommandManager.argument("songId", StringArgumentType.string())
-                .executes { this.executePlay(it, StringArgumentType.getString(it, "songid"));1 })
+                .executes { this.executePlay(it, StringArgumentType.getString(it, "songId"));1 })
         ).then(CommandManager.literal("stop").executes { this.executeStop(it);1 })
             .then(CommandManager.literal("pause").executes { this.executePause(it);1 })
             .then(CommandManager.literal("resume").executes { this.executeResume(it);1 }).then(
-                CommandManager.literal("seek").then(CommandManager.argument("seek-value", IntegerArgumentType.integer())
-                    .executes { this.executeSeek(it, IntegerArgumentType.getInteger(it, "seek-value"));1 })
-            ).then(
                 CommandManager.literal("volume")
-                    .then(CommandManager.argument("volume-value", DoubleArgumentType.doubleArg()).executes {
+                    .then(CommandManager.argument("volume-value", DoubleArgumentType.doubleArg(1.00, 100.00)).executes {
                         this.executeVolume(
                             it, DoubleArgumentType.getDouble(it, "volume-value")
                         );1
@@ -104,8 +100,6 @@ interface BaseCommand : CommandRegistrationCallback {
     fun executePause(source: CommandContext<ServerCommandSource>)
 
     fun executeResume(source: CommandContext<ServerCommandSource>)
-
-    fun executeSeek(source: CommandContext<ServerCommandSource>, value: Int)
 
     fun executeVolume(source: CommandContext<ServerCommandSource>, value: Double)
 

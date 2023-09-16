@@ -14,14 +14,12 @@
  *    limitations under the License.
  */
 
-package cn.rtast.rmusic.utils
+package cn.rtast.rmusic.utils.player
 
-import cn.rtast.rmusic.entities.QRCodeCheckStatus
+import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 
-fun mappingQRCodeAuth(code: Int): QRCodeCheckStatus {
-    return QRCodeCheckStatus.entries.first { it.id == code }
-}
+object Status {
+    fun onStatusChanged(event: StreamPlayerEvent) {
 
-fun currentTime(): Long {
-    return System.currentTimeMillis() / 1000
+    }
 }
