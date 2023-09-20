@@ -58,7 +58,19 @@ object Http {
     }
 
     private fun buildRequest(url: String, headers: Map<String, String>?): Request.Builder {
-        val requestBuilder = Request.Builder().url(url)
+        val sessionManager = SessionManager()
+        val newUrl = if (sessionManager.getStatus() == SessionManager.SessionStatus.LoggedIn) {
+            val result = StringBuilder()
+            if (url.contains("?")) {
+                result.append("&cookie=${sessionManager.getCookie()}")
+            } else {
+                result.append("?cookie=${sessionManager.getCookie()}")
+            }
+            "$url$result"
+        } else {
+            url
+        }
+        val requestBuilder = Request.Builder().url(newUrl)
 
         headers?.forEach { (key, value) ->
             requestBuilder.addHeader(key, value)

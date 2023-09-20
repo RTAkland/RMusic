@@ -16,7 +16,7 @@
 
 package cn.rtast.rmusic.utils.player
 
-import cn.rtast.rmusic.utils.CloudMusic
+import cn.rtast.rmusic.music.CloudMusic
 import cn.rtast.rmusic.utils.toMinutes
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
