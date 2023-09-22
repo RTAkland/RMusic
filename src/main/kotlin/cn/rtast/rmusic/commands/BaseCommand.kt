@@ -70,15 +70,18 @@ interface BaseCommand : CommandRegistrationCallback {
                             );1
                         })
                 )
-            ).then(CommandManager.literal("logout").executes { this.executeLogout(it);1 }).then(
-                CommandManager.literal("verify").then(
-                    CommandManager.literal("captcha")
-                        .then(CommandManager.argument("captcha", StringArgumentType.string()).executes {
-                            this.executeVerifyCaptcha(
-                                it, StringArgumentType.getString(it, "captcha")
-                            );1
-                        })
+            ).then(CommandManager.literal("logout").executes { this.executeLogout(it);1 })
+            .then(CommandManager.literal("verify").then(CommandManager.literal("captcha").then(CommandManager.argument(
+                    "phone", LongArgumentType.longArg()
                 ).then(
+                    CommandManager.argument("captcha", StringArgumentType.string())
+                ).executes {
+                    this.executeVerifyCaptcha(
+                        it,
+                        LongArgumentType.getLong(it, "ohone"),
+                        StringArgumentType.getString(it, "captcha")
+                    );1
+                }).then(
                     CommandManager.literal("qrcode")
                         .then(CommandManager.argument("qr-key", StringArgumentType.string()).executes {
                             this.executeVerifyQRCode(
@@ -87,8 +90,12 @@ interface BaseCommand : CommandRegistrationCallback {
                         })
                 )
             ).then(CommandManager.literal("set-api-host").requires { it.hasPermissionLevel(2) }
-                .then(CommandManager.argument("new-host", StringArgumentType.string())
-                    .executes { this.executeSetAPIHost(it, StringArgumentType.getString(it, "new-host"));1 }))
+                .then(CommandManager.argument("new-host", StringArgumentType.string()).executes {
+                        this.executeSetAPIHost(
+                            it, StringArgumentType.getString(it, "new-host")
+                        );1
+                    }))
+            )
         )
         dispatcher.register(CommandManager.literal("rm").redirect(rootCommandNode))
     }
@@ -113,7 +120,7 @@ interface BaseCommand : CommandRegistrationCallback {
 
     fun executeVerifyQRCode(source: CommandContext<ServerCommandSource>, key: String)
 
-    fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, captcha: String)
+    fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, cellphone: Long, captcha: String)
 
     fun executeSetAPIHost(source: CommandContext<ServerCommandSource>, newHost: String)
 }

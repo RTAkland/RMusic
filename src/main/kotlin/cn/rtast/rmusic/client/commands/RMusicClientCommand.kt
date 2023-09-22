@@ -18,8 +18,10 @@ package cn.rtast.rmusic.client.commands
 
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.commands.BaseCommand
+import cn.rtast.rmusic.models.Login
 import cn.rtast.rmusic.music.CloudMusic
 import cn.rtast.rmusic.utils.Message
+import cn.rtast.rmusic.utils.SessionManager
 import com.goxr3plus.streamplayer.enums.Status
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
@@ -30,6 +32,39 @@ import net.minecraft.util.Formatting
 import kotlin.concurrent.thread
 
 class RMusicClientCommand : BaseCommand {
+
+    private fun loginStatus(message: Message, response: Login) {
+        if (response.code != 200) {
+            message.sendMessage(
+                Text.translatable("session.netease.login.failure").styled { it.withColor(Formatting.RED) })
+        } else {
+            message.sendMessage(Text.translatable("session.netease.login.success",
+                Text.literal(response.profile!!.nickname).styled { it.withColor(Formatting.AQUA) },
+                Text.literal(response.profile.userId.toString()).styled {
+                    it.withColor(Formatting.DARK_GREEN)
+                }).styled {
+                it.withColor(Formatting.GREEN)
+                it.withItalic(true)
+            })
+        }
+    }
+
+    private fun loginStatusAnonymous(status: Boolean, message: Message) {
+        if (status) {
+            message.sendMessage(
+                Text.translatable("session.netease.login.failure").styled { it.withColor(Formatting.RED) })
+        } else {
+            message.sendMessage(Text.translatable("session.netease.login.success", Text.literal("null").styled {
+                it.withColor(Formatting.AQUA)
+                it.withItalic(true)
+            }, Text.literal("null").styled {
+                it.withColor(Formatting.AQUA)
+                it.withItalic(true)
+            }).styled {
+                it.withColor(Formatting.GREEN)
+            })
+        }
+    }
 
     override fun executePlay(source: CommandContext<ServerCommandSource>, songId: String) {
         val message = Message(source)
@@ -115,19 +150,7 @@ class RMusicClientCommand : BaseCommand {
         })
         thread {
             val resp = CloudMusic().loginWithEmail(email, passwd)
-            if (resp.code != 200) {
-                message.sendMessage(Text.translatable("session.netease.login.failure")
-                    .styled { it.withColor(Formatting.RED) })
-            } else {
-                message.sendMessage(Text.translatable("session.netease.login.success",
-                    Text.literal(resp.profile!!.nickname).styled { it.withColor(Formatting.AQUA) },
-                    Text.literal(resp.profile.userId.toString()).styled {
-                        it.withColor(Formatting.DARK_GREEN)
-                    }).styled {
-                    it.withColor(Formatting.GREEN)
-                    it.withItalic(true)
-                })
-            }
+            this.loginStatus(message, resp)
         }
     }
 
@@ -144,12 +167,11 @@ class RMusicClientCommand : BaseCommand {
                         Text.literal(key).styled { key -> key.withColor(Formatting.AQUA) })
                 )
             })
-            message.sendMessage(
-                Text.translatable(
-                    "rmusic.login.qr.check",
-                    Text.translatable("rmusic.here.text").styled { it.withColor(Formatting.AQUA) })
-                    .styled { it.withColor(Formatting.GREEN)
-                    it.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm verify $key"))})
+            message.sendMessage(Text.translatable("rmusic.login.qr.check",
+                Text.translatable("rmusic.here.text").styled { it.withColor(Formatting.AQUA) }).styled {
+                it.withColor(Formatting.GREEN)
+                it.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm verify $key"))
+            })
         }
 
     }
@@ -158,26 +180,75 @@ class RMusicClientCommand : BaseCommand {
         source: CommandContext<ServerCommandSource>, cellphone: Long, passwd: String?
     ) {
         val message = Message(source)
-
+        if (passwd == null) {
+            thread {
+                CloudMusic().sendCaptcha(cellphone)
+            }
+            message.sendMessage(Text.translatable(
+                "rmusic.login.phone.captcha",
+                Text.literal(cellphone.toString()).styled {
+                    it.withColor(Formatting.AQUA)
+                    it.withItalic(true)
+                }).styled {
+                it.withColor(Formatting.GREEN)
+            })
+        } else {
+            thread {
+                val loginResponse = CloudMusic().loginWithPhone(cellphone, passwd)
+                this.loginStatus(message, loginResponse)
+            }
+        }
     }
 
     override fun executeLogout(source: CommandContext<ServerCommandSource>) {
         val message = Message(source)
-
+        if (SessionManager().getStatus() == SessionManager.SessionStatus.LoggedIn) {
+            message.sendMessage(Text.translatable("session.netease.logout.success").styled {
+                it.withColor(Formatting.GREEN)
+            })
+        } else {
+            message.sendMessage(Text.translatable("session.netease.logout.failure").styled {
+                it.withColor(Formatting.RED)
+            })
+        }
     }
 
     override fun executeVerifyQRCode(source: CommandContext<ServerCommandSource>, key: String) {
         val message = Message(source)
-
+        message.sendMessage(Text.translatable("rmusic.login.checking").styled {
+            it.withColor(Formatting.GREEN)
+        })
+        thread {
+            val response = CloudMusic().checkQRCode(key)
+            if (response == null) {
+                message.sendMessage(
+                    Text.translatable("session.netease.login.failure").styled { it.withColor(Formatting.RED) })
+            } else {
+                SessionManager().setCookie(response)
+                this.loginStatusAnonymous(true, message)
+            }
+        }
     }
 
-    override fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, captcha: String) {
+    override fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, cellphone: Long, captcha: String) {
         val message = Message(source)
+
+        message.sendMessage(Text.translatable("session.netease.login.failure").styled { it.withColor(Formatting.RED) })
+
+        thread {
+            val verifyResponse = CloudMusic().verifyCaptcha(cellphone, captcha)
+            this.loginStatusAnonymous(verifyResponse, message)
+        }
 
     }
 
     override fun executeSetAPIHost(source: CommandContext<ServerCommandSource>, newHost: String) {
         val message = Message(source)
-
+        SessionManager().setApiHost(newHost)
+        message.sendMessage(Text.translatable("config.modify.new",
+            Text.literal(newHost).styled { it.withColor(Formatting.AQUA)
+            it.withItalic(true)}).styled {
+            it.withColor(Formatting.GREEN)
+        })
     }
 }

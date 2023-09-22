@@ -21,7 +21,10 @@ import cn.rtast.rmusic.exceptions.CaptchaException
 import cn.rtast.rmusic.models.Login
 import cn.rtast.rmusic.models.QRCodeImage
 import cn.rtast.rmusic.models.Song
-import cn.rtast.rmusic.utils.*
+import cn.rtast.rmusic.utils.Http
+import cn.rtast.rmusic.utils.currentTime
+import cn.rtast.rmusic.utils.fromJson
+import cn.rtast.rmusic.utils.removeLast2
 
 class CloudMusic {
 
@@ -36,12 +39,12 @@ class CloudMusic {
         return QRCodeImage(resp.data.qrurl, resp.data.qrimg, key)
     }
 
-    fun checkStatus(key: String): String? {
+    fun checkQRCode(key: String): String? {
         val resp = Http.get(
             "/login/qr/check", mapOf("key" to key)
         ).body.string().fromJson<QRCodeCheckModel>()
-        val status = mappingQRCodeAuth(resp.code)
-        return if (status == QRCodeCheckStatus.AuthSuccessfully) resp.cookie else null
+
+        return if (resp.code != 200) null else resp.cookie
     }
 
     fun searchMusic(keyword: String, limit: Int): List<Song> {

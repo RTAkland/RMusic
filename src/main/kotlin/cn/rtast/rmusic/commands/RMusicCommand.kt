@@ -101,12 +101,8 @@ class RMusicCommand : BaseCommand {
         }
     }
 
-    override fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, captcha: String) {
-        if (source.source.isExecutedByPlayer) {
-
-        } else {
-
-        }
+    override fun executeVerifyCaptcha(source: CommandContext<ServerCommandSource>, cellphone: Long, captcha: String) {
+        TODO("Not yet implemented")
     }
 
     override fun executeSetAPIHost(source: CommandContext<ServerCommandSource>, newHost: String) {

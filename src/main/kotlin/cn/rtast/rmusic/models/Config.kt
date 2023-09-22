@@ -19,5 +19,5 @@ package cn.rtast.rmusic.models
 data class Config(
     var apiHost: String,
     var cookie: String?,
-    var sessionStatus: Boolean
+    var sessionState: Boolean
 )

@@ -41,27 +41,23 @@ class SessionManager {
 
 
     fun getStatus(): SessionStatus {
-        return if (this.readConfJson().sessionStatus) SessionStatus.LoggedIn else SessionStatus.Anonymous
-    }
-
-    fun setStatus(status: SessionStatus) {
-        val confJson = this.readConfJson()
-        confJson.sessionStatus = (status == SessionStatus.LoggedIn)
-    }
-
-    fun getApiHost(): String {
-        return this.readConfJson().apiHost
+        return if (this.readConfJson().sessionState) SessionStatus.LoggedIn else SessionStatus.Anonymous
     }
 
     fun setApiHost(host: String) {
         val confJson = this.readConfJson()
         confJson.apiHost = host
+        RMusic.API_HOST = host
         this.writeConfJson(confJson)
     }
 
     fun getCookie(): String {
         if (this.getStatus() == SessionStatus.Anonymous) throw SessionException("You are not logged in yet!")
         return this.readConfJson().cookie!!
+    }
+
+    fun setCookie(cookie: String) {
+        this.conf.writeText(Config(this.readConfJson().apiHost, cookie, true).toJson())
     }
 
     enum class SessionStatus {

@@ -19,7 +19,8 @@ package cn.rtast.rmusic.utils
 import cn.rtast.rmusic.entities.QRCodeCheckStatus
 
 fun mappingQRCodeAuth(code: Int): QRCodeCheckStatus {
-    return QRCodeCheckStatus.entries.first { it.id == code }
+    return QRCodeCheckStatus.values().first { it.id == code }  // for kotlin 1.8.22 and below
+//    return QRCodeCheckStatus.entries.first { it.id == code }  // for kotlin 1.9.x and above
 }
 
 fun currentTime(): Long {

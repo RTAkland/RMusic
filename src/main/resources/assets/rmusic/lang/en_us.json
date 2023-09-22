@@ -16,9 +16,15 @@
   "player.setvolume": "设置音量为 [ %s ].",
   "player.stop": "已停止播放.",
   "session.netease.login.failure": "登录失败",
-  "session.netease.login.success": "登陆成功!",
+  "session.netease.login.success": "登陆成功! [ (%s:%s) ]",
   "session.netease.login.wait": "使用 [ %s ] 登陆中",
   "session.netease.logout.failure": "你还没有登录!",
   "session.netease.logout.success": "已登出.",
-  "config.modify.new": "新的API地址: [ %s ]."
+  "config.modify.new": "新的API地址: [ %s ].",
+  "rmusic.mail.text": "邮箱",
+  "rmusic.loginurl.text": "点击 [ %s ] 打开浏览器扫码登录",
+  "rmusic.here.text": "这里",
+  "rmusic.login.qr.check": "完成扫码登陆后点击 [ %s ] 来完成登录",
+  "rmusic.login.phone.captcha": "已将验证发送至 %s 使用/rm verify captcha <验证码> 来验证登录",
+  "rmusic.login.checking": "正在验证中."
 }

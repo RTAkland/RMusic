@@ -24,5 +24,7 @@
   "rmusic.mail.text": "邮箱",
   "rmusic.loginurl.text": "点击 [ %s ] 打开浏览器扫码登录",
   "rmusic.here.text": "这里",
-  "rmusic.login.qr.check": "完成扫码登陆后点击 [ %s ] 来完成登录"
+  "rmusic.login.qr.check": "完成扫码登陆后点击 [ %s ] 来完成登录",
+  "rmusic.login.phone.captcha": "已将验证发送至 %s 使用/rm verify captcha <验证码> 来验证登录",
+  "rmusic.login.checking": "正在验证中."
 }

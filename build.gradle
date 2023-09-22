@@ -1,7 +1,7 @@
 plugins {
     id 'fabric-loom' version '1.2-SNAPSHOT'
     id 'maven-publish'
-    id 'org.jetbrains.kotlin.jvm' version '1.9.10'
+    id 'org.jetbrains.kotlin.jvm' version '1.8.22'
 }
 
 version = project.mod_version
@@ -33,11 +33,8 @@ dependencies {
     implementation 'com.googlecode.soundlibs:soundlibs:1.4'
     implementation 'com.google.zxing:core:3.5.2'
     implementation 'com.google.zxing:javase:3.5.2'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
 
     embed(api('com.github.goxr3plus:java-stream-player:10.0.2'))
-    embed(api('com.google.zxing:core:3.5.2'))
-    embed(api('org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'))
 }
 
 processResources {
