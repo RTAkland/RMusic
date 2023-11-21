@@ -15,18 +15,10 @@
  */
 
 
-package cn.rtast.rmusic.client
+package cn.rtast.rmusic.models
 
-import cn.rtast.rmusic.utils.MusicPlayer
-import net.fabricmc.api.ClientModInitializer
-
-class RMusicClient: ClientModInitializer {
-
-    companion object {
-        var player: MusicPlayer? = null
-    }
-
-    override fun onInitializeClient() {
-
-    }
-}
+data class QRCodeModel(
+    val b64Image: String,
+    val key: String,
+    val qrcodeUrl: String
+)

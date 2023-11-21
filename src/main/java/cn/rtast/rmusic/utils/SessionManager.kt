@@ -17,6 +17,20 @@
 
 package cn.rtast.rmusic.utils
 
-class SessionManager {
+object SessionManager {
 
+    private var loginState = false
+    private var cookie: String? = null
+
+    fun setCookie(cookie: String) {
+        this.loginState = true
+        this.cookie = cookie
+    }
+
+    fun removeCookie() {
+        if (this.cookie != null) {
+            this.cookie = null
+            this.loginState = false
+        }
+    }
 }

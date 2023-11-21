@@ -65,7 +65,6 @@ java {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
     }
     archivesBaseName = project.archives_base_name + "-" + project.fabric_version
-    //    withSourcesJar()
 }
 
 jar {

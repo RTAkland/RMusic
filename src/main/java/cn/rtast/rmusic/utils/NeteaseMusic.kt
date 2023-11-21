@@ -17,10 +17,42 @@
 
 package cn.rtast.rmusic.utils
 
-import cn.rtast.rmusic.RMusic.Companion.API
+import cn.rtast.rmusic.QRCODE_CHECK_PATH
+import cn.rtast.rmusic.QRCODE_GEN_PATH
+import cn.rtast.rmusic.QRCODE_KEY_GEN_PATH
+import cn.rtast.rmusic.entities.CookieEntity
+import cn.rtast.rmusic.entities.qrcode.KeyEntity
+import cn.rtast.rmusic.entities.qrcode.QRImageEntity
+import cn.rtast.rmusic.models.QRCodeModel
+import cn.rtast.rmusic.utils.http.HttpManager
+import cn.rtast.rmusic.utils.http.Params
 
 class NeteaseMusic {
-    private fun getQRCode() {
+
+    private fun getQRCodeKey(): String {
+        val resp = HttpManager.get(QRCODE_KEY_GEN_PATH, null, null).body.string()
+        return resp.fromJson<KeyEntity>().data.unikey
+    }
+
+    fun createQRCode(): QRCodeModel {
+        val key = this.getQRCodeKey()
+        val params = Params()
+            .addParam("key", key)
+            .addParam("qrimg", "1")
+        val resp = HttpManager.get(QRCODE_GEN_PATH, params, null).body.string()
+        val json = resp.fromJson<QRImageEntity>()
+        return QRCodeModel(json.data.qrimg, key, json.data.qrurl)
+    }
+
+    fun checkQRCodeState(key: String): Boolean {
+        val params = Params()
+            .addParam("key", key)
+        val resp = HttpManager.get(QRCODE_CHECK_PATH, params, null).body.string()
+        val json = resp.fromJson<CookieEntity>()
+        return json.code == 803
+    }
+
+    fun search(keyword: String) {
 
     }
 }

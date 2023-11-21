@@ -19,6 +19,8 @@ package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.utils.http.Params
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 import java.security.MessageDigest
 
 fun ByteArray.getMD5(): String {
@@ -35,4 +37,16 @@ fun joinToURL(url: String, params: Params): String {
     val paramsToAdd = if (url.contains("?")) paramsString.removePrefix("?") else paramsString
     newUrl.append(paramsToAdd)
     return newUrl.toString()
+}
+
+inline fun <reified T> String.fromArrayJson(): T {
+    return RMusic.gson.fromJson(this, object : TypeToken<T>() {}.type)
+}
+
+fun Any.toJson(): String {
+    return RMusic.gson.toJson(this)
+}
+
+inline fun <reified T> String.fromJson(): T {
+    return RMusic.gson.fromJson(this, T::class.java)
 }

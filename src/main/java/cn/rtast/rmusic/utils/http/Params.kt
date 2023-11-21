@@ -21,13 +21,9 @@ class Params {
 
     private val params = mutableMapOf<String, String>()
 
-    fun addParam(key: String, value: String): Boolean {
-        return if (this.params.contains(key)) {
-            true
-        } else {
-            this.params[key] = value
-            false
-        }
+    fun addParam(key: String, value: String): Params {
+        this.params[key] = value
+        return this
     }
 
     override fun toString(): String {

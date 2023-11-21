@@ -25,12 +25,12 @@ interface RLogger {
 
     fun log(level: Level, message: String)
 
-    fun debug(message: String)
+    fun debug(message: Any)
 
-    fun info(message: String)
+    fun info(message: Any)
 
-    fun warn(message: String)
+    fun warn(message: Any)
 
-    fun error(message: String)
+    fun error(message: Any)
 
 }

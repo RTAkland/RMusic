@@ -15,20 +15,30 @@
  */
 package cn.rtast.rmusic
 
+import cn.rtast.rmusic.enums.logger.Level
+import cn.rtast.rmusic.utils.MusicPlayer
 import cn.rtast.rmusic.utils.logger.ConsoleLogger
+import com.google.gson.Gson
 import net.fabricmc.api.ModInitializer
 import net.minecraft.util.Identifier
+import java.net.URL
 
 class RMusic : ModInitializer {
 
     companion object {
         val logger = ConsoleLogger()
+        val gson = Gson()
         var API = "https://rmusic.dgtmc.top"
-        var cookie: String? = null
         val RNetworkingChannel = Identifier("rmusic", "channel")
     }
 
     override fun onInitialize() {
 
     }
+}
+
+fun main() {
+    RMusic.logger.setLogLevel(Level.DEBUG)
+    val url = "https://static.rtakland.icu/files/res/music.mp3"
+    MusicPlayer().play(URL(url))
 }

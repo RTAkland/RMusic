@@ -37,19 +37,19 @@ class ConsoleLogger : RLogger {
         }
     }
 
-    override fun debug(message: String) {
-        this.log(Level.DEBUG, message)
+    override fun debug(message: Any) {
+        this.log(Level.DEBUG, message.toString())
     }
 
-    override fun info(message: String) {
-        this.log(Level.INFO, message)
+    override fun info(message: Any) {
+        this.log(Level.INFO, message.toString())
     }
 
-    override fun warn(message: String) {
-        this.log(Level.WARN, message)
+    override fun warn(message: Any) {
+        this.log(Level.WARN, message.toString())
     }
 
-    override fun error(message: String) {
-        this.log(Level.ERROR, message)
+    override fun error(message: Any) {
+        this.log(Level.ERROR, message.toString())
     }
 }

@@ -15,18 +15,6 @@
  */
 
 
-package cn.rtast.rmusic.client
+package cn.rtast.rmusic.exceptions
 
-import cn.rtast.rmusic.utils.MusicPlayer
-import net.fabricmc.api.ClientModInitializer
-
-class RMusicClient: ClientModInitializer {
-
-    companion object {
-        var player: MusicPlayer? = null
-    }
-
-    override fun onInitializeClient() {
-
-    }
-}
+class MusicPlayerNotInitializedException(message: String?) : Exception(message)
