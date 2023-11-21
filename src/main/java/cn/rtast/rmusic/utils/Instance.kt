@@ -30,8 +30,8 @@ fun ByteArray.getMD5(): String {
 
 fun joinToURL(url: String, params: Params): String {
     val newUrl = StringBuilder(url)
-    if (RMusic.cookie != null) {
-        params.addParam("cookie", RMusic.cookie!!)
+    if (SessionManager.cookie != null) {
+        params.addParam("cookie", SessionManager.cookie!!)
     }
     val paramsString = params.toString()
     val paramsToAdd = if (url.contains("?")) paramsString.removePrefix("?") else paramsString
