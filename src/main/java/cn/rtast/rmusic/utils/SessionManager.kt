@@ -18,4 +18,5 @@
 package cn.rtast.rmusic.utils
 
 class SessionManager {
+
 }

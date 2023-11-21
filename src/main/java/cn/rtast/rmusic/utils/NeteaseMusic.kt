@@ -13,25 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.rtast.rmusic
 
-import cn.rtast.rmusic.utils.http.GZip
-import net.fabricmc.api.ModInitializer
-import net.minecraft.util.Identifier
-import java.io.File
 
-class RMusic : ModInitializer {
+package cn.rtast.rmusic.utils
 
-    companion object {
-        var API = "https://rmusic.dgtmc.top"
-        var cookie: String? = null
-        val RNetworkingChannel = Identifier("rmusic", "channel")
-    }
+import cn.rtast.rmusic.RMusic.Companion.API
 
-    override fun onInitialize() {
+class NeteaseMusic {
+    private fun getQRCode() {
 
     }
-}
-
-fun main() {
 }

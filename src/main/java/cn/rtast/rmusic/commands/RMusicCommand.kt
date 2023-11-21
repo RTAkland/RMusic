@@ -15,12 +15,19 @@
  */
 
 
-package cn.rtast.rmusic.api
+package cn.rtast.rmusic.commands
 
-import cn.rtast.rmusic.RMusic.Companion.API
+import com.mojang.brigadier.CommandDispatcher
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.minecraft.command.CommandRegistryAccess
+import net.minecraft.server.command.CommandManager
+import net.minecraft.server.command.ServerCommandSource
 
-class NeteaseMusic {
-    private fun getQRCode() {
-
+class RMusicCommand: CommandRegistrationCallback {
+    override fun register(
+        dispatcher: CommandDispatcher<ServerCommandSource>,
+        registryAccess: CommandRegistryAccess,
+        environment: CommandManager.RegistrationEnvironment
+    ) {
     }
 }

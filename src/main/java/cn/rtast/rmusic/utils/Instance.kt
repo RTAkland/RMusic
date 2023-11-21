@@ -17,6 +17,7 @@
 
 package cn.rtast.rmusic.utils
 
+import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.utils.http.Params
 import java.security.MessageDigest
 
@@ -27,6 +28,9 @@ fun ByteArray.getMD5(): String {
 
 fun joinToURL(url: String, params: Params): String {
     val newUrl = StringBuilder(url)
+    if (RMusic.cookie != null) {
+        params.addParam("cookie", RMusic.cookie!!)
+    }
     val paramsString = params.toString()
     val paramsToAdd = if (url.contains("?")) paramsString.removePrefix("?") else paramsString
     newUrl.append(paramsToAdd)
