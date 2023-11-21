@@ -18,24 +18,20 @@
 package cn.rtast.rmusic.mixins;
 
 import cn.rtast.rmusic.client.RMusicClient;
-import com.goxr3plus.streamplayer.enums.Status;
-import net.minecraft.client.sound.SoundInstance;
-import net.minecraft.client.sound.SoundSystem;
-import net.minecraft.sound.SoundCategory;
+import net.minecraft.server.PlayerManager;
+import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(SoundSystem.class)
-public class SoundSystemMixin {
-    @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At("HEAD"), cancellable = true)
-    public void play(SoundInstance sound, CallbackInfo ci) {
-        if (RMusicClient.Companion.getPlayer() != null &&
-                RMusicClient.Companion.getPlayer().getStatus() == Status.PLAYING) {
-            if (sound.getCategory() == SoundCategory.MUSIC) {
-                ci.cancel();
-            }
+@Mixin(PlayerManager.class)
+public class PlayerManagerMixin {
+
+    @Inject(method = "remove", at = @At("HEAD"))
+    public void remove(ServerPlayerEntity player, CallbackInfo ci) {
+        if (RMusicClient.Companion.getPlayer() != null) {
+            RMusicClient.Companion.getPlayer().stop();
         }
     }
 }
