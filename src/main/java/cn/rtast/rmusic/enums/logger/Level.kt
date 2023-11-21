@@ -18,8 +18,8 @@
 package cn.rtast.rmusic.enums.logger
 
 enum class Level(val level: Int) {
-    DEBUG(0),
-    INFO(1),
-    WARN(2),
-    ERROR(3)
+    DEBUG(3),
+    INFO(2),
+    WARN(1),
+    ERROR(0)
 }

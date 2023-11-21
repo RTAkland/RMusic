@@ -18,8 +18,6 @@
 package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.client.RMusicClient
-import cn.rtast.rmusic.exceptions.MusicPlayerNotInitializedException
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
@@ -56,5 +54,6 @@ class MusicPlayer : StreamPlayer(), StreamPlayerListener {
     }
 
     override fun statusUpdated(event: StreamPlayerEvent) {
+
     }
 }

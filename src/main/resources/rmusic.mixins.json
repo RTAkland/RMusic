@@ -4,6 +4,7 @@
   "package": "cn.rtast.rmusic.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "PlayerManagerMixin"
   ],
   "client": [
     "SoundSystemMixin"
