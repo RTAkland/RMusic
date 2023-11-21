@@ -24,10 +24,12 @@ class RMusic : ModInitializer {
 
     companion object {
         var API = "https://rmusic.dgtmc.top"
-        val CHANNEL_ID = Identifier("rmusic", "channel")
+        var cookie: String? = null
+        val RNetworkingChannel = Identifier("rmusic", "channel")
     }
 
     override fun onInitialize() {
+
         val confFile = File("$DEFAULT_CONF_PATH/rmusic.yml")
 //        CommandRegistrationCallback.EVENT.register(RMusicCommand())
     }

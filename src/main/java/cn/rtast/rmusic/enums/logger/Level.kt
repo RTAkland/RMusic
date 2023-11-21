@@ -15,20 +15,11 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.enums.logger
 
-const val VERSION = "0.1.0b"
-const val DEFAULT_CONF_PATH = "./config/rmusic"
-
-const val CELLPHONE_LOGIN_PATH = "/login/cellphone"
-const val EMAIL_LOGIN_PATH = "/login"
-
-const val QRCODE_KEY_GEN_PATH = "/login/qr/key"
-const val QRCODE_GEN_PATH = "/login/qr/create"
-const val QRCODE_CHECK_PATH = "/login/qr/check"
-const val ANONIMOUS_PATH = "/register/anonimous"
-const val LOGIN_REFRESH = "/login/refresh"
-const val CAPTCHA_SEND_PATH = "/captcha/sent"
-const val VERIFY_CAPTCHA_PATH = "/captcha/verify"
-
-
+enum class Level(val level: Int) {
+    DEBUG(0),
+    INFO(1),
+    WARN(2),
+    ERROR(3)
+}

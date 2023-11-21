@@ -15,20 +15,23 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.utils
 
-const val VERSION = "0.1.0b"
-const val DEFAULT_CONF_PATH = "./config/rmusic"
+import cn.rtast.rmusic.models.TimeModel
+import java.time.LocalDateTime
 
-const val CELLPHONE_LOGIN_PATH = "/login/cellphone"
-const val EMAIL_LOGIN_PATH = "/login"
+class TimeUtil {
 
-const val QRCODE_KEY_GEN_PATH = "/login/qr/key"
-const val QRCODE_GEN_PATH = "/login/qr/create"
-const val QRCODE_CHECK_PATH = "/login/qr/check"
-const val ANONIMOUS_PATH = "/register/anonimous"
-const val LOGIN_REFRESH = "/login/refresh"
-const val CAPTCHA_SEND_PATH = "/captcha/sent"
-const val VERIFY_CAPTCHA_PATH = "/captcha/verify"
+    fun getCurrentDate(): TimeModel {
+        val currentDateTime = LocalDateTime.now()
 
+        val year = currentDateTime.year
+        val month = currentDateTime.monthValue
+        val day = currentDateTime.dayOfMonth
+        val hour = currentDateTime.hour
+        val minute = currentDateTime.minute
+        val second = currentDateTime.second
 
+        return TimeModel(year, month, day, hour, minute, second)
+    }
+}

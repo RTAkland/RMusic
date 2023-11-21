@@ -29,11 +29,15 @@ object HttpManager {
         .followSslRedirects(true)
         .build()
 
-    private fun executeRequest(request: Request.Builder) {
+    private fun executeRequest(request: Request.Builder): Response {
+        return okClient.newCall(request.build()).execute()
     }
 
-    fun get(url: String, params: Params?, headers: Headers?) {
-        val newUrl = joinToURL(url, params)
+    fun get(url: String, params: Params?, headers: Headers?): Response {
+        var newUrl = url
+        if (params != null) {
+            joinToURL(url, params).also { newUrl = it }
+        }
         val request = Request.Builder().url(newUrl)
         if (headers != null) {
             request.headers(headers)
@@ -41,12 +45,16 @@ object HttpManager {
         return executeRequest(request)
     }
 
-    fun post(url: String, formBody: FormBody, params: Params?, headers: Headers?) {
-        val newUrl = joinToURL(url, params)
+    fun post(url: String, formBody: FormBody, params: Params?, headers: Headers?): Response {
+        var newUrl = url
+        if (params != null) {
+            newUrl = joinToURL(url, params)
+        }
         val request = Request.Builder().url(newUrl).post(formBody)
         if (headers != null) {
             request.headers(headers)
         }
         return executeRequest(request)
     }
+
 }

@@ -15,12 +15,22 @@
  */
 
 
-package cn.rtast.rmusic.models.conf
+package cn.rtast.rmusic.utils.logger
 
-import cn.rtast.rmusic.enums.Languages
+import cn.rtast.rmusic.enums.logger.Level
 
-data class ConfigModel(
-    val api: String,
-    val msgPrefix: String,
-    val lang: Languages
-)
+interface RLogger {
+
+    fun setLogLevel(level: Level)
+
+    fun log(level: Level, message: String)
+
+    fun debug(message: String)
+
+    fun info(message: String)
+
+    fun warn(message: String)
+
+    fun error(message: String)
+
+}

@@ -25,17 +25,10 @@ fun ByteArray.getMD5(): String {
     return ins.digest(this).joinToString("") { "%02x".format(it) }
 }
 
-fun joinToURL(url: String, params: Params?): String {
-    val newUrl = StringBuilder()
-    newUrl.append(url)
-    if (params != null) {
-        newUrl.append("?")
-    }
-    params?.build()?.entries?.forEachIndexed { index, (key, value) ->
-        newUrl.append("$key=$value")
-        if (index < params.build().size - 1) {
-            newUrl.append("&")
-        }
-    }
+fun joinToURL(url: String, params: Params): String {
+    val newUrl = StringBuilder(url)
+    val paramsString = params.toString()
+    val paramsToAdd = if (url.contains("?")) paramsString.removePrefix("?") else paramsString
+    newUrl.append(paramsToAdd)
     return newUrl.toString()
 }

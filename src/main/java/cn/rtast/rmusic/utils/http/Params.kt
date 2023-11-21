@@ -30,7 +30,10 @@ class Params {
         }
     }
 
-    fun build(): MutableMap<String, String> {
-        return params
+    override fun toString(): String {
+        val paramsString = params.entries.joinToString("&") { (key, value) ->
+            "$key=$value"
+        }
+        return if (paramsString.isNotEmpty()) "?$paramsString" else ""
     }
 }

@@ -17,11 +17,10 @@
 
 package cn.rtast.rmusic.api
 
-import cn.rtast.rmusic.RMusic.Companion.API_HOST
+import cn.rtast.rmusic.RMusic.Companion.API
 
 class NeteaseMusic {
     private fun getQRCode() {
-        val url = "$API_HOST/login/qr/key"
 
     }
 }
