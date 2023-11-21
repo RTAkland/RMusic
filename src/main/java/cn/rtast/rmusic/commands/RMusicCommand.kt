@@ -23,7 +23,7 @@ import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
 
-class RMusicCommand: CommandRegistrationCallback {
+open class RMusicCommand : CommandRegistrationCallback {
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
         registryAccess: CommandRegistryAccess,

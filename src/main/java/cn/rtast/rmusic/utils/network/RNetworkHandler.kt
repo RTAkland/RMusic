@@ -13,22 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.rtast.rmusic
 
-import cn.rtast.rmusic.utils.logger.ConsoleLogger
-import net.fabricmc.api.ModInitializer
-import net.minecraft.util.Identifier
 
-class RMusic : ModInitializer {
+package cn.rtast.rmusic.utils.network
 
-    companion object {
-        val logger = ConsoleLogger()
-        var API = "https://rmusic.dgtmc.top"
-        var cookie: String? = null
-        val RNetworkingChannel = Identifier("rmusic", "channel")
-    }
+interface RNetworkHandler {
 
-    override fun onInitialize() {
+    fun register()
 
-    }
+    fun send()
 }
