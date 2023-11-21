@@ -22,7 +22,7 @@ import cn.rtast.rmusic.utils.TimeUtil
 
 class ConsoleLogger : RLogger {
 
-    private var level: Level? = null
+    private var level: Level = Level.INFO
     private val timeUtil = TimeUtil()
 
 
@@ -31,9 +31,9 @@ class ConsoleLogger : RLogger {
     }
 
     override fun log(level: Level, message: String) {
-        if (this.level?.level!! >= level.level) {
+        if (this.level.level >= level.level) {
             val currentTime = this.timeUtil.getCurrentDate().toString()
-            println("[$currentTime]+[${this.javaClass}]:$message")
+            println("$currentTime+[${this.hashCode()}]:$message")
         }
     }
 
