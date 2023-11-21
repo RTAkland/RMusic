@@ -20,7 +20,6 @@ package cn.rtast.rmusic.utils
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.utils.http.Params
 import com.google.common.reflect.TypeToken
-import com.google.gson.Gson
 import java.security.MessageDigest
 
 fun ByteArray.getMD5(): String {
