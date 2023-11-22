@@ -35,11 +35,6 @@ class MusicPlayer : StreamPlayer(), StreamPlayerListener {
         this.play()
     }
 
-    fun play(file: File) {
-        this.open(file)
-        this.play()
-    }
-
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
         RMusic.logger.info("Stream opened.")
     }
@@ -54,6 +49,6 @@ class MusicPlayer : StreamPlayer(), StreamPlayerListener {
     }
 
     override fun statusUpdated(event: StreamPlayerEvent) {
-
+        RMusic.logger.info("Status updated: ${event.playerStatus}")
     }
 }
