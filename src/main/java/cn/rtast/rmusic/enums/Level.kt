@@ -15,11 +15,16 @@
  */
 
 
-package cn.rtast.rmusic.enums.logger
+package cn.rtast.rmusic.enums
 
-enum class Level(val level: Int) {
-    DEBUG(3),
-    INFO(2),
-    WARN(1),
-    ERROR(0)
+import cn.rtast.rmusic.GREEN_ANSI_PREFIX
+import cn.rtast.rmusic.RED_ANSI_PREFIX
+import cn.rtast.rmusic.WHITE_ANSI_PREFIX
+import cn.rtast.rmusic.YELLOW_ANSI_PREFIX
+
+enum class Level(val level: Int, val color: String) {
+    DEBUG(3, WHITE_ANSI_PREFIX),
+    INFO(2, GREEN_ANSI_PREFIX),
+    WARN(1, YELLOW_ANSI_PREFIX),
+    ERROR(0, RED_ANSI_PREFIX)
 }
