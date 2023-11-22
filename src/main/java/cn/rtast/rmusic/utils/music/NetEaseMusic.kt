@@ -15,7 +15,7 @@
  */
 
 
-package cn.rtast.rmusic.utils
+package cn.rtast.rmusic.utils.music
 
 import cn.rtast.rmusic.QRCODE_CHECK_PATH
 import cn.rtast.rmusic.QRCODE_GEN_PATH
@@ -24,6 +24,7 @@ import cn.rtast.rmusic.entities.CookieEntity
 import cn.rtast.rmusic.entities.qrcode.KeyEntity
 import cn.rtast.rmusic.entities.qrcode.QRImageEntity
 import cn.rtast.rmusic.models.QRCodeModel
+import cn.rtast.rmusic.utils.fromJson
 import cn.rtast.rmusic.utils.http.HttpManager
 import cn.rtast.rmusic.utils.http.Params
 

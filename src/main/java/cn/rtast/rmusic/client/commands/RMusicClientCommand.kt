@@ -17,7 +17,51 @@
 
 package cn.rtast.rmusic.client.commands
 
+import cn.rtast.rmusic.commands.IRMusicCommand
 import cn.rtast.rmusic.commands.RMusicCommand
 
-class RMusicClientCommand {
+class RMusicClientCommand: IRMusicCommand {
+    override fun executePlay(songId: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeStop(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeMute(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executePause(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeResume(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeEmailLogin(email: String, password: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executePhoneLogin(cellphone: String, password: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeSendCaptcha(cellphone: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeVerifyCaptcha(cellphone: String, captcha: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeLogout(): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun executeSearch(keyword: String, limit: Int): Int {
+        TODO("Not yet implemented")
+    }
 }

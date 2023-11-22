@@ -20,7 +20,15 @@ package cn.rtast.rmusic.utils
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.utils.http.Params
 import com.google.common.reflect.TypeToken
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.server.network.ServerPlayerEntity
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
+import java.util.*
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 fun ByteArray.getMD5(): String {
     val ins = MessageDigest.getInstance("MD5")
@@ -55,4 +63,53 @@ fun Any.toJson(): String {
 
 inline fun <reified T> String.fromJson(): T {
     return RMusic.gson.fromJson(this, T::class.java)
+}
+
+fun compress(input: String): ByteArray {
+
+    val outputStream = ByteArrayOutputStream()
+    val gzip = GZIPOutputStream(outputStream)
+    gzip.write(input.toByteArray())
+    gzip.close()
+    return outputStream.toByteArray()
+}
+
+fun decompress(compressed: ByteArray): String {
+    val inputStream = ByteArrayInputStream(compressed)
+    val outputStream = ByteArrayOutputStream()
+    val input = GZIPInputStream(inputStream)
+    val buffer = ByteArray(1024)
+    var len: Int
+    while (input.read(buffer).also { len = it } > 0) {
+        outputStream.write(buffer, 0, len)
+    }
+    input.close()
+    outputStream.close()
+    return outputStream.toString("UTF-8")
+}
+
+fun sendPacket(message: String, player: ServerPlayerEntity) {
+    val compressed = compress(message)
+    val packet = PacketByteBufs.create()
+    packet.writeByteArray(compressed)
+    ServerPlayNetworking.send(player, RMusic.RNetworkChannel, packet)
+}
+
+fun base64ToByteArray(base64Image: String): ByteArray {
+    val startIndex = base64Image.indexOf("base64,") + 7
+    val base64EncodedImage = base64Image.substring(startIndex)
+    return Base64.getDecoder().decode(base64EncodedImage)
+}
+
+fun byteArrayTo2DArray(bytes: ByteArray, width: Int): Array<IntArray> {
+    val byteArray = bytes.map { it.toInt() and 0xFF }.toIntArray()
+    val height = byteArray.size / width
+    val result = Array(height) { IntArray(width) }
+
+    for (i in 0 until height) {
+        for (j in 0 until width) {
+            result[i][j] = byteArray[i * width + j]
+        }
+    }
+    return result
 }

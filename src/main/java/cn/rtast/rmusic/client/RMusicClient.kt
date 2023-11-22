@@ -17,7 +17,7 @@
 
 package cn.rtast.rmusic.client
 
-import cn.rtast.rmusic.utils.MusicPlayer
+import cn.rtast.rmusic.utils.music.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
 
 class RMusicClient: ClientModInitializer {

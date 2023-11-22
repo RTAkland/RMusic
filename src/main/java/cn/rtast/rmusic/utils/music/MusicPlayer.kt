@@ -15,7 +15,7 @@
  */
 
 
-package cn.rtast.rmusic.utils
+package cn.rtast.rmusic.utils.music
 
 import cn.rtast.rmusic.RMusic
 import com.goxr3plus.streamplayer.stream.StreamPlayer

@@ -32,7 +32,7 @@ class RMusic : ModInitializer {
     }
 
     override fun onInitialize() {
-        logger.info("RMusic 已加载!")
+        logger.info("RMusic($VERSION) 已加载!")
         CommandRegistrationCallback.EVENT.register(RMusicCommand())
     }
 }

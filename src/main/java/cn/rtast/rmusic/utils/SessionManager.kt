@@ -17,10 +17,20 @@
 
 package cn.rtast.rmusic.utils
 
+import cn.rtast.rmusic.DEFAULT_CONF_PATH
+import java.io.File
+
 object SessionManager {
 
     private var loginState = false
+    private val confFile = File(DEFAULT_CONF_PATH)
     var cookie: String? = null
+
+    init {
+        if (!confFile.exists()) {
+            confFile.createNewFile()
+        }
+    }
 
     fun setSessionCookie(cookie: String) {
         this.loginState = true
