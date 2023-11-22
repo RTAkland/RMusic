@@ -28,15 +28,22 @@ fun ByteArray.getMD5(): String {
 }
 
 fun joinToURL(url: String, params: Params): String {
+    val newParams = Params.Builder().apply {
+        params.params.forEach { (key, value) ->
+            this.addParam(key, value)
+        }
+        if (SessionManager.cookie != null) {
+            this.addParam("cookie", SessionManager.cookie!!)
+        }
+    }.build()
+
     val newUrl = StringBuilder(url)
-    if (SessionManager.cookie != null) {
-        params.addParam("cookie", SessionManager.cookie!!)
-    }
-    val paramsString = params.toString()
+    val paramsString = newParams.toString()
     val paramsToAdd = if (url.contains("?")) paramsString.removePrefix("?") else paramsString
     newUrl.append(paramsToAdd)
     return newUrl.toString()
 }
+
 
 inline fun <reified T> String.fromArrayJson(): T {
     return RMusic.gson.fromJson(this, object : TypeToken<T>() {}.type)
