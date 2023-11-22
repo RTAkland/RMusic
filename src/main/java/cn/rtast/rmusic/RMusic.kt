@@ -15,13 +15,12 @@
  */
 package cn.rtast.rmusic
 
-import cn.rtast.rmusic.enums.logger.Level
-import cn.rtast.rmusic.utils.MusicPlayer
-import cn.rtast.rmusic.utils.logger.ConsoleLogger
+import cn.rtast.rmusic.commands.RMusicCommand
+import cn.rtast.rmusic.utils.ConsoleLogger
 import com.google.gson.Gson
 import net.fabricmc.api.ModInitializer
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.util.Identifier
-import java.net.URL
 
 class RMusic : ModInitializer {
 
@@ -29,16 +28,11 @@ class RMusic : ModInitializer {
         val logger = ConsoleLogger()
         val gson = Gson()
         var API = "https://rmusic.dgtmc.top"
-        val RNetworkingChannel = Identifier("rmusic", "channel")
+        val RNetworkChannel = Identifier("rmusic", "channel")
     }
 
     override fun onInitialize() {
-
+        logger.info("RMusic 已加载!")
+        CommandRegistrationCallback.EVENT.register(RMusicCommand())
     }
-}
-
-fun main() {
-    RMusic.logger.setLogLevel(Level.DEBUG)
-    val url = "https://static.rtakland.icu/files/res/music.mp3"
-    MusicPlayer().play(URL(url))
 }
