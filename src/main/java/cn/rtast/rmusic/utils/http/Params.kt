@@ -17,13 +17,20 @@
 
 package cn.rtast.rmusic.utils.http
 
-class Params {
+class Params private constructor(builder: Builder) {
+    val params = builder.params
 
-    private val params = mutableMapOf<String, String>()
+    class Builder {
+        internal val params = mutableMapOf<String, String>()
 
-    fun addParam(key: String, value: String): Params {
-        this.params[key] = value
-        return this
+        fun addParam(key: String, value: Any): Builder {
+            this.params[key] = value.toString()
+            return this
+        }
+
+        fun build(): Params {
+            return Params(this)
+        }
     }
 
     override fun toString(): String {
