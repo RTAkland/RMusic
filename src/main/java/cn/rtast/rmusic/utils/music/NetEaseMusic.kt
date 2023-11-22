@@ -27,7 +27,7 @@ import cn.rtast.rmusic.models.QRCodeModel
 import cn.rtast.rmusic.utils.http.HttpManager
 import cn.rtast.rmusic.utils.http.Params
 
-class NeteaseMusic {
+class NetEaseMusic {
 
     private fun getQRCodeKey(): String {
         val resp = HttpManager.get(QRCODE_KEY_GEN_PATH, null, null).body.string()
@@ -36,23 +36,27 @@ class NeteaseMusic {
 
     fun createQRCode(): QRCodeModel {
         val key = this.getQRCodeKey()
-        val params = Params()
+        val params = Params.Builder()
             .addParam("key", key)
             .addParam("qrimg", "1")
+            .build()
         val resp = HttpManager.get(QRCODE_GEN_PATH, params, null).body.string()
         val json = resp.fromJson<QRImageEntity>()
         return QRCodeModel(json.data.qrimg, key, json.data.qrurl)
     }
 
     fun checkQRCodeState(key: String): Boolean {
-        val params = Params()
+        val params = Params.Builder()
             .addParam("key", key)
+            .build()
         val resp = HttpManager.get(QRCODE_CHECK_PATH, params, null).body.string()
         val json = resp.fromJson<CookieEntity>()
         return json.code == 803
     }
 
-    fun search(keyword: String) {
-
+    fun search(keyword: String, limit: Int) {
+        val params = Params.Builder()
+            .addParam("limit", 10)
+            .build()
     }
 }
