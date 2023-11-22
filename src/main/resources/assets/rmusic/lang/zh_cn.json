@@ -1,10 +1,10 @@
 {
   "rmusic.tip.playing": "正在播放: [ %s ]",
   "rmusic.tip.login.failed": "登录失败",
-  "rmusic.tip.login.success": "登录成功, 用户名: [ %s ]",
+  "rmusic.tip.login.success": "登录成功",
   "rmusic.tip.logout.failed": "退出登录失败, 你还没有登录",
   "rmusic.tip.logout.success": "退出登录成功",
-  "rmusic.tip.pause.failed": "暂停成功",
+  "rmusic.tip.pause.failed": "暂停失败",
   "rmusic.tip.pause.success": "暂停成功",
   "rmusic.tip.mute.failed": "已静音",
   "rmusic.tip.mute.success": "已取消静音",
@@ -15,5 +15,5 @@
   "rmusic.tip.verify.captcha.failed": "验证失败",
   "rmusic.tip.verify.captcha.success": "验证成功, 用户名: [ %s ]",
   "rmusic.tip.search": "正在搜索: [ %s ]",
-  "rmusic.tip.search.success.result": "[ %s ]:歌曲名: [ %s ] 作者: [ %s ] "
+  "rmusic.tip.search.success.result": "歌曲名: [ %s ] 作者: [ %s ] [ %s ]"
 }

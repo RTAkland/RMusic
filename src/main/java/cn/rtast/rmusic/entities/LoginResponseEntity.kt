@@ -18,7 +18,6 @@
 package cn.rtast.rmusic.entities
 
 data class LoginResponseEntity(
-    val profile: Profile,
     val code: Int,
     val cookie: String,
 )

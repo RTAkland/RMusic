@@ -23,8 +23,12 @@ import cn.rtast.rmusic.utils.music.MusicPlayer
 import cn.rtast.rmusic.utils.music.NetEaseMusic
 import com.mojang.brigadier.context.CommandContext
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.text.ClickEvent
+import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import java.net.URL
+import kotlin.concurrent.thread
 
 class RMusicClientCommand : IRMusicCommand {
 
@@ -94,42 +98,49 @@ class RMusicClientCommand : IRMusicCommand {
     }
 
     override fun executeEmailLogin(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
-        val resp = this.netease.loginEmailPwd(email, password)
-        if (resp.code != 200) {
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.login.failed"))
-        } else {
-            SessionManager.setSessionCookie(resp.cookie)
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.login.success", resp.nickname))
-
+        thread {
+            val resp = this.netease.loginEmailPwd(email, password)
+            if (resp == null) {
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.login.failed"))
+            } else {
+                SessionManager.setSessionCookie(resp)
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.login.success"))
+            }
         }
     }
 
     override fun executePhoneLogin(ctx: CommandContext<ServerCommandSource>, cellphone: String, password: String) {
-        val resp = this.netease.loginCellphonePwd(cellphone, password)
-        if (resp.code != 200) {
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.login.failed"))
-        } else {
-            SessionManager.setSessionCookie(resp.cookie)
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.login.success", resp.nickname))
+        thread {
+            val resp = this.netease.loginCellphonePwd(cellphone, password)
+            if (resp == null) {
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.login.failed"))
+            } else {
+                SessionManager.setSessionCookie(resp)
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.login.success"))
+            }
         }
     }
 
     override fun executeSendCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String) {
-        val resp = this.netease.sendCaptcha(cellphone)
-        if (resp.code != 200) {
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.send.captcha.failed", resp.message))
-        } else {
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.send.captcha.success", cellphone))
+        thread {
+            val resp = this.netease.sendCaptcha(cellphone)
+            if (resp.code != 200) {
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.send.captcha.failed", resp.message))
+            } else {
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.send.captcha.success", cellphone))
+            }
         }
     }
 
     override fun executeVerifyCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String, captcha: String) {
-        val resp = this.netease.loginCellphoneCaptcha(cellphone, captcha)
-        if (resp.code != 200) {
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.verify.captcha.failed"))
-        } else {
-            SessionManager.setSessionCookie(resp.cookie)
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.verify.captcha.success", resp.nickname))
+        thread {
+            val resp = this.netease.loginCellphoneCaptcha(cellphone, captcha)
+            if (resp == null) {
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.verify.captcha.failed"))
+            } else {
+                SessionManager.setSessionCookie(resp)
+                ctx.source.sendMessage(Text.translatable("rmusic.tip.verify.captcha.success"))
+            }
         }
     }
 
@@ -143,19 +154,27 @@ class RMusicClientCommand : IRMusicCommand {
     }
 
     override fun executeSearch(ctx: CommandContext<ServerCommandSource>, keyword: String, limit: Int) {
-        ctx.source.sendMessage(Text.translatable("rmusic.tip.search"))
-        val resp = this.netease.search(keyword, limit)
-        resp.result.songs.forEach { song ->
-            val artists = StringBuilder()
-            song.artists.forEach { art ->
-                artists.append(art.name + "|")
-            }
-            ctx.source.sendMessage(
-                Text.translatable(
-                    "rmusic.tip.search.success.result",
-                    Text.literal(artists.toString())
+        thread {
+            ctx.source.sendMessage(Text.translatable("rmusic.tip.search", keyword))
+            val resp = this.netease.search(keyword, limit)
+            resp.result.songs.forEach { song ->
+                val artists = StringBuilder()
+                song.artists.forEach { art ->
+                    artists.append(art.name + "|")
+                }
+                ctx.source.sendMessage(
+                    Text.translatable(
+                        "rmusic.tip.search.success.result",
+                        Text.literal(song.name),
+                        Text.literal(artists.toString()),
+                        Text.literal("▶").styled {
+                            it.withColor(Formatting.GREEN)
+                            it.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "rm play ${song.id}"))
+                            it.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(song.id.toString())))
+                        }
+                    )
                 )
-            )
+            }
         }
     }
 }

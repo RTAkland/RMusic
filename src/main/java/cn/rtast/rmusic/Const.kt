@@ -19,17 +19,13 @@ package cn.rtast.rmusic
 
 const val VERSION = "0.2.3b"
 const val DEFAULT_CONF_PATH = "./config/rmusic"
-const val LOG_FILE_PATH = "./logs/"
 
+const val API_ROOT_PATH = "https://rmusic.dgtmc.top"
 const val CELLPHONE_LOGIN_PATH = "/login/cellphone"
 const val EMAIL_LOGIN_PATH = "/login"
-const val QRCODE_KEY_GEN_PATH = "/login/qr/key"
-const val QRCODE_GEN_PATH = "/login/qr/create"
-const val QRCODE_CHECK_PATH = "/login/qr/check"
 const val CAPTCHA_SEND_PATH = "/captcha/sent"
 const val VERIFY_CAPTCHA_PATH = "/captcha/verify"
 const val SONG_URL_V1_PATH = "/song/url/v1"
-const val USER_INFO_PATH = "/user/account"
 const val SEARCH_PATH = "/search"
 
 const val WHITE_ANSI_PREFIX = "\u001B[37m"

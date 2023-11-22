@@ -23,7 +23,6 @@ import cn.rtast.rmusic.entities.LoginResponseEntity
 import cn.rtast.rmusic.entities.search.SearchEntity
 import cn.rtast.rmusic.entities.url.SongUrlEntity
 import cn.rtast.rmusic.models.CaptchaModel
-import cn.rtast.rmusic.models.UserInfoModel
 import cn.rtast.rmusic.utils.fromJson
 import cn.rtast.rmusic.utils.http.HttpManager
 import cn.rtast.rmusic.utils.http.Params
@@ -32,41 +31,41 @@ class NetEaseMusic {
 
     fun search(keyword: String, limit: Int): SearchEntity {
         val params = Params.Builder().addParam("keywords", keyword).addParam("limit", limit).build()
-        val resp = HttpManager.get(SEARCH_PATH, params, null).body.string()
+        val resp = HttpManager.get(API_ROOT_PATH + SEARCH_PATH, params, null).body.string()
         return resp.fromJson<SearchEntity>()
     }
 
-    fun loginCellphonePwd(cellphone: String, password: String): UserInfoModel {
+    fun loginCellphonePwd(cellphone: String, password: String): String? {
         val params = Params.Builder().addParam("phone", cellphone).addParam("password", password).build()
-        val resp = HttpManager.get(CELLPHONE_LOGIN_PATH, params, null).body.string()
+        val resp = HttpManager.get(API_ROOT_PATH + CELLPHONE_LOGIN_PATH, params, null).body.string()
         val json = resp.fromJson<LoginResponseEntity>()
-        return UserInfoModel(json.code, json.profile.nickname, json.cookie)
+        return if (json.code == 200) json.cookie else null
     }
 
-    fun loginEmailPwd(email: String, password: String): UserInfoModel {
+    fun loginEmailPwd(email: String, password: String): String? {
         val params = Params.Builder().addParam("email", email).addParam("password", password).build()
-        val resp = HttpManager.get(EMAIL_LOGIN_PATH, params, null).body.string()
+        val resp = HttpManager.get(API_ROOT_PATH + EMAIL_LOGIN_PATH, params, null).body.string()
         val json = resp.fromJson<LoginResponseEntity>()
-        return UserInfoModel(json.code, json.profile.nickname, json.cookie)
+        return if (json.code == 200) json.cookie else null
     }
 
-    fun loginCellphoneCaptcha(cellphone: String, captcha: String): UserInfoModel {
+    fun loginCellphoneCaptcha(cellphone: String, captcha: String): String? {
         val params = Params.Builder().addParam("phone", cellphone).addParam("captcha", captcha).build()
-        val resp = HttpManager.get(VERIFY_CAPTCHA_PATH, params, null).body.string()
+        val resp = HttpManager.get(API_ROOT_PATH + VERIFY_CAPTCHA_PATH, params, null).body.string()
         val json = resp.fromJson<LoginResponseEntity>()
-        return UserInfoModel(json.code, json.profile.nickname, json.cookie)
+        return if (json.code == 200) json.cookie else null
     }
 
     fun sendCaptcha(cellphone: String): CaptchaModel {
         val params = Params.Builder().addParam("phone", cellphone).build()
-        val resp = HttpManager.get(CAPTCHA_SEND_PATH, params, null).body.string()
+        val resp = HttpManager.get(API_ROOT_PATH + CAPTCHA_SEND_PATH, params, null).body.string()
         val json = resp.fromJson<CaptchaSendEntity>()
         return if (json.code == 200) CaptchaModel(json.code, "二维码已发送") else CaptchaModel(json.code, json.message)
     }
 
     fun getSongUrl(songId: String): String? {
         val params = Params.Builder().addParam("id", songId).addParam("br", 320000).build()
-        val resp = HttpManager.get(SONG_URL_V1_PATH, params, null).body.string()
+        val resp = HttpManager.get(API_ROOT_PATH + SONG_URL_V1_PATH, params, null).body.string()
         val json = resp.fromJson<SongUrlEntity>()
         return if (json.code == 200) json.data.first().url else null
     }

@@ -18,7 +18,9 @@ package cn.rtast.rmusic.client
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.utils.decompress
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.minecraft.client.MinecraftClient
 import net.minecraft.network.PacketByteBuf
+import net.minecraft.server.MinecraftServer
 
 class ClientNetworkHandler {
 
@@ -35,6 +37,6 @@ class ClientNetworkHandler {
     }
 
     private fun onPacket(packet: String) {
-
+        val client = MinecraftClient.getInstance().inGameHud.playerListHud
     }
 }
