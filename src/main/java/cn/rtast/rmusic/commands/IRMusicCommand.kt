@@ -20,6 +20,7 @@ package cn.rtast.rmusic.commands
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.context.CommandContext
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.server.command.CommandManager
@@ -29,83 +30,101 @@ interface IRMusicCommand : CommandRegistrationCallback {
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
         registryAccess: CommandRegistryAccess,
-        environment: CommandManager.RegistrationEnvironment
+        environment: CommandManager.RegistrationEnvironment,
     ) {
-        val node = dispatcher.register(CommandManager.literal("rmusic").then(CommandManager.literal("play")
-                .then(CommandManager.argument("song-id", StringArgumentType.string())
-                    .executes { this.executePlay(StringArgumentType.getString(it, "song-id")) }))
-            .then(CommandManager.literal("stop").executes { this.executeStop() })
-            .then(CommandManager.literal("pause").executes { this.executePause() })
-            .then(CommandManager.literal("resume").executes { this.executeResume() })
-            .then(CommandManager.literal("mute").executes { this.executeMute() }).then(CommandManager.literal("login")
-                .then(CommandManager.literal("cellphone")
-                    .then(CommandManager.argument("cellphone-number", StringArgumentType.string())
-                        .then(CommandManager.argument("cellphone-password", StringArgumentType.string()).executes {
-                                this.executePhoneLogin(
-                                    StringArgumentType.getString(
-                                        it, "cellphone-number"
-                                    ), StringArgumentType.getString(it, "cellphone-password")
-                                )
-                            })).then(CommandManager.literal("captcha")
-                        .then(CommandManager.literal("send").then(CommandManager.argument(
+        val node = dispatcher.register(CommandManager.literal("rmusic").then(
+            CommandManager.literal("play").then(CommandManager.argument("song-id", StringArgumentType.string())
+                .executes { this.executePlay(it, StringArgumentType.getString(it, "song-id"));1 })
+        ).then(CommandManager.literal("stop").executes { this.executeStop(it);1 })
+            .then(CommandManager.literal("pause").executes { this.executePause(it);1 })
+            .then(CommandManager.literal("resume").executes { this.executeResume(it);1 })
+            .then(CommandManager.literal("mute").executes { this.executeMute(it);1 }).then(
+                CommandManager.literal("login").requires { it.hasPermissionLevel(2) }.then(
+                    CommandManager.literal("cellphone").then(
+                        CommandManager.argument("cellphone-number", StringArgumentType.string())
+                            .then(CommandManager.argument("cellphone-password", StringArgumentType.string()).executes {
+                                    this.executePhoneLogin(
+                                        it, StringArgumentType.getString(
+                                            it, "cellphone-number"
+                                        ), StringArgumentType.getString(it, "cellphone-password")
+                                    );1
+                                })
+                    ).then(
+                        CommandManager.literal("captcha").then(
+                            CommandManager.literal("send").then(CommandManager.argument(
                                 "cellphone-captcha", StringArgumentType.string()
                             ).executes {
-                                    this.executeSendCaptcha(
-                                        StringArgumentType.getString(
-                                            it, "cellphone-captcha"
-                                        )
+                                this.executeSendCaptcha(
+                                    it, StringArgumentType.getString(
+                                        it, "cellphone-captcha"
                                     )
-                                })).then(CommandManager.literal("verify").then(CommandManager.argument(
-                                "cellphone-verify", StringArgumentType.string()
-                            ).then(CommandManager.argument(
+                                );1
+                            })
+                        ).then(
+                            CommandManager.literal("verify").then(
+                                CommandManager.argument(
+                                    "cellphone-verify", StringArgumentType.string()
+                                ).then(CommandManager.argument(
                                     "captcha", StringArgumentType.string()
                                 ).executes {
-                                        this.executeVerifyCaptcha(
-                                            StringArgumentType.getString(
-                                                it, "cellphone-verify"
-                                            ), StringArgumentType.getString(it, "captcha")
-                                        )
-                                    }))))).then(CommandManager.literal("email")
-                    .then(CommandManager.argument("email-address", StringArgumentType.string())
-                        .then(CommandManager.argument("email-password", StringArgumentType.string()).executes {
-                                this.executeEmailLogin(
-                                    StringArgumentType.getString(
-                                        it, "email-address"
-                                    ), StringArgumentType.getString(it, "email-password")
-                                );1
-                            })))).then(CommandManager.literal("logout").executes { this.executeLogout() })
-            .then(CommandManager.literal("search").then(CommandManager.argument("keyword", StringArgumentType.string())
-                    .then(CommandManager.literal("limit")
+                                    this.executeVerifyCaptcha(
+                                        it, StringArgumentType.getString(
+                                            it, "cellphone-verify"
+                                        ), StringArgumentType.getString(it, "captcha")
+                                    );1
+                                })
+                            )
+                        )
+                    )
+                ).then(
+                    CommandManager.literal("email").then(
+                        CommandManager.argument("email-address", StringArgumentType.string())
+                            .then(CommandManager.argument("email-password", StringArgumentType.string()).executes {
+                                    this.executeEmailLogin(
+                                        it, StringArgumentType.getString(
+                                            it, "email-address"
+                                        ), StringArgumentType.getString(it, "email-password")
+                                    );1
+                                })
+                    )
+                )
+            ).then(CommandManager.literal("logout").requires { it.hasPermissionLevel(2) }
+                .executes { this.executeLogout(it);1 }).then(CommandManager.literal("search").then(
+                CommandManager.argument("keyword", StringArgumentType.string()).then(
+                    CommandManager.literal("limit")
                         .then(CommandManager.argument("limit", IntegerArgumentType.integer(2)).executes {
-                                this.executeSearch(
-                                    StringArgumentType.getString(
-                                        it, "keyword"
-                                    ), IntegerArgumentType.getInteger(it, "limit")
-                                )
-                            }))).executes { this.executeSearch(StringArgumentType.getString(it, "keyword"), 10) }))
+                            this.executeSearch(
+                                it, StringArgumentType.getString(
+                                    it, "keyword"
+                                ), IntegerArgumentType.getInteger(it, "limit")
+                            );1
+                        })
+                )
+            ).executes { this.executeSearch(it, StringArgumentType.getString(it, "keyword"), 10);1 })
+        )
         dispatcher.register(CommandManager.literal("rm").redirect(node))
     }
 
-    fun executePlay(songId: String): Int
+    fun executePlay(ctx: CommandContext<ServerCommandSource>, songId: String)
 
-    fun executeStop(): Int
+    fun executeStop(ctx: CommandContext<ServerCommandSource>)
 
-    fun executeMute(): Int
+    fun executeMute(ctx: CommandContext<ServerCommandSource>)
 
-    fun executePause(): Int
+    fun executePause(ctx: CommandContext<ServerCommandSource>)
 
-    fun executeResume(): Int
+    fun executeResume(ctx: CommandContext<ServerCommandSource>)
 
-    fun executeEmailLogin(email: String, password: String): Int
+    fun executeEmailLogin(ctx: CommandContext<ServerCommandSource>, email: String, password: String)
 
-    fun executePhoneLogin(cellphone: String, password: String): Int
+    fun executePhoneLogin(ctx: CommandContext<ServerCommandSource>, cellphone: String, password: String)
 
-    fun executeSendCaptcha(cellphone: String): Int
+    fun executeSendCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String)
 
-    fun executeVerifyCaptcha(cellphone: String, captcha: String): Int
+    fun executeVerifyCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String, captcha: String)
 
-    fun executeLogout(): Int
+    fun executeLogout(ctx: CommandContext<ServerCommandSource>)
 
-    fun executeSearch(keyword: String, limit: Int): Int
+    fun executeSearch(ctx: CommandContext<ServerCommandSource>, keyword: String, limit: Int)
 
 }

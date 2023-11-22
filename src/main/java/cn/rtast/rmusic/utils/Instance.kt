@@ -18,6 +18,8 @@
 package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.enums.Actions
+import cn.rtast.rmusic.models.PayloadModel
 import cn.rtast.rmusic.utils.http.Params
 import com.google.common.reflect.TypeToken
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -88,8 +90,8 @@ fun decompress(compressed: ByteArray): String {
     return outputStream.toString("UTF-8")
 }
 
-fun sendPacket(message: String, player: ServerPlayerEntity) {
-    val compressed = compress(message)
+fun sendPacket(payload: PayloadModel, player: ServerPlayerEntity) {
+    val compressed = compress(payload.toJson())
     val packet = PacketByteBufs.create()
     packet.writeByteArray(compressed)
     ServerPlayNetworking.send(player, RMusic.RNetworkChannel, packet)

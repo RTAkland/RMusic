@@ -17,51 +17,74 @@
 
 package cn.rtast.rmusic.commands
 
+import cn.rtast.rmusic.enums.Actions
+import cn.rtast.rmusic.models.PayloadModel
+import cn.rtast.rmusic.utils.music.NetEaseMusic
+import cn.rtast.rmusic.utils.sendPacket
+import cn.rtast.rmusic.utils.toJson
+import com.mojang.brigadier.context.CommandContext
+import net.minecraft.server.command.ServerCommandSource
 
-class RMusicCommand: IRMusicCommand {
 
+class RMusicCommand : IRMusicCommand {
 
-    override fun executePlay(songId: String): Int {
-        TODO("Not yet implemented")
+    override fun executePlay(ctx: CommandContext<ServerCommandSource>, songId: String) {
+        val payload = PayloadModel(Actions.Play, songId)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeStop(): Int {
-        TODO("Not yet implemented")
+    override fun executeStop(ctx: CommandContext<ServerCommandSource>) {
+        val payload = PayloadModel(Actions.Stop, null)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeMute(): Int {
-        TODO("Not yet implemented")
+    override fun executeMute(ctx: CommandContext<ServerCommandSource>) {
+        val payload = PayloadModel(Actions.Mute, null)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executePause(): Int {
-        TODO("Not yet implemented")
+    override fun executePause(ctx: CommandContext<ServerCommandSource>) {
+        val payload = PayloadModel(Actions.Pause, null)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeResume(): Int {
-        TODO("Not yet implemented")
+    override fun executeResume(ctx: CommandContext<ServerCommandSource>) {
+        val payload = PayloadModel(Actions.Resume, null)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeEmailLogin(email: String, password: String): Int {
-        TODO("Not yet implemented")
+    override fun executeEmailLogin(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
+        val payload = PayloadModel(Actions.LoginEmailPwd, "$email|$password")
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executePhoneLogin(cellphone: String, password: String): Int {
-        TODO("Not yet implemented")
+    override fun executePhoneLogin(ctx: CommandContext<ServerCommandSource>, cellphone: String, password: String) {
+        val payload = PayloadModel(Actions.LoginPhonePwd, "$cellphone|$password")
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeSendCaptcha(cellphone: String): Int {
-        TODO("Not yet implemented")
+    override fun executeSendCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String) {
+        val payload = PayloadModel(Actions.SendCaptcha, cellphone)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeVerifyCaptcha(cellphone: String, captcha: String): Int {
-        TODO("Not yet implemented")
+    override fun executeVerifyCaptcha(
+        ctx: CommandContext<ServerCommandSource>,
+        cellphone: String,
+        captcha: String,
+    ) {
+        val payload = PayloadModel(Actions.VerifyCaptcha, "$cellphone|$captcha")
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeLogout(): Int {
-        TODO("Not yet implemented")
+    override fun executeLogout(ctx: CommandContext<ServerCommandSource>) {
+        val payload = PayloadModel(Actions.Logout, null)
+        sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeSearch(keyword: String, limit: Int): Int {
-        TODO("Not yet implemented")
+    override fun executeSearch(ctx: CommandContext<ServerCommandSource>, keyword: String, limit: Int) {
+        val result = NetEaseMusic().search(keyword, limit)
+        val payload = PayloadModel(Actions.Search, result.toJson())
+        sendPacket(payload, ctx.source.player!!)
     }
 }

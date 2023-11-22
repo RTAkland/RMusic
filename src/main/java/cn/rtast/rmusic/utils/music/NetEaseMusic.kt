@@ -17,12 +17,11 @@
 
 package cn.rtast.rmusic.utils.music
 
-import cn.rtast.rmusic.QRCODE_CHECK_PATH
-import cn.rtast.rmusic.QRCODE_GEN_PATH
-import cn.rtast.rmusic.QRCODE_KEY_GEN_PATH
+import cn.rtast.rmusic.*
 import cn.rtast.rmusic.entities.CookieEntity
 import cn.rtast.rmusic.entities.qrcode.KeyEntity
 import cn.rtast.rmusic.entities.qrcode.QRImageEntity
+import cn.rtast.rmusic.entities.search.SearchEntity
 import cn.rtast.rmusic.models.QRCodeModel
 import cn.rtast.rmusic.utils.fromJson
 import cn.rtast.rmusic.utils.http.HttpManager
@@ -51,13 +50,48 @@ class NetEaseMusic {
             .addParam("key", key)
             .build()
         val resp = HttpManager.get(QRCODE_CHECK_PATH, params, null).body.string()
-        val json = resp.fromJson<CookieEntity>()
-        return json.code == 803
+        return resp.fromJson<CookieEntity>().code == 803
     }
 
-    fun search(keyword: String, limit: Int) {
+    fun search(keyword: String, limit: Int): SearchEntity {
         val params = Params.Builder()
-            .addParam("limit", 10)
+            .addParam("keywords", keyword)
+            .addParam("limit", limit)
             .build()
+        val resp = HttpManager.get(SEARCH_PATH, params, null).body.string()
+        return resp.fromJson<SearchEntity>()
+    }
+
+    fun loginCellphonePwd(cellphone: String, password: String) {
+        val params = Params.Builder()
+            .addParam("phone", cellphone)
+            .addParam("password", password)
+            .build()
+        val resp = HttpManager.get(CELLPHONE_LOGIN_PATH, params, null).body.string()
+        val json = resp.fromJson<>()
+    }
+
+    fun loginEmailPwd(email: String, password: String) {
+        val params = Params.Builder()
+            .addParam("email", email)
+            .addParam("password", password)
+            .build()
+        val resp = HttpManager.get(EMAIL_LOGIN_PATH, params, null).body.string()
+
+    }
+
+    fun loginCellphoneCaptcha(cellphone: String, captcha: String) {
+        val params = Params.Builder()
+            .addParam("phone", cellphone)
+            .addParam("captcha", captcha)
+            .build()
+
+    }
+
+    fun sendCaptcha(cellphone: String) {
+        val params = Params.Builder()
+            .addParam("phone", cellphone)
+            .build()
+
     }
 }

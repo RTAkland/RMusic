@@ -21,6 +21,5 @@ import cn.rtast.rmusic.enums.Actions
 
 data class PayloadModel(
     val action: Actions,
-    val payload: String,
-    val requireResponse: Boolean
+    val payload: String?
 )

@@ -18,50 +18,52 @@
 package cn.rtast.rmusic.client.commands
 
 import cn.rtast.rmusic.commands.IRMusicCommand
-import cn.rtast.rmusic.commands.RMusicCommand
+import com.mojang.brigadier.context.CommandContext
+import net.minecraft.server.command.ServerCommandSource
 
-class RMusicClientCommand: IRMusicCommand {
-    override fun executePlay(songId: String): Int {
+class RMusicClientCommand : IRMusicCommand {
+
+    override fun executePlay(ctx: CommandContext<ServerCommandSource>, songId: String) {
         TODO("Not yet implemented")
     }
 
-    override fun executeStop(): Int {
+    override fun executeStop(ctx: CommandContext<ServerCommandSource>) {
         TODO("Not yet implemented")
     }
 
-    override fun executeMute(): Int {
+    override fun executeMute(ctx: CommandContext<ServerCommandSource>) {
         TODO("Not yet implemented")
     }
 
-    override fun executePause(): Int {
+    override fun executePause(ctx: CommandContext<ServerCommandSource>) {
         TODO("Not yet implemented")
     }
 
-    override fun executeResume(): Int {
+    override fun executeResume(ctx: CommandContext<ServerCommandSource>) {
         TODO("Not yet implemented")
     }
 
-    override fun executeEmailLogin(email: String, password: String): Int {
+    override fun executeEmailLogin(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
         TODO("Not yet implemented")
     }
 
-    override fun executePhoneLogin(cellphone: String, password: String): Int {
+    override fun executePhoneLogin(ctx: CommandContext<ServerCommandSource>, cellphone: String, password: String) {
         TODO("Not yet implemented")
     }
 
-    override fun executeSendCaptcha(cellphone: String): Int {
+    override fun executeSendCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String) {
         TODO("Not yet implemented")
     }
 
-    override fun executeVerifyCaptcha(cellphone: String, captcha: String): Int {
+    override fun executeVerifyCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String, captcha: String) {
         TODO("Not yet implemented")
     }
 
-    override fun executeLogout(): Int {
+    override fun executeLogout(ctx: CommandContext<ServerCommandSource>) {
         TODO("Not yet implemented")
     }
 
-    override fun executeSearch(keyword: String, limit: Int): Int {
+    override fun executeSearch(ctx: CommandContext<ServerCommandSource>, keyword: String, limit: Int) {
         TODO("Not yet implemented")
     }
 }

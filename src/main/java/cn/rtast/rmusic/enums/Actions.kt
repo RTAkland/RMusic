@@ -18,5 +18,15 @@
 package cn.rtast.rmusic.enums
 
 enum class Actions {
-    Play, Pause, Mute, Next, Previous, Search
+    Play,
+    Stop,
+    Pause,
+    Mute,
+    Resume,
+    Search,
+    LoginPhonePwd,
+    VerifyCaptcha,
+    LoginEmailPwd,
+    SendCaptcha,
+    Logout
 }
