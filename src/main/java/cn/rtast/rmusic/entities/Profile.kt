@@ -15,8 +15,8 @@
  */
 
 
-package cn.rtast.rmusic.entities.qrcode
+package cn.rtast.rmusic.entities
 
-data class KeyData(
-    val unikey: String
+data class Profile(
+    val nickname: String
 )

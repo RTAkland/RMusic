@@ -15,9 +15,9 @@
  */
 
 
-package cn.rtast.rmusic.entities.qrcode
+package cn.rtast.rmusic.entities
 
-data class QRImageData(
-    val qrimg: String,
-    val qrurl: String
+data class CaptchaSendEntity(
+    val code: Int,
+    val message: String
 )

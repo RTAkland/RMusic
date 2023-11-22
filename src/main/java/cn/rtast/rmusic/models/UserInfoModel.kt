@@ -15,8 +15,10 @@
  */
 
 
-package cn.rtast.rmusic.entities.qrcode
+package cn.rtast.rmusic.models
 
-data class QRImageEntity(
-    val `data`: QRImageData
+data class UserInfoModel(
+    val code: Int,
+    val nickname: String,
+    val cookie: String
 )

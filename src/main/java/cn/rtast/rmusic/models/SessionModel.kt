@@ -15,8 +15,9 @@
  */
 
 
-package cn.rtast.rmusic.entities.qrcode
+package cn.rtast.rmusic.models
 
-data class KeyEntity(
-    val `data`: KeyData
+data class SessionModel(
+    val cookie: String?,
+    val state: Boolean
 )

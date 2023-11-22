@@ -18,13 +18,14 @@
 package cn.rtast.rmusic.utils
 
 import cn.rtast.rmusic.DEFAULT_CONF_PATH
+import cn.rtast.rmusic.models.SessionModel
 import java.io.File
 
 object SessionManager {
 
-    private var loginState = false
-    private val confFile = File(DEFAULT_CONF_PATH)
+    var loginState = false
     var cookie: String? = null
+    private val confFile = File(DEFAULT_CONF_PATH)
 
     init {
         if (!confFile.exists()) {
@@ -35,10 +36,14 @@ object SessionManager {
     fun setSessionCookie(cookie: String) {
         this.loginState = true
         this.cookie = cookie
+        val model = SessionModel(this.cookie, true)
+        confFile.writeText(model.toJson())
     }
 
     fun removeSessionCookie() {
-        this.cookie = null
         this.loginState = false
+        this.cookie = null
+        val model = SessionModel(null, false)
+        confFile.writeText(model.toJson())
     }
 }

@@ -13,27 +13,28 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package cn.rtast.rmusic.client.network
+package cn.rtast.rmusic.client
 
 import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.utils.decompress
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
-import net.fabricmc.fabric.api.networking.v1.PacketSender
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.network.ClientPlayNetworkHandler
 import net.minecraft.network.PacketByteBuf
 
 class ClientNetworkHandler {
 
     fun register() {
-        ClientPlayNetworking.registerGlobalReceiver(RMusic.RNetworkChannel) { client: MinecraftClient,
-                                                                              handler: ClientPlayNetworkHandler,
-                                                                              buf: PacketByteBuf,
-                                                                              responseSender: PacketSender ->
-
+        ClientPlayNetworking.registerGlobalReceiver(RMusic.RNetworkChannel) {
+                _,
+                _, buf: PacketByteBuf,
+                _,
+            ->
+            val ogByteArray = buf.readByteArray()
+            val decompressed = decompress(ogByteArray)
+            this.onPacket(decompressed)
         }
     }
 
-    fun send(packetByteBuf: PacketByteBuf) {
+    private fun onPacket(packet: String) {
 
     }
 }

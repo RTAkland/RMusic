@@ -15,6 +15,9 @@
  */
 
 
-package cn.rtast.rmusic.exceptions
+package cn.rtast.rmusic.entities.url
 
-class MusicPlayerNotInitializedException(message: String?) : Exception(message)
+data class SongUrlEntity(
+    val code: Int,
+    val `data`: List<Data>
+)

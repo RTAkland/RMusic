@@ -17,8 +17,8 @@
 
 package cn.rtast.rmusic.entities
 
-data class CookieEntity(
+data class LoginResponseEntity(
+    val profile: Profile,
     val code: Int,
-    val message: String,
-    val cookie: String
+    val cookie: String,
 )

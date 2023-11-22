@@ -18,80 +18,56 @@
 package cn.rtast.rmusic.utils.music
 
 import cn.rtast.rmusic.*
-import cn.rtast.rmusic.entities.CookieEntity
-import cn.rtast.rmusic.entities.qrcode.KeyEntity
-import cn.rtast.rmusic.entities.qrcode.QRImageEntity
+import cn.rtast.rmusic.entities.CaptchaSendEntity
+import cn.rtast.rmusic.entities.LoginResponseEntity
 import cn.rtast.rmusic.entities.search.SearchEntity
-import cn.rtast.rmusic.models.QRCodeModel
+import cn.rtast.rmusic.entities.url.SongUrlEntity
+import cn.rtast.rmusic.models.CaptchaModel
+import cn.rtast.rmusic.models.UserInfoModel
 import cn.rtast.rmusic.utils.fromJson
 import cn.rtast.rmusic.utils.http.HttpManager
 import cn.rtast.rmusic.utils.http.Params
 
 class NetEaseMusic {
 
-    private fun getQRCodeKey(): String {
-        val resp = HttpManager.get(QRCODE_KEY_GEN_PATH, null, null).body.string()
-        return resp.fromJson<KeyEntity>().data.unikey
-    }
-
-    fun createQRCode(): QRCodeModel {
-        val key = this.getQRCodeKey()
-        val params = Params.Builder()
-            .addParam("key", key)
-            .addParam("qrimg", "1")
-            .build()
-        val resp = HttpManager.get(QRCODE_GEN_PATH, params, null).body.string()
-        val json = resp.fromJson<QRImageEntity>()
-        return QRCodeModel(json.data.qrimg, key, json.data.qrurl)
-    }
-
-    fun checkQRCodeState(key: String): Boolean {
-        val params = Params.Builder()
-            .addParam("key", key)
-            .build()
-        val resp = HttpManager.get(QRCODE_CHECK_PATH, params, null).body.string()
-        return resp.fromJson<CookieEntity>().code == 803
-    }
-
     fun search(keyword: String, limit: Int): SearchEntity {
-        val params = Params.Builder()
-            .addParam("keywords", keyword)
-            .addParam("limit", limit)
-            .build()
+        val params = Params.Builder().addParam("keywords", keyword).addParam("limit", limit).build()
         val resp = HttpManager.get(SEARCH_PATH, params, null).body.string()
         return resp.fromJson<SearchEntity>()
     }
 
-    fun loginCellphonePwd(cellphone: String, password: String) {
-        val params = Params.Builder()
-            .addParam("phone", cellphone)
-            .addParam("password", password)
-            .build()
+    fun loginCellphonePwd(cellphone: String, password: String): UserInfoModel {
+        val params = Params.Builder().addParam("phone", cellphone).addParam("password", password).build()
         val resp = HttpManager.get(CELLPHONE_LOGIN_PATH, params, null).body.string()
-        val json = resp.fromJson<>()
+        val json = resp.fromJson<LoginResponseEntity>()
+        return UserInfoModel(json.code, json.profile.nickname, json.cookie)
     }
 
-    fun loginEmailPwd(email: String, password: String) {
-        val params = Params.Builder()
-            .addParam("email", email)
-            .addParam("password", password)
-            .build()
+    fun loginEmailPwd(email: String, password: String): UserInfoModel {
+        val params = Params.Builder().addParam("email", email).addParam("password", password).build()
         val resp = HttpManager.get(EMAIL_LOGIN_PATH, params, null).body.string()
-
+        val json = resp.fromJson<LoginResponseEntity>()
+        return UserInfoModel(json.code, json.profile.nickname, json.cookie)
     }
 
-    fun loginCellphoneCaptcha(cellphone: String, captcha: String) {
-        val params = Params.Builder()
-            .addParam("phone", cellphone)
-            .addParam("captcha", captcha)
-            .build()
-
+    fun loginCellphoneCaptcha(cellphone: String, captcha: String): UserInfoModel {
+        val params = Params.Builder().addParam("phone", cellphone).addParam("captcha", captcha).build()
+        val resp = HttpManager.get(VERIFY_CAPTCHA_PATH, params, null).body.string()
+        val json = resp.fromJson<LoginResponseEntity>()
+        return UserInfoModel(json.code, json.profile.nickname, json.cookie)
     }
 
-    fun sendCaptcha(cellphone: String) {
-        val params = Params.Builder()
-            .addParam("phone", cellphone)
-            .build()
+    fun sendCaptcha(cellphone: String): CaptchaModel {
+        val params = Params.Builder().addParam("phone", cellphone).build()
+        val resp = HttpManager.get(CAPTCHA_SEND_PATH, params, null).body.string()
+        val json = resp.fromJson<CaptchaSendEntity>()
+        return if (json.code == 200) CaptchaModel(json.code, "二维码已发送") else CaptchaModel(json.code, json.message)
+    }
 
+    fun getSongUrl(songId: String): String? {
+        val params = Params.Builder().addParam("id", songId).addParam("br", 320000).build()
+        val resp = HttpManager.get(SONG_URL_V1_PATH, params, null).body.string()
+        val json = resp.fromJson<SongUrlEntity>()
+        return if (json.code == 200) json.data.first().url else null
     }
 }
