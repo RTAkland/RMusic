@@ -63,20 +63,6 @@ class RMusicCommand : IRMusicCommand {
         sendPacket(payload, ctx.source.player!!)
     }
 
-    override fun executeSendCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String) {
-        val payload = PayloadModel(Actions.SendCaptcha, cellphone)
-        sendPacket(payload, ctx.source.player!!)
-    }
-
-    override fun executeVerifyCaptcha(
-        ctx: CommandContext<ServerCommandSource>,
-        cellphone: String,
-        captcha: String,
-    ) {
-        val payload = PayloadModel(Actions.VerifyCaptcha, "$cellphone|$captcha")
-        sendPacket(payload, ctx.source.player!!)
-    }
-
     override fun executeLogout(ctx: CommandContext<ServerCommandSource>) {
         val payload = PayloadModel(Actions.Logout, null)
         sendPacket(payload, ctx.source.player!!)

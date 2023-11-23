@@ -21,7 +21,6 @@ import cn.rtast.rmusic.RMusic
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
-import java.io.File
 import java.net.URL
 
 class MusicPlayer : StreamPlayer(), StreamPlayerListener {

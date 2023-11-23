@@ -1,5 +1,6 @@
 {
   "rmusic.tip.playing": "Playing: [ %s ]",
+  "rmusic.tip.logging": "Logging in",
   "rmusic.tip.login.failed": "Login failed",
   "rmusic.tip.login.success": "Login success",
   "rmusic.tip.logout.failed": "Logout failed, because you are not login yet",
@@ -10,10 +11,6 @@
   "rmusic.tip.mute.success": "Muted",
   "rmusic.tip.resume.failed": "Resume failed",
   "rmusic.tip.resume.success": "Resume success",
-  "rmusic.tip.send.captcha.failed": "Send captcha to: [ %s ] failed",
-  "rmusic.tip.send.captcha.success": "Sent captcha to: [ %s ]",
-  "rmusic.tip.verify.captcha.failed": "Captcha verify failed",
-  "rmusic.tip.verify.captcha.success": "Captcha verify success",
   "rmusic.tip.search": "Searching: [ %s ]",
-  "rmusic.tip.search.success.result": "[ %s ]:歌曲名: [ %s ] 作者: [ %s ] "
+  "rmusic.tip.search.success.result": "Song Name: [ %s ] Artist(s): [ %s ] [ %s ]"
 }

@@ -18,11 +18,9 @@
 package cn.rtast.rmusic.utils.music
 
 import cn.rtast.rmusic.*
-import cn.rtast.rmusic.entities.CaptchaSendEntity
 import cn.rtast.rmusic.entities.LoginResponseEntity
 import cn.rtast.rmusic.entities.search.SearchEntity
 import cn.rtast.rmusic.entities.url.SongUrlEntity
-import cn.rtast.rmusic.models.CaptchaModel
 import cn.rtast.rmusic.utils.fromJson
 import cn.rtast.rmusic.utils.http.HttpManager
 import cn.rtast.rmusic.utils.http.Params
@@ -49,23 +47,10 @@ class NetEaseMusic {
         return if (json.code == 200) json.cookie else null
     }
 
-    fun loginCellphoneCaptcha(cellphone: String, captcha: String): String? {
-        val params = Params.Builder().addParam("phone", cellphone).addParam("captcha", captcha).build()
-        val resp = HttpManager.get(API_ROOT_PATH + VERIFY_CAPTCHA_PATH, params, null).body.string()
-        val json = resp.fromJson<LoginResponseEntity>()
-        return if (json.code == 200) json.cookie else null
-    }
-
-    fun sendCaptcha(cellphone: String): CaptchaModel {
-        val params = Params.Builder().addParam("phone", cellphone).build()
-        val resp = HttpManager.get(API_ROOT_PATH + CAPTCHA_SEND_PATH, params, null).body.string()
-        val json = resp.fromJson<CaptchaSendEntity>()
-        return if (json.code == 200) CaptchaModel(json.code, "二维码已发送") else CaptchaModel(json.code, json.message)
-    }
-
     fun getSongUrl(songId: String): String? {
         val params = Params.Builder().addParam("id", songId).addParam("br", 320000).build()
         val resp = HttpManager.get(API_ROOT_PATH + SONG_URL_V1_PATH, params, null).body.string()
+        println(resp)
         val json = resp.fromJson<SongUrlEntity>()
         return if (json.code == 200) json.data.first().url else null
     }

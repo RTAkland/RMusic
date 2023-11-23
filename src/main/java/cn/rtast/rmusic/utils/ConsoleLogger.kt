@@ -39,26 +39,26 @@ class ConsoleLogger {
         return Throwable().stackTrace[2].lineNumber
     }
 
-    private fun log(level: Level, message: Any) {
+    private fun log(level: Level, message: Any?) {
         if (this.level.level >= level.level) {
             val currentTime = this.timeUtil.getCurrentDate().toString()
             println("${level.color}$currentTime+[${this.getCallClass()}:${this.getCallMethod()}:${this.getCallLine()}]:$message")
         }
     }
 
-    fun debug(message: Any) {
+    fun debug(message: Any?) {
         this.log(Level.DEBUG, message)
     }
 
-    fun info(message: Any) {
+    fun info(message: Any?) {
         this.log(Level.INFO, message)
     }
 
-    fun warn(message: Any) {
+    fun warn(message: Any?) {
         this.log(Level.WARN, message)
     }
 
-    fun error(message: Any) {
+    fun error(message: Any?) {
         this.log(Level.ERROR, message)
     }
 }

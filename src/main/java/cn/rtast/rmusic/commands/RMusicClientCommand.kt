@@ -17,6 +17,7 @@
 
 package cn.rtast.rmusic.commands
 
+import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.client.RMusicClient
 import cn.rtast.rmusic.utils.SessionManager
 import cn.rtast.rmusic.utils.music.MusicPlayer
@@ -42,9 +43,11 @@ class RMusicClientCommand : IRMusicCommand {
         if (RMusicClient.player!!.isPausedOrPlaying || RMusicClient.player!!.mute) {
             this.executeStop(ctx)
         }
-        val url = this.netease.getSongUrl(songId)
-        RMusicClient.player!!.play(URL(url))
-        ctx.source.sendMessage(Text.translatable("rmusic.tip.playing", songId))
+        thread {
+            val url = this.netease.getSongUrl(songId)
+            RMusicClient.player!!.play(URL(url))
+            ctx.source.sendMessage(Text.translatable("rmusic.tip.playing", songId))
+        }
     }
 
     override fun executeStop(ctx: CommandContext<ServerCommandSource>) {
@@ -98,6 +101,7 @@ class RMusicClientCommand : IRMusicCommand {
     }
 
     override fun executeEmailLogin(ctx: CommandContext<ServerCommandSource>, email: String, password: String) {
+        ctx.source.sendMessage(Text.translatable("rmusic.tip.logging"))
         thread {
             val resp = this.netease.loginEmailPwd(email, password)
             if (resp == null) {
@@ -110,6 +114,7 @@ class RMusicClientCommand : IRMusicCommand {
     }
 
     override fun executePhoneLogin(ctx: CommandContext<ServerCommandSource>, cellphone: String, password: String) {
+        ctx.source.sendMessage(Text.translatable("rmusic.tip.logging"))
         thread {
             val resp = this.netease.loginCellphonePwd(cellphone, password)
             if (resp == null) {
@@ -117,29 +122,6 @@ class RMusicClientCommand : IRMusicCommand {
             } else {
                 SessionManager.setSessionCookie(resp)
                 ctx.source.sendMessage(Text.translatable("rmusic.tip.login.success"))
-            }
-        }
-    }
-
-    override fun executeSendCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String) {
-        thread {
-            val resp = this.netease.sendCaptcha(cellphone)
-            if (resp.code != 200) {
-                ctx.source.sendMessage(Text.translatable("rmusic.tip.send.captcha.failed", resp.message))
-            } else {
-                ctx.source.sendMessage(Text.translatable("rmusic.tip.send.captcha.success", cellphone))
-            }
-        }
-    }
-
-    override fun executeVerifyCaptcha(ctx: CommandContext<ServerCommandSource>, cellphone: String, captcha: String) {
-        thread {
-            val resp = this.netease.loginCellphoneCaptcha(cellphone, captcha)
-            if (resp == null) {
-                ctx.source.sendMessage(Text.translatable("rmusic.tip.verify.captcha.failed"))
-            } else {
-                SessionManager.setSessionCookie(resp)
-                ctx.source.sendMessage(Text.translatable("rmusic.tip.verify.captcha.success"))
             }
         }
     }
@@ -154,8 +136,8 @@ class RMusicClientCommand : IRMusicCommand {
     }
 
     override fun executeSearch(ctx: CommandContext<ServerCommandSource>, keyword: String, limit: Int) {
+        ctx.source.sendMessage(Text.translatable("rmusic.tip.search", keyword))
         thread {
-            ctx.source.sendMessage(Text.translatable("rmusic.tip.search", keyword))
             val resp = this.netease.search(keyword, limit)
             resp.result.songs.forEach { song ->
                 val artists = StringBuilder()
@@ -165,12 +147,17 @@ class RMusicClientCommand : IRMusicCommand {
                 ctx.source.sendMessage(
                     Text.translatable(
                         "rmusic.tip.search.success.result",
-                        Text.literal(song.name),
-                        Text.literal(artists.toString()),
+                        Text.literal(song.name).styled { it.withColor(Formatting.YELLOW) },
+                        Text.literal(artists.toString()).styled { it.withColor(Formatting.YELLOW) },
                         Text.literal("▶").styled {
                             it.withColor(Formatting.GREEN)
-                            it.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "rm play ${song.id}"))
-                            it.withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal(song.id.toString())))
+                                .withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${song.id}"))
+                                .withHoverEvent(
+                                    HoverEvent(
+                                        HoverEvent.Action.SHOW_TEXT,
+                                        Text.literal(song.id.toString())
+                                    )
+                                )
                         }
                     )
                 )
