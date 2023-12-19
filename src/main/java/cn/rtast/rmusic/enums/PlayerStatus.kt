@@ -15,8 +15,10 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.enums
 
-const val VERSION = "1.0.0"  // Don't change it
-
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+enum class PlayerStatus {
+    Playing,
+    Stopped,
+    Paused
+}

@@ -18,6 +18,7 @@
 package cn.rtast.rmusic.entities.search
 
 data class Artist(
-    val id: Long,
+    val id: Int,
     val name: String,
+    val al: Alia
 )

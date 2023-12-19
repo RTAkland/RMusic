@@ -15,8 +15,19 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.mixins;
 
-const val VERSION = "1.0.0"  // Don't change it
+import net.minecraft.client.MinecraftClient;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+@Mixin(MinecraftClient.class)
+public class Test {
+
+    @Inject(method = "isPaused", at = @At("HEAD"), remap = false)
+    private void isPaused(CallbackInfoReturnable<Boolean> info) {
+
+    }
+}

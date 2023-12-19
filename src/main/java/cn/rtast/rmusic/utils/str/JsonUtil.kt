@@ -15,8 +15,24 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.utils.str
 
-const val VERSION = "1.0.0"  // Don't change it
+import com.google.common.reflect.TypeToken
+import com.google.gson.Gson
 
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+object JsonUtil {
+
+    val gson = Gson()
+
+    fun toJson(src: Any): String {
+        return gson.toJson(src)
+    }
+
+    inline fun <reified T> fromJson(src: String): T {
+        return gson.fromJson(src, T::class.java)
+    }
+
+    inline fun <reified T> fromArrayJson(src: String): T {
+        return gson.fromJson(src, object : TypeToken<T>() {}.type)
+    }
+}

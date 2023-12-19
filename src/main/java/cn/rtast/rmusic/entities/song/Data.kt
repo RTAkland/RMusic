@@ -15,8 +15,10 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.entities.song
 
-const val VERSION = "1.0.0"  // Don't change it
-
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+data class Data(
+    val id: Int,
+    val size: Long,
+    val url: String
+)

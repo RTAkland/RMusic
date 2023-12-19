@@ -15,8 +15,18 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.utils.str
 
-const val VERSION = "1.0.0"  // Don't change it
+import java.net.URLEncoder
+import java.util.*
 
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+object StringUtil {
+
+    fun encodeURI(input: String): String {
+        return URLEncoder.encode(input, "UTF-8")
+    }
+
+    fun base64Decode(input: String): String {
+        return Base64.getDecoder().decode(input).toString(Charsets.UTF_8)
+    }
+}

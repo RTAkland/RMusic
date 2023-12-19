@@ -15,8 +15,18 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.utils
 
-const val VERSION = "1.0.0"  // Don't change it
+import net.minecraft.client.MinecraftClient
+import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+object Message {
+
+    fun m(message: String) {
+        val client = MinecraftClient.getInstance()
+
+        client.player!!.sendMessage(Text.literal(message).styled { it.withColor(Formatting.AQUA) }, true)
+
+    }
+}

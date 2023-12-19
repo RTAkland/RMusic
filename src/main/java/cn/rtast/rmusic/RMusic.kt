@@ -15,28 +15,46 @@
  */
 package cn.rtast.rmusic
 
-import cn.rtast.rmusic.commands.RMusicCommand
-import cn.rtast.rmusic.enums.Actions
-import cn.rtast.rmusic.models.PayloadModel
-import cn.rtast.rmusic.utils.ConsoleLogger
-import cn.rtast.rmusic.utils.fromJson
-import cn.rtast.rmusic.utils.toJson
-import com.google.gson.Gson
+import cn.rtast.rmusic.utils.LoginManager
+import cn.rtast.rmusic.utils.LyricParser
+import cn.rtast.rmusic.utils.MusicPlayer
+import cn.rtast.rmusic.utils.NetEaseMusic
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
-import net.minecraft.util.Identifier
+import net.minecraft.server.command.CommandManager
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import kotlin.concurrent.thread
+
 
 class RMusic : ModInitializer {
 
     companion object {
-        val logger = ConsoleLogger()
-        val gson = Gson()
-        var API = "https://rmusic.dgtmc.top"
-        val RNetworkChannel = Identifier("rmusic", "channel")
+        val logger: Logger = LoggerFactory.getLogger("RMusic-main")
+        val player = MusicPlayer()
+        val loginManager = LoginManager()
     }
 
     override fun onInitialize() {
         logger.info("RMusic($VERSION) 已加载!")
-        CommandRegistrationCallback.EVENT.register(RMusicCommand())
+
+        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
+            dispatcher.register(CommandManager.literal("play").executes {
+                thread {
+                    val parser = LyricParser()
+                    val net = NetEaseMusic()
+                    val id = 1469483755L
+                    val lyric = net.getLyric(id)
+                    val song = net.getSongUrl(id)
+                    println(lyric)
+                    val player = MusicPlayer()
+                    val parsed = parser.parse(lyric)
+                    player.playMusic(song, parsed)
+                    println(parsed)
+                }
+                1
+            })
+        }
+
     }
 }

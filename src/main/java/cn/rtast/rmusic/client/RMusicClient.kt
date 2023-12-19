@@ -17,23 +17,10 @@
 
 package cn.rtast.rmusic.client
 
-import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.commands.RMusicClientCommand
-import cn.rtast.rmusic.utils.music.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.api.EnvType
-import net.fabricmc.api.Environment
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 
-@Environment(EnvType.CLIENT)
 class RMusicClient : ClientModInitializer {
-
-    companion object {
-        var player: MusicPlayer? = null
-    }
-
     override fun onInitializeClient() {
-        RMusic.logger.info("RMusic 客户端已加载")
-        CommandRegistrationCallback.EVENT.register(RMusicClientCommand())
+
     }
 }

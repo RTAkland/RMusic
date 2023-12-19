@@ -15,8 +15,10 @@
  */
 
 
-package cn.rtast.rmusic
+package cn.rtast.rmusic.entities.login.qrcode
 
-const val VERSION = "1.0.0"  // Don't change it
-
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+data class CheckQRCodeStatusEntity(
+    val code: Int,
+    val message: String,
+    val cookie: String
+)
