@@ -21,6 +21,7 @@ import cn.rtast.rmusic.utils.MusicPlayer
 import cn.rtast.rmusic.utils.NetEaseMusic
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
+import net.minecraft.client.MinecraftClient
 import net.minecraft.server.command.CommandManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,6 +34,8 @@ class RMusic : ModInitializer {
         val logger: Logger = LoggerFactory.getLogger("RMusic-main")
         val player = MusicPlayer()
         val loginManager = LoginManager()
+        
+        val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
     }
 
     override fun onInitialize() {

@@ -17,16 +17,16 @@
 
 package cn.rtast.rmusic.utils
 
-import net.minecraft.client.MinecraftClient
+import cn.rtast.rmusic.RMusic
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
 object Message {
 
     fun m(message: String) {
-        val client = MinecraftClient.getInstance()
-
-        client.player!!.sendMessage(Text.literal(message).styled { it.withColor(Formatting.AQUA) }, true)
-
+        RMusic.minecraftClient.player!!.sendMessage(
+            Text.literal(message).styled { it.withColor(Formatting.AQUA) },
+            true
+        )
     }
 }
