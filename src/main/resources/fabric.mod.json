@@ -11,19 +11,13 @@
     "repo": "https://github.com/RTAkland/RMusic"
   },
   "license": "Apache-2.0",
-  "icon": "assets/rmusic/icon.png",
+  "icon": "texture/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
       {
         "adapter": "kotlin",
         "value": "cn.rtast.rmusic.RMusic"
-      }
-    ],
-    "client": [
-      {
-        "adapter": "kotlin",
-        "value": "cn.rtast.rmusic.client.RMusicClient"
       }
     ]
   },

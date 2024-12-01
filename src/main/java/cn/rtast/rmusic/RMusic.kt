@@ -15,10 +15,10 @@
  */
 package cn.rtast.rmusic
 
-import cn.rtast.rmusic.utils.LoginManager
-import cn.rtast.rmusic.utils.MusicPlayer
+import cn.rtast.rmusic.command.RMusicCommand
+import cn.rtast.rmusic.util.MusicPlayer
 import net.fabricmc.api.ModInitializer
-import net.minecraft.client.MinecraftClient
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -28,12 +28,10 @@ class RMusic : ModInitializer {
     companion object {
         val logger: Logger = LoggerFactory.getLogger("RMusic-main")
         val player = MusicPlayer()
-        val loginManager = LoginManager()
-        
-        val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
     }
 
     override fun onInitialize() {
         logger.info("RMusic($VERSION) 已加载!")
+        ClientCommandRegistrationCallback.EVENT.register(RMusicCommand())
     }
 }

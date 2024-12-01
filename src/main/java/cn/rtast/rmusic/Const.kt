@@ -17,6 +17,19 @@
 
 package cn.rtast.rmusic
 
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import net.minecraft.client.MinecraftClient
+import net.minecraft.util.Identifier
+
 const val VERSION = "1.0.0"  // Don't change it
 
-const val NetEaseMusicAPI = "https://rmusic.dgtmc.top"
+const val NCM_API = "https://ncm.rtast.cn"
+
+val gson: Gson = GsonBuilder()
+    .disableHtmlEscaping()
+    .create()
+
+val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
+val defaultCoverId: Identifier = Identifier.of("rmusic", "cover")
+val minecraftClient: MinecraftClient = MinecraftClient.getInstance()

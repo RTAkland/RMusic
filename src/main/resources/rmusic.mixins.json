@@ -4,9 +4,10 @@
   "package": "cn.rtast.rmusic.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "PlayerListMixin"
+    "SoundSystemMixin"
   ],
   "client": [
+    "QuitServerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
