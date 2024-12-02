@@ -11,7 +11,7 @@
     "repo": "https://github.com/RTAkland/RMusic"
   },
   "license": "Apache-2.0",
-  "icon": "texture/icon.png",
+  "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

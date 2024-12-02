@@ -31,5 +31,5 @@ val gson: Gson = GsonBuilder()
     .create()
 
 val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
-val defaultCoverId: Identifier = Identifier.of("rmusic", "cover")
+val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/loading.png")
 val minecraftClient: MinecraftClient = MinecraftClient.getInstance()

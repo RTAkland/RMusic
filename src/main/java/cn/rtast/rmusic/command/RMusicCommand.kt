@@ -8,7 +8,8 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.util.NCMusic
+import cn.rtast.rmusic.qrcodeId
+import cn.rtast.rmusic.util.*
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -24,6 +25,7 @@ import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import java.net.URI
 
 class RMusicCommand : ClientCommandRegistrationCallback {
 
@@ -48,7 +50,7 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         val clickableText = Text.literal(" [▶]").styled {
                                             it.withColor(Formatting.YELLOW)
                                                 .withClickEvent(
-                                                    ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/rm play ${r.id}")
+                                                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${r.id}")
                                                 )
                                                 .withHoverEvent(
                                                     HoverEvent(
@@ -72,11 +74,15 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                 val songId = context.getArgument("songId", Long::class.java)
                                 scope.launch {
                                     try {
-
                                         val songUrl = NCMusic.getSongUrl(songId)
                                         val lyric = NCMusic.getLyric(songId)
                                         RMusic.player.playMusic(songUrl, lyric)
-                                        context.source.sendFeedback(Text.literal("正在播放: $songId"))
+                                        val songDetail = NCMusic.getSongDetail(songId)
+                                        renderSongDetail(songDetail)
+                                        val coverBytes =
+                                            URI(songDetail.cover + "?param=128y128").toURL().readBytes().toPNG()
+                                        renderCover(coverBytes)
+                                        context.source.sendFeedback(Text.literal("正在播放: ${songDetail.name} - 《${songDetail.artists}》"))
                                     } catch (_: NullPointerException) {
                                         context.source.sendFeedback(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
                                     }
@@ -109,35 +115,21 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                     LiteralArgumentBuilder.literal<FabricClientCommandSource>("login")
                         .executes { context ->
                             scope.launch {
-                                val (key, url) = NCMusic.loginByQRCode()
-                                context.source.sendFeedback(Text.literal("点面").append(Text.literal("[这里]").styled {
-                                    it.withColor(Formatting.GREEN)
-                                        .withHoverEvent(
+                                val (key, qrcode) = NCMusic.loginByQRCode()
+                                renderQRCode(qrcode)
+                                context.source.sendFeedback(
+                                    Text.literal("扫码并登录完成后点击").append(Text.literal("[这里]").styled {
+                                        it.withColor(Formatting.GREEN).withHoverEvent(
                                             HoverEvent(
                                                 HoverEvent.Action.SHOW_TEXT,
-                                                Text.literal("点击这里打开浏览器扫码")
+                                                Text.literal("点击这里确认登录状态")
+                                                    .styled { it.withColor(Formatting.GREEN) }
                                             )
                                         ).withClickEvent(
-                                            ClickEvent(
-                                                ClickEvent.Action.OPEN_URL,
-                                                "https://api.rtast.cn/api/viewQrcode?key=${key}"
-                                            )
+                                            ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
                                         )
-                                }).append(Text.literal(", 扫码登录完成后点击")).append(Text.literal("[这里]").styled {
-                                    it.withColor(Formatting.GREEN)
-                                        .withHoverEvent(
-                                            HoverEvent(
-                                                HoverEvent.Action.SHOW_TEXT,
-                                                Text.literal("点击这里确认二维码状态")
-                                            )
-                                        )
-                                        .withClickEvent(
-                                            ClickEvent(
-                                                ClickEvent.Action.RUN_COMMAND,
-                                                "/rm login confirm $key"
-                                            )
-                                        )
-                                }))
+                                    })
+                                )
                             }
                             0
                         }.then(
@@ -162,6 +154,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                 .then(
                                     argument("qrcodeKey", StringArgumentType.string()).executes { context ->
                                         scope.launch {
+                                            loadQRCode = false
+                                            destroyTexture(qrcodeId)
                                             val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
                                             val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
                                             if (cookie != null) {

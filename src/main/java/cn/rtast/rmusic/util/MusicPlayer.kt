@@ -19,6 +19,7 @@ package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.minecraftClient
+import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
@@ -42,20 +43,23 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         nEncodedBytes: Int,
         microsecondPosition: Long,
         pcmData: ByteArray,
-        properties: MutableMap<String, Any>,
+        properties: MutableMap<String, Any>
     ) {
         val currentSecond = (microsecondPosition / 1000000).toInt()
         for (key in lyric!!.keys) {
             if (currentSecond == key) {
-                val lyricText = lyric!![key] ?: continue
-                val message = Text.literal(lyricText).styled { it.withColor(Formatting.YELLOW) }
-                minecraftClient.player?.sendMessage(message, true)
+                val lyric = Text.literal(lyric!![key] ?: continue)
+                    .styled { it.withColor(Formatting.YELLOW) }
+                minecraftClient.inGameHud.setOverlayMessage(lyric, false)
             }
         }
     }
 
     override fun statusUpdated(event: StreamPlayerEvent) {
-
+        if (event.playerStatus == Status.STOPPED) {
+            loadCover = false
+            loadSongDetail = false
+        }
     }
 
     fun playMusic(songUrl: String, lyric: Map<Int, String>) {

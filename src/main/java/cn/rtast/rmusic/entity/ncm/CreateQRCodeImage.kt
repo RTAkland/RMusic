@@ -13,7 +13,7 @@ data class CreateQRCodeImage(
     val data: Data
 ) {
     data class Data(
-        @SerializedName("qrurl")
-        val qrUrl: String
+        @SerializedName("qrimg")
+        val base64Image: String
     )
 }
