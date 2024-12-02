@@ -18,12 +18,12 @@ object NCMusic {
     private const val GET_SONG_URL_PATH = "song/url"
     private const val GET_LYRIC_PATH = "lyric"
 
-    fun loginByQRCode(): Pair<String, ByteArray> {
+    fun loginByQRCode(): Pair<String, String> {
         val key = Http.get<GetQRKey>("$NCM_API/$QRCODE_KEY_PATH").data.uniKey
         val qrcode = Http.get<CreateQRCodeImage>(
             "$NCM_API/$CREATE_QRCODE_PATH",
-            mapOf("key" to key, "qrimg" to "1")
-        ).data.base64Image.replace("data:image/png;base64,", "").decodeToByteArray()
+            mapOf("key" to key)
+        ).data.qrUrl
         return key to qrcode
     }
 
@@ -44,7 +44,7 @@ object NCMusic {
     }
 
     fun getSongUrl(id: Long): String {
-        return Http.get<GetSongUrl>("$NCM_API/$GET_SONG_URL_PATH", mapOf("id" to id)).data.first().toString()
+        return Http.get<GetSongUrl>("$NCM_API/$GET_SONG_URL_PATH", mapOf("id" to id)).data.first().url
     }
 
     fun getLyric(id: Long): MutableMap<Int, String> {

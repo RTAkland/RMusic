@@ -7,7 +7,7 @@
     "SoundSystemMixin"
   ],
   "client": [
-    "QuitServerMixin"
+    "MinecraftClientMixin"
   ],
   "injectors": {
     "defaultRequire": 1

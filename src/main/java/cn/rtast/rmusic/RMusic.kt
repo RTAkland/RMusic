@@ -16,6 +16,7 @@
 package cn.rtast.rmusic
 
 import cn.rtast.rmusic.command.RMusicCommand
+import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
@@ -28,6 +29,7 @@ class RMusic : ModInitializer {
     companion object {
         val logger: Logger = LoggerFactory.getLogger("RMusic-main")
         val player = MusicPlayer()
+        val loginManager = CookieManager()
     }
 
     override fun onInitialize() {

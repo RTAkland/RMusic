@@ -48,8 +48,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         for (key in lyric!!.keys) {
             if (currentSecond == key) {
                 val lyricText = lyric!![key] ?: continue
-                val message =
-                    Text.empty().apply { append(lyricText) }.styled { it.withColor(Formatting.entries.random()) }
+                val message = Text.literal(lyricText).styled { it.withColor(Formatting.YELLOW) }
                 minecraftClient.player?.sendMessage(message, true)
             }
         }

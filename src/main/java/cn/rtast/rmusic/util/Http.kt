@@ -4,11 +4,12 @@
  * Date: 2024/12/1
  */
 
-@file:Suppress("unused")
+//@file:Suppress("unused")
 
 package cn.rtast.rmusic.util
 
 
+import cn.rtast.rmusic.RMusic
 import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -36,8 +37,12 @@ object Http {
             it.forEach { (key, value) ->
                 paramsUrl.append("$key=$value&")
             }
+            RMusic.loginManager.getCookie()?.let {
+                paramsUrl.append("cookie=$it&")
+            }
             paramsUrl.dropLast(1)
         }
+        println(paramsUrl)
         return if (params != null) paramsUrl.toString() else url
     }
 
