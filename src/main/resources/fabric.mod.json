@@ -8,7 +8,10 @@
     "RTAkland"
   ],
   "contact": {
-    "repo": "https://github.com/RTAkland/RMusic"
+    "repo": "https://repo.rtast.cn/RTAkland/rmusic",
+    "homepage": "https://github.com/RTAkland",
+    "email": "me@rtast.cn",
+    "sources": "https://repo.rtast.cn/RTAkland/rmusic"
   },
   "license": "Apache-2.0",
   "icon": "icon.png",
