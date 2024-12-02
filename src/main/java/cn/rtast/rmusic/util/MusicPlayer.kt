@@ -25,11 +25,14 @@ import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import java.io.File
+import java.io.FileOutputStream
 import java.net.URI
 
 class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     private var lyric: Map<Int, String>? = null
+    private var currentMusicFileName: String? = null
 
     init {
         this.addStreamPlayerListener(this)
@@ -59,12 +62,21 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         if (event.playerStatus == Status.STOPPED) {
             loadCover = false
             loadSongDetail = false
+            File("./config/rmusic", currentMusicFileName!!).delete()
         }
     }
 
     fun playMusic(songUrl: String, lyric: Map<Int, String>) {
+        val filename = songUrl.split("/").last().split("?").first()
+        val musicFile = File("./config/rmusic", filename)
+        URI(songUrl).toURL().openStream().use { inputStream ->
+            FileOutputStream(musicFile).use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
         this.lyric = lyric
-        this.open(URI(songUrl).toURL())
+        this.currentMusicFileName = filename
+        this.open(musicFile)
         this.play()
     }
 }

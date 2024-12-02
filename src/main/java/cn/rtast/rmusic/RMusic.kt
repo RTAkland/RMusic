@@ -18,14 +18,13 @@ package cn.rtast.rmusic
 import cn.rtast.rmusic.command.RMusicCommand
 import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
-import net.fabricmc.api.ModInitializer
+import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.minecraft.text.Text
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class RMusic : ModInitializer {
+class RMusic : ClientModInitializer {
 
     companion object {
         val logger: Logger = LoggerFactory.getLogger("RMusic-main")
@@ -33,8 +32,10 @@ class RMusic : ModInitializer {
         val loginManager = CookieManager()
     }
 
-    override fun onInitialize() {
+    override fun onInitializeClient() {
         logger.info("RMusic($VERSION) 已加载!")
-        ClientCommandRegistrationCallback.EVENT.register(RMusicCommand())
+        ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->
+            RMusicCommand().register(dispatcher)
+        }
     }
 }

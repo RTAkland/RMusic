@@ -4,7 +4,7 @@
  * Date: 2024/12/1
  */
 
-//@file:Suppress("unused")
+@file:Suppress("unused")
 
 package cn.rtast.rmusic.util
 
@@ -42,7 +42,6 @@ object Http {
             }
             paramsUrl.dropLast(1)
         }
-        println(paramsUrl)
         return if (params != null) paramsUrl.toString() else url
     }
 

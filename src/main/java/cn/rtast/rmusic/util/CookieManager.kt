@@ -17,6 +17,8 @@ class CookieManager {
 
     fun login(cookie: String) {
         val state = LoginState(cookie).toJson()
+        file.delete()
+        file.createNewFile()
         file.writeText(state)
     }
 

@@ -17,6 +17,7 @@ import net.minecraft.client.texture.NativeImage
 import net.minecraft.client.texture.NativeImageBackedTexture
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import kotlin.math.sin
 
 
 var loadQRCode = true
@@ -56,12 +57,30 @@ fun destroyTexture(id: Identifier) {
 
 fun renderSongDetail(detail: SongDetail) {
     loadSongDetail = true
+    var colorCycle = 0f
+    val colorChangeSpeed = 0.01f
     HudRenderCallback.EVENT.register { context, tickDeltaManager ->
         if (!loadSongDetail) return@register
+        colorCycle += colorChangeSpeed * tickDeltaManager.lastDuration
+        if (colorCycle > 1f) colorCycle = 0f
+        val red = (sin(colorCycle * Math.PI * 2) * 0.5 + 0.5) * 255
+        val green = (sin((colorCycle + 0.33) * Math.PI * 2) * 0.5 + 0.5) * 255
+        val blue = (sin((colorCycle + 0.66) * Math.PI * 2) * 0.5 + 0.5) * 255
+        val color = ((255 shl 24) or (red.toInt() shl 16) or (green.toInt() shl 8) or blue.toInt())
         context.drawText(
             minecraftClient.textRenderer,
-            Text.literal("${detail.name} - 《${detail.artists}》"),
-            5, 80, 0xFFFF00, true
+            Text.literal("正在播放: ↓"),
+            5, 73, color, true
+        )
+        context.drawText(
+            minecraftClient.textRenderer,
+            Text.literal("《${detail.name}》"),
+            5, 83, color, true
+        )
+        context.drawText(
+            minecraftClient.textRenderer,
+            Text.literal("by: ${detail.artists}"),
+            5, 93, color, true
         )
     }
 }
