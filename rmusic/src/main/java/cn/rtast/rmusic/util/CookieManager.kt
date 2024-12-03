@@ -8,6 +8,8 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.entity.LoginState
+import cn.rtast.rmusic.util.str.fromJson
+import cn.rtast.rmusic.util.str.toJson
 import java.io.File
 
 class CookieManager {

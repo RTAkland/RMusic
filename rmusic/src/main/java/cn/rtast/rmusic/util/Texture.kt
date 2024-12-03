@@ -7,6 +7,7 @@
 
 package cn.rtast.rmusic.util
 
+import cn.rtast.rmusic.cacheDir
 import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.qrcodeId
@@ -17,6 +18,8 @@ import net.minecraft.client.texture.NativeImage
 import net.minecraft.client.texture.NativeImageBackedTexture
 import net.minecraft.text.Text
 import net.minecraft.util.Identifier
+import java.io.File
+import java.net.URI
 import kotlin.math.sin
 
 
@@ -40,12 +43,20 @@ fun renderQRCode(qrcode: ByteArray) {
     loadQRCode = true
     HudRenderCallback.EVENT.register { context, _ ->
         if (!loadQRCode) return@register
-        context.drawTexture(renderLayer, qrcodeId, 0, 50, 0f, 0f, 96, 96, 96, 96)
+        context.drawTexture(renderLayer, qrcodeId, 0, 50, 0f, 0f, 80, 80, 80, 80)
     }
 }
 
-fun renderCover(cover: ByteArray) {
+fun renderCover(songDetail: SongDetail) {
     loadCover = true
+    val cachedCover = File(cacheDir, "${songDetail.id}.png")
+    val cover = if (cachedCover.exists()) cachedCover.readBytes() else {
+        val coverBytes = URI(songDetail.cover + "?param=128y128").toURL().readBytes()
+            .toPNG().cropToCircle().toBufferedImage()
+            .createRecordImage().toByteArray()
+        cachedCover.writeBytes(coverBytes)
+        coverBytes
+    }
     registerTexture(cover, defaultCoverId)
     HudRenderCallback.EVENT.register { context, _ ->
         if (!loadCover) return@register

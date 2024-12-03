@@ -17,7 +17,9 @@
 
 package cn.rtast.rmusic.util
 
+import cn.rtast.rmusic.cacheDir
 import cn.rtast.rmusic.entity.ncm.SongDetail
+import cn.rtast.rmusic.util.music.NCMusic
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
@@ -32,7 +34,6 @@ import java.net.URI
 class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     private var lyric: Map<Int, String>? = null
-    private var currentMusicFileName: String? = null
     private var currentSongDetail: SongDetail? = null
     private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
 
@@ -72,22 +73,25 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
             )
             loadCover = false
             loadSongDetail = false
-            File("./config/rmusic", currentMusicFileName!!).delete()
         }
     }
 
-    fun playMusic(songUrl: String, lyric: Map<Int, String>, songDetail: SongDetail) {
+    fun playMusic(lyric: Map<Int, String>, songDetail: SongDetail) {
         this.currentSongDetail = songDetail
-        val filename = songUrl.split("/").last().split("?").first()
-        val musicFile = File("./config/rmusic", filename)
-        URI(songUrl).toURL().openStream().use { inputStream ->
-            FileOutputStream(musicFile).use { outputStream ->
-                inputStream.copyTo(outputStream)
-            }
-        }
         this.lyric = lyric
-        this.currentMusicFileName = filename
-        this.open(musicFile)
-        this.play()
+        val cachedSongFile = File(cacheDir, songDetail.id.toString())
+        if (cachedSongFile.exists()) {
+            this.open(cachedSongFile)
+            this.play()
+        } else {
+            val songUrl = NCMusic.getSongUrl(songDetail.id)
+            URI(songUrl).toURL().openStream().use { inputStream ->
+                FileOutputStream(cachedSongFile).use { outputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+            this.open(cachedSongFile)
+            this.play()
+        }
     }
 }

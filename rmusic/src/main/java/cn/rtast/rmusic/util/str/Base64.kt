@@ -6,7 +6,7 @@
 
 @file:Suppress("unused")
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.str
 
 import java.util.Base64
 

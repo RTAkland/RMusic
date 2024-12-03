@@ -8,6 +8,8 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.entity.Config
+import cn.rtast.rmusic.util.str.fromJson
+import cn.rtast.rmusic.util.str.toJson
 import java.io.File
 
 class ConfigManager {
@@ -25,7 +27,7 @@ class ConfigManager {
     }
 
     fun default() {
-        file.writeText(Config("https://ncm.rtast.cn", true).toJson())
+        file.writeText(Config("https://ncm.rtast.cn", true, "http://127.0.0.1:7979").toJson())
     }
 
     fun write(data: Config) {

@@ -12,6 +12,9 @@ import cn.rtast.rmusic.entity.MusicPayload
 import cn.rtast.rmusic.entity.SongInfo
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
+import cn.rtast.rmusic.util.music.NCMusic
+import cn.rtast.rmusic.util.str.encodeToBase64
+import cn.rtast.rmusic.util.str.toJson
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.LongArgumentType
@@ -30,7 +33,6 @@ import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.io.File
-import java.net.URI
 
 class RMusicCommand : ClientCommandRegistrationCallback {
 
@@ -80,8 +82,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                     )
                                             }
                                             songText.append(playButton)
-                                            val shareButton = Text.literal(" [↗]").styled {
-                                                it.withColor(Formatting.AQUA)
+                                            val shareButton = Text.literal(" [↗]").styled { style ->
+                                                style.withColor(Formatting.AQUA)
                                                     .withClickEvent(
                                                         ClickEvent(
                                                             ClickEvent.Action.RUN_COMMAND,
@@ -142,13 +144,10 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
                                         val songDetail = NCMusic.getSongDetail(songId)
                                         songInfo = songDetail
+                                        renderCover(songDetail)
                                         renderSongDetail()
-                                        val songUrl = NCMusic.getSongUrl(songId)
                                         val lyric = NCMusic.getLyric(songId)
-                                        RMusicClient.player.playMusic(songUrl, lyric, songDetail)
-                                        val coverBytes = URI(songDetail.cover + "?param=128y128")
-                                            .toURL().readBytes().toPNG()
-                                        renderCover(coverBytes)
+                                        RMusicClient.player.playMusic(lyric, songDetail)
                                     } catch (_: NullPointerException) {
                                         context.source.sendFeedback(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
                                     } catch (e: Exception) {
@@ -296,8 +295,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                         .then(
                             ClientCommandManager.literal("confirm")
                                 .executes { context ->
-                                    val files = File("./config/rmusic/").listFiles()!!
-                                        .filter { file -> file.isFile && !file.name.endsWith(".json") }
+                                    val files = File("./config/rmusic/cache").listFiles()
+                                        ?.filter { it.isFile } ?: emptyList()
                                     files.forEach { file -> file.delete() }
                                     context.source.sendFeedback(
                                         Text.literal("已删除").append(
@@ -369,6 +368,15 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                             e.printStackTrace()
                                         }
                                     }
+                                    0
+                                }
+                        )
+                ).then(
+                    ClientCommandManager.literal("qq-search")
+                        .then(
+                            argument("qq-search-keyword", StringArgumentType.string())
+                                .executes { context ->
+
                                     0
                                 }
                         )

@@ -9,8 +9,8 @@ package cn.rtast.rmusic.network
 
 import cn.rtast.rmusic.entity.MusicPayload
 import cn.rtast.rmusic.entity.SongInfo
-import cn.rtast.rmusic.util.decodeToString
-import cn.rtast.rmusic.util.fromJson
+import cn.rtast.rmusic.util.str.decodeToString
+import cn.rtast.rmusic.util.str.fromJson
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.sound.SoundCategory

@@ -5,10 +5,10 @@
  */
 
 
-package cn.rtast.rmusic.entity.ncm
+package cn.rtast.rmusic.entity
 
 data class SearchResult(
-    val id: Long,
+    val id: String,
     val name: String,
     val artists: String,
 //    val cover: String,

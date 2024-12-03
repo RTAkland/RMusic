@@ -21,3 +21,4 @@
 > 按下esc会自动暂停音乐播放, 使用`/rm config auto-pause false` 来取消设置自动暂停, 设置成功后
 > 使用`/rm reload`来重新加载配置文件
 
+![showcase](public/showcase.png)

@@ -20,6 +20,7 @@ package cn.rtast.rmusic
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import net.minecraft.util.Identifier
+import java.io.File
 
 val gson: Gson = GsonBuilder()
     .disableHtmlEscaping()
@@ -28,3 +29,4 @@ val gson: Gson = GsonBuilder()
 val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
 val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/loading.png")
 val networkingId: Identifier = Identifier.of("rmusic", "networking")
+val cacheDir = File("./config/rmusic/cache").apply { mkdirs() }

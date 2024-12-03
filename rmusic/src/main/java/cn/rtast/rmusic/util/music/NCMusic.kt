@@ -5,10 +5,14 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.music
 
 import cn.rtast.rmusic.RMusicClient
+import cn.rtast.rmusic.entity.SearchResult
 import cn.rtast.rmusic.entity.ncm.*
+import cn.rtast.rmusic.util.Http
+import cn.rtast.rmusic.util.str.LyricParser
+import cn.rtast.rmusic.util.str.decodeToByteArray
 
 object NCMusic {
     private const val QRCODE_KEY_PATH = "login/qr/key"
@@ -39,7 +43,7 @@ object NCMusic {
         val result = Http.get<RawSearchResult>("$NCM_API/$SEARCH_PATH", mapOf("keywords" to keyword))
         return result.result.songs.map {
             SearchResult(
-                it.id,
+                it.id.toString(),
                 it.name,
                 it.artists.joinToString(",") { artist -> artist.name },
             )
