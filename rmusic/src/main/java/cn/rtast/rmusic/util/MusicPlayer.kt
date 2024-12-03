@@ -17,13 +17,12 @@
 
 package cn.rtast.rmusic.util
 
-import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.entity.ncm.SongDetail
-import cn.rtast.rmusic.minecraftClient
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
+import net.minecraft.client.MinecraftClient
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.io.File
@@ -35,13 +34,13 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
     private var lyric: Map<Int, String>? = null
     private var currentMusicFileName: String? = null
     private var currentSongDetail: SongDetail? = null
+    private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
 
     init {
         this.addStreamPlayerListener(this)
     }
 
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
-        RMusic.logger.info("Opened")
         minecraftClient.inGameHud.setOverlayMessage(
             Text.literal("正在播放: ")
                 .append(Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists}")),

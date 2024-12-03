@@ -15,12 +15,18 @@
   },
   "license": "Apache-2.0",
   "icon": "icon.png",
-  "environment": "client",
+  "environment": "*",
   "entrypoints": {
     "client": [
       {
         "adapter": "kotlin",
-        "value": "cn.rtast.rmusic.RMusic"
+        "value": "cn.rtast.rmusic.RMusicClient"
+      }
+    ],
+    "main": [
+      {
+        "adapter": "kotlin",
+        "value": "cn.rtast.rmusic.RMusicServer"
       }
     ]
   },

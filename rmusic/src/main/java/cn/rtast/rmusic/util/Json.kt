@@ -1,12 +1,13 @@
 /*
  * Copyright © 2024 RTAkland
  * Author: RTAkland
- * Date: 2024/12/1
+ * Date: 2024/12/3
  */
 
 @file:Suppress("unused")
 
 package cn.rtast.rmusic.util
+
 
 import cn.rtast.rmusic.gson
 import com.google.gson.reflect.TypeToken

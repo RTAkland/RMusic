@@ -9,7 +9,7 @@
 package cn.rtast.rmusic.util
 
 
-import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.RMusicClient
 import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
@@ -38,7 +38,7 @@ object Http {
             it.forEach { (key, value) ->
                 paramsUrl.append("$key=$value&")
             }
-            RMusic.loginManager.getCookie()?.let {
+            RMusicClient.loginManager.getCookie()?.let {
                 paramsUrl.append("cookie=$it&")
             }
             paramsUrl.append("timestamp=${Instant.now().epochSecond}&")

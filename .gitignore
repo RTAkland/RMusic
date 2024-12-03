@@ -1,6 +1,11 @@
 .gradle/
 .idea/
 .kotlin/
-run/
+client/run/
 build/
 remappedSrc/
+**/run/
+**/build/
+**/remappedSrc/
+**/.gradle/
+**/.kotlin/

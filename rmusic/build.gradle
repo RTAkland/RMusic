@@ -1,21 +1,12 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "2.0.21"
     id("fabric-loom") version "1.8-SNAPSHOT"
 }
-
-version = project.modVersion
-group = "cn.rtast"
 
 configurations {
     embed
     compile.extendsFrom(embed)
-}
-
-repositories {
-    mavenCentral()
-    maven { url = "https://jitpack.io" }
 }
 
 dependencies {
@@ -24,23 +15,15 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation("net.fabricmc:fabric-language-kotlin:$fabricLanguageKotlinVersion")
-    implementation("org.jflac:jflac-codec:1.5.2")
     implementation("com.github.goxr3plus:java-stream-player:10.0.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
-    implementation("javazoom:jlayer:1.0.1")
-    implementation("com.googlecode.soundlibs:mp3spi:1.9.5.4")
-    implementation("com.googlecode.soundlibs:tritonus-all:0.3.7.2")
-    implementation("com.googlecode.soundlibs:jorbis:0.0.17.4")
-    implementation("com.googlecode.soundlibs:vorbisspi:1.0.3.3")
-
     embed(implementation("com.github.goxr3plus:java-stream-player:10.0.2"))
     embed(implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11"))
 }
 
 processResources {
-    filteringCharset = 'UTF-8'
-    filesMatching('fabric.mod.json') {
+    filteringCharset = "UTF-8"
+    filesMatching("fabric.mod.json") {
         expand(version: project.version,
                 minecraft_version: minecraftVersion,
                 yarn_mappings: yarnMappings,
@@ -50,23 +33,23 @@ processResources {
     }
 }
 
-tasks.compileJava {
-    options.encoding = "UTF-8"
-    options.release.set(21)
-    sourceCompatibility = "21"
-    targetCompatibility = "21"
-}
-
 tasks.jar {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from configurations.embed.collect {
+    from(configurations.embed.filter { file ->
+        !file.name.contains("junit") && !file.name.contains("kotlin")
+    }.collect {
         it.isDirectory() ? it : zipTree(it)
-    }
-    from("LICENSE") {
-        rename { "LICENSE-RMusic" }
-    }
+    })
 }
+
 
 tasks.compileKotlin {
     compilerOptions.jvmTarget = JvmTarget.JVM_21
+}
+
+tasks.compileJava {
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+    options.encoding = "UTF-8"
+    options.release.set(21)
 }

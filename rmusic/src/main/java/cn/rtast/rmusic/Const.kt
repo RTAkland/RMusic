@@ -19,7 +19,6 @@ package cn.rtast.rmusic
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Identifier
 
 val gson: Gson = GsonBuilder()
@@ -28,4 +27,4 @@ val gson: Gson = GsonBuilder()
 
 val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
 val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/loading.png")
-val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
+val networkingId: Identifier = Identifier.of("rmusic", "networking")

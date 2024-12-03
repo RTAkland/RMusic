@@ -7,13 +7,12 @@
 
 package cn.rtast.rmusic.mixins;
 
-import cn.rtast.rmusic.RMusic;
+import cn.rtast.rmusic.RMusicClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.WindowEventHandler;
 import net.minecraft.util.thread.ReentrantThreadExecutor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -29,20 +28,17 @@ public abstract class MinecraftClientMixin extends ReentrantThreadExecutor<Runna
         super(string);
     }
 
-    @Unique
-    public MinecraftClient client = (MinecraftClient) (Object) this;
-
     @Inject(method = "onDisconnected", at = @At("HEAD"))
     public void onDisconnectedMixin(CallbackInfo ci) {
-        RMusic.Companion.getPlayer().stop();
+        RMusicClient.Companion.getPlayer().stop();
     }
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickMixin(CallbackInfo ci) {
-        if (isPaused() && Objects.requireNonNull(RMusic.Companion.getConfigManager().getConfig()).getAutoPause()) {
-            RMusic.Companion.getPlayer().pause();
+        if (isPaused() && Objects.requireNonNull(RMusicClient.Companion.getConfigManager().getConfig()).getAutoPause()) {
+            RMusicClient.Companion.getPlayer().pause();
         } else {
-            RMusic.Companion.getPlayer().resume();
+            RMusicClient.Companion.getPlayer().resume();
         }
     }
 }

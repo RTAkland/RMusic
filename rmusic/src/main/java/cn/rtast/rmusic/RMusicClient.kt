@@ -16,6 +16,7 @@
 package cn.rtast.rmusic
 
 import cn.rtast.rmusic.command.RMusicCommand
+import cn.rtast.rmusic.network.registerClientReceiver
 import cn.rtast.rmusic.util.ConfigManager
 import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
@@ -25,8 +26,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
-class RMusic : ClientModInitializer {
-
+class RMusicClient : ClientModInitializer {
     companion object {
         val logger: Logger = LoggerFactory.getLogger("RMusic-main")
         val player = MusicPlayer()
@@ -35,9 +35,8 @@ class RMusic : ClientModInitializer {
     }
 
     override fun onInitializeClient() {
+        registerClientReceiver()
+        ClientCommandRegistrationCallback.EVENT.register(RMusicCommand())
         logger.info("RMusic 已加载!")
-        ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->
-            RMusicCommand().register(dispatcher)
-        }
     }
 }

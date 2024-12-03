@@ -7,8 +7,9 @@
 
 package cn.rtast.rmusic.command
 
-import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.minecraftClient
+import cn.rtast.rmusic.RMusicClient
+import cn.rtast.rmusic.entity.MusicPayload
+import cn.rtast.rmusic.entity.SongInfo
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import com.mojang.brigadier.CommandDispatcher
@@ -20,7 +21,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
@@ -28,11 +32,14 @@ import net.minecraft.util.Formatting
 import java.io.File
 import java.net.URI
 
-class RMusicCommand {
+class RMusicCommand : ClientCommandRegistrationCallback {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    fun register(dispatcher: CommandDispatcher<FabricClientCommandSource>) {
+    override fun register(
+        dispatcher: CommandDispatcher<FabricClientCommandSource>,
+        registryAccess: CommandRegistryAccess
+    ) {
         dispatcher.register(
             ClientCommandManager.literal("rm")
                 .then(
@@ -60,8 +67,8 @@ class RMusicCommand {
                                                     .append(Text.literal(r.artists).styled {
                                                         it.withColor(Formatting.AQUA)
                                                     })
-                                            val clickableText = Text.literal(" [▶]").styled {
-                                                it.withColor(Formatting.DARK_PURPLE)
+                                            val playButton = Text.literal(" [▶]").styled { style ->
+                                                style.withColor(Formatting.DARK_PURPLE)
                                                     .withClickEvent(
                                                         ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${r.id}")
                                                     )
@@ -72,7 +79,28 @@ class RMusicCommand {
                                                                 .styled { it.withColor(Formatting.YELLOW) })
                                                     )
                                             }
-                                            songText.append(clickableText)
+                                            songText.append(playButton)
+                                            val shareButton = Text.literal(" [↗]").styled {
+                                                it.withColor(Formatting.AQUA)
+                                                    .withClickEvent(
+                                                        ClickEvent(
+                                                            ClickEvent.Action.RUN_COMMAND,
+                                                            "/rm share ${r.id}"
+                                                        )
+                                                    )
+                                                    .withHoverEvent(
+                                                        HoverEvent(
+                                                            HoverEvent.Action.SHOW_TEXT,
+                                                            Text.literal("点击分享给服务器内的其他玩家\n")
+                                                                .append(
+                                                                    Text.literal("注意: 只有服务器安装了RMusic并且其他玩家安装了RMusic客户端模组的玩家才能收到分享消息")
+                                                                        .styled {
+                                                                            it.withColor(Formatting.RED)
+                                                                        })
+                                                        )
+                                                    )
+                                            }
+                                            songText.append(shareButton)
                                             context.source.sendFeedback(songText)
                                         }
                                     } catch (e: Exception) {
@@ -86,11 +114,11 @@ class RMusicCommand {
                     ClientCommandManager.literal("play")
                         .then(
                             argument("songId", LongArgumentType.longArg(0)).executes { context ->
-                                if (RMusic.player.isOpened || RMusic.player.isPausedOrPlaying) {
+                                if (RMusicClient.player.isOpened || RMusicClient.player.isPausedOrPlaying) {
                                     context.source.sendFeedback(
                                         Text.literal("你已经在播放歌曲啦!, 你可以点")
-                                            .append(Text.literal("[这里]").styled {
-                                                it.withColor(Formatting.GREEN)
+                                            .append(Text.literal("[这里]").styled { style ->
+                                                style.withColor(Formatting.GREEN)
                                                     .withHoverEvent(
                                                         HoverEvent(
                                                             HoverEvent.Action.SHOW_TEXT,
@@ -117,7 +145,7 @@ class RMusicCommand {
                                         renderSongDetail()
                                         val songUrl = NCMusic.getSongUrl(songId)
                                         val lyric = NCMusic.getLyric(songId)
-                                        RMusic.player.playMusic(songUrl, lyric, songDetail)
+                                        RMusicClient.player.playMusic(songUrl, lyric, songDetail)
                                         val coverBytes = URI(songDetail.cover + "?param=128y128")
                                             .toURL().readBytes().toPNG()
                                         renderCover(coverBytes)
@@ -133,21 +161,21 @@ class RMusicCommand {
                 ).then(
                     ClientCommandManager.literal("pause")
                         .executes { context ->
-                            RMusic.player.pause()
+                            RMusicClient.player.pause()
                             context.source.sendFeedback(Text.literal("已暂停"))
                             0
                         }
                 ).then(
                     ClientCommandManager.literal("resume")
                         .executes { context ->
-                            RMusic.player.resume()
+                            RMusicClient.player.resume()
                             context.source.sendFeedback(Text.literal("已恢复播放"))
                             0
                         }
                 ).then(
                     ClientCommandManager.literal("stop")
                         .executes { context ->
-                            RMusic.player.stop()
+                            RMusicClient.player.stop()
                             context.source.sendFeedback(Text.literal("已停止播放"))
                             0
                         }
@@ -162,17 +190,18 @@ class RMusicCommand {
                                     println(key)
                                     renderQRCode(qrcode)
                                     context.source.sendFeedback(
-                                        Text.literal("扫码并登录完成后点击").append(Text.literal("[这里]").styled {
-                                            it.withColor(Formatting.GREEN).withHoverEvent(
-                                                HoverEvent(
-                                                    HoverEvent.Action.SHOW_TEXT,
-                                                    Text.literal("点击这里确认登录状态")
-                                                        .styled { it.withColor(Formatting.GREEN) }
+                                        Text.literal("扫码并登录完成后点击")
+                                            .append(Text.literal("[这里]").styled { style ->
+                                                style.withColor(Formatting.GREEN).withHoverEvent(
+                                                    HoverEvent(
+                                                        HoverEvent.Action.SHOW_TEXT,
+                                                        Text.literal("点击这里确认登录状态")
+                                                            .styled { it.withColor(Formatting.GREEN) }
+                                                    )
+                                                ).withClickEvent(
+                                                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
                                                 )
-                                            ).withClickEvent(
-                                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
-                                            )
-                                        })
+                                            })
                                     )
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -182,7 +211,7 @@ class RMusicCommand {
                         }.then(
                             ClientCommandManager.literal("status")
                                 .executes { context ->
-                                    if (RMusic.loginManager.getCookie() != null) {
+                                    if (RMusicClient.loginManager.getCookie() != null) {
                                         context.source.sendFeedback(Text.literal("你已登录"))
                                     } else {
                                         context.source.sendFeedback(Text.literal("你还未登录"))
@@ -192,7 +221,7 @@ class RMusicCommand {
                         ).then(
                             ClientCommandManager.literal("logout")
                                 .executes { context ->
-                                    RMusic.loginManager.logout()
+                                    RMusicClient.loginManager.logout()
                                     context.source.sendFeedback(Text.literal("已退出登录"))
                                     0
                                 }
@@ -208,7 +237,7 @@ class RMusicCommand {
                                                 val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
                                                 val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
                                                 if (cookie != null) {
-                                                    RMusic.loginManager.login(cookie)
+                                                    RMusicClient.loginManager.login(cookie)
                                                     val accountInfo = NCMusic.getUserAccount()
                                                     context.source.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
                                                 } else {
@@ -231,9 +260,9 @@ class RMusicCommand {
                                         .executes { context ->
                                             try {
                                                 val apiHost = context.getArgument("apiHost", String::class.java)
-                                                val currentConfig = RMusic.configManager.read()
+                                                val currentConfig = RMusicClient.configManager.read()
                                                 val afterConfig = currentConfig.copy(api = apiHost)
-                                                RMusic.configManager.write(afterConfig)
+                                                RMusicClient.configManager.write(afterConfig)
                                                 context.source.sendFeedback(Text.literal("设置api地址成功: $apiHost"))
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
@@ -244,7 +273,7 @@ class RMusicCommand {
                         ).then(
                             ClientCommandManager.literal("default")
                                 .executes { context ->
-                                    RMusic.configManager.default()
+                                    RMusicClient.configManager.default()
                                     context.source.sendFeedback(Text.literal("已将配置文件设置为默认"))
                                     0
                                 }
@@ -254,9 +283,9 @@ class RMusicCommand {
                                     argument("autoPause", BoolArgumentType.bool())
                                         .executes { context ->
                                             val settings = context.getArgument("autoPause", Boolean::class.java)
-                                            val currentConfig = RMusic.configManager.read()
+                                            val currentConfig = RMusicClient.configManager.read()
                                             val afterConfig = currentConfig.copy(autoPause = settings)
-                                            RMusic.configManager.write(afterConfig)
+                                            RMusicClient.configManager.write(afterConfig)
                                             context.source.sendFeedback(Text.literal("auto-pause设置成功: $settings"))
                                             0
                                         }
@@ -267,8 +296,7 @@ class RMusicCommand {
                         .then(
                             ClientCommandManager.literal("confirm")
                                 .executes { context ->
-                                    val files = File("./config/rmusic/")
-                                        .listFiles()
+                                    val files = File("./config/rmusic/").listFiles()!!
                                         .filter { file -> file.isFile && !file.name.endsWith(".json") }
                                     files.forEach { file -> file.delete() }
                                     context.source.sendFeedback(
@@ -290,8 +318,8 @@ class RMusicCommand {
                         .executes { context ->
                             context.source.sendFeedback(
                                 Text.literal("本操作会清空所有已缓存到本地的音频文件, 点击").append(
-                                    Text.literal("[这里]").styled {
-                                        it.withColor(Formatting.GREEN)
+                                    Text.literal("[这里]").styled { style ->
+                                        style.withColor(Formatting.GREEN)
                                             .withHoverEvent(
                                                 HoverEvent(
                                                     HoverEvent.Action.SHOW_TEXT,
@@ -312,10 +340,38 @@ class RMusicCommand {
                 ).then(
                     ClientCommandManager.literal("reload")
                         .executes { context ->
-                            RMusic.configManager.reload()
+                            RMusicClient.configManager.reload()
                             context.source.sendFeedback(Text.literal("已重新加载配置文件"))
                             0
                         }
+                ).then(
+                    ClientCommandManager.literal("share")
+                        .then(
+                            argument("songId", LongArgumentType.longArg())
+                                .executes { context ->
+                                    val songId = context.getArgument("songId", Long::class.java)
+                                    context.source.sendFeedback(Text.literal("正在准备一些必要的信息用于分享给其他玩家"))
+                                    scope.launch {
+                                        try {
+                                            val detail = NCMusic.getSongDetail(songId)
+                                            val songUrl = NCMusic.getSongUrl(songId)
+                                            val payload = SongInfo(
+                                                detail.name,
+                                                songId,
+                                                detail.artists,
+                                                songUrl,
+                                                context.source.player.name.string
+                                            ).toJson().encodeToBase64()
+                                            val packet = MusicPayload(payload)
+                                            ClientPlayNetworking.send(packet)
+                                            context.source.sendFeedback(Text.literal("已经成功分享到服务器内其他的玩家了"))
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                        }
+                                    }
+                                    0
+                                }
+                        )
                 )
         )
     }

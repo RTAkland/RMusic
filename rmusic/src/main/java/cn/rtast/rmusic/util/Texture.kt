@@ -9,9 +9,9 @@ package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.ncm.SongDetail
-import cn.rtast.rmusic.minecraftClient
 import cn.rtast.rmusic.qrcodeId
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.texture.NativeImage
 import net.minecraft.client.texture.NativeImageBackedTexture
@@ -26,6 +26,7 @@ var loadSongDetail = true
 var songInfo: SongDetail? = null
 
 private val renderLayer = RenderLayer::getGuiTexturedOverlay
+private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
 
 private fun registerTexture(textureResource: ByteArray, id: Identifier) {
     destroyTexture(qrcodeId)
@@ -37,7 +38,7 @@ private fun registerTexture(textureResource: ByteArray, id: Identifier) {
 fun renderQRCode(qrcode: ByteArray) {
     registerTexture(qrcode, qrcodeId)
     loadQRCode = true
-    HudRenderCallback.EVENT.register { context, tickDeltaManager ->
+    HudRenderCallback.EVENT.register { context, _ ->
         if (!loadQRCode) return@register
         context.drawTexture(renderLayer, qrcodeId, 0, 50, 0f, 0f, 96, 96, 96, 96)
     }
@@ -46,7 +47,7 @@ fun renderQRCode(qrcode: ByteArray) {
 fun renderCover(cover: ByteArray) {
     loadCover = true
     registerTexture(cover, defaultCoverId)
-    HudRenderCallback.EVENT.register { context, tickDeltaManager ->
+    HudRenderCallback.EVENT.register { context, _ ->
         if (!loadCover) return@register
         context.drawTexture(renderLayer, defaultCoverId, 5, 20, 0f, 0f, 48, 48, 48, 48)
     }

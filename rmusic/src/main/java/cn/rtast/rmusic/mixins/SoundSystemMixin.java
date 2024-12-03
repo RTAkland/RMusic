@@ -7,7 +7,7 @@
 
 package cn.rtast.rmusic.mixins;
 
-import cn.rtast.rmusic.RMusic;
+import cn.rtast.rmusic.RMusicClient;
 import net.minecraft.client.sound.SoundInstance;
 import net.minecraft.client.sound.SoundSystem;
 import net.minecraft.sound.SoundCategory;
@@ -26,7 +26,7 @@ public abstract class SoundSystemMixin {
     @Inject(method = "play(Lnet/minecraft/client/sound/SoundInstance;)V", at = @At("HEAD"), cancellable = true)
     public void play(SoundInstance soundInstance, CallbackInfo ci) {
         currentCategory = soundInstance.getCategory();
-        if (RMusic.Companion.getPlayer().isPlaying()) {
+        if (RMusicClient.Companion.getPlayer().isPlaying()) {
             if (soundInstance.getCategory() == SoundCategory.MUSIC) {
                 ci.cancel();
             }
@@ -37,16 +37,16 @@ public abstract class SoundSystemMixin {
     public void updateSoundVolume(SoundCategory category, float volume, CallbackInfo ci) {
         if (category == SoundCategory.RECORDS) {
             if (volume == 0.0f) {
-                RMusic.Companion.getPlayer().setMute(true);
+                RMusicClient.Companion.getPlayer().setMute(true);
             } else {
-                RMusic.Companion.getPlayer().setMute(false);
-                RMusic.Companion.getPlayer().setGain(volume);
+                RMusicClient.Companion.getPlayer().setMute(false);
+                RMusicClient.Companion.getPlayer().setGain(volume);
             }
         }
     }
     @Inject(method = "tick()V", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
-        if (RMusic.Companion.getPlayer().isPlaying()) {
+        if (RMusicClient.Companion.getPlayer().isPlaying()) {
             if (currentCategory == SoundCategory.MUSIC) {
                 ci.cancel();
             }
