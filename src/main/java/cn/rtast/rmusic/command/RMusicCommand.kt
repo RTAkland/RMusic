@@ -8,10 +8,11 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusic
-import cn.rtast.rmusic.entity.Config
+import cn.rtast.rmusic.minecraftClient
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import com.mojang.brigadier.CommandDispatcher
+import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import kotlinx.coroutines.CoroutineScope
@@ -24,6 +25,7 @@ import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
+import java.io.File
 import java.net.URI
 
 class RMusicCommand {
@@ -84,29 +86,41 @@ class RMusicCommand {
                     ClientCommandManager.literal("play")
                         .then(
                             argument("songId", LongArgumentType.longArg(0)).executes { context ->
+                                if (RMusic.player.isOpened || RMusic.player.isPausedOrPlaying) {
+                                    context.source.sendFeedback(
+                                        Text.literal("你已经在播放歌曲啦!, 你可以点")
+                                            .append(Text.literal("[这里]").styled {
+                                                it.withColor(Formatting.GREEN)
+                                                    .withHoverEvent(
+                                                        HoverEvent(
+                                                            HoverEvent.Action.SHOW_TEXT,
+                                                            Text.literal("点击停止播放当前正在播放的歌曲").styled {
+                                                                it.withColor(Formatting.YELLOW)
+                                                            })
+                                                    )
+                                                    .withClickEvent(
+                                                        ClickEvent(
+                                                            ClickEvent.Action.RUN_COMMAND,
+                                                            "/rm stop"
+                                                        )
+                                                    )
+                                            }).append(Text.literal("来停止播放当前歌曲"))
+                                    )
+                                    return@executes 0
+                                }
                                 val songId = context.getArgument("songId", Long::class.java)
                                 scope.launch {
                                     try {
                                         context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
+                                        val songDetail = NCMusic.getSongDetail(songId)
+                                        songInfo = songDetail
+                                        renderSongDetail()
                                         val songUrl = NCMusic.getSongUrl(songId)
                                         val lyric = NCMusic.getLyric(songId)
-                                        val songDetail = NCMusic.getSongDetail(songId)
-                                        context.source.player.sendMessage(
-                                            Text.literal("正在播放: 《${songDetail.name}》 - ${songDetail.artists}")
-                                                .styled {
-                                                    it.withColor(Formatting.AQUA)
-                                                }, true
-                                        )
-                                        RMusic.player.playMusic(songUrl, lyric)
+                                        RMusic.player.playMusic(songUrl, lyric, songDetail)
                                         val coverBytes = URI(songDetail.cover + "?param=128y128")
                                             .toURL().readBytes().toPNG()
                                         renderCover(coverBytes)
-                                        context.source.sendFeedback(
-                                            Text.literal("正在播放: ").append(
-                                                Text.literal("${songDetail.name} - 《${songDetail.artists}》").styled {
-                                                    it.withColor(Formatting.YELLOW).withItalic(true)
-                                                })
-                                        )
                                     } catch (_: NullPointerException) {
                                         context.source.sendFeedback(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
                                     } catch (e: Exception) {
@@ -217,8 +231,9 @@ class RMusicCommand {
                                         .executes { context ->
                                             try {
                                                 val apiHost = context.getArgument("apiHost", String::class.java)
-                                                val config = Config(apiHost)
-                                                RMusic.configManager.write(config)
+                                                val currentConfig = RMusic.configManager.read()
+                                                val afterConfig = currentConfig.copy(api = apiHost)
+                                                RMusic.configManager.write(afterConfig)
                                                 context.source.sendFeedback(Text.literal("设置api地址成功: $apiHost"))
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
@@ -233,7 +248,74 @@ class RMusicCommand {
                                     context.source.sendFeedback(Text.literal("已将配置文件设置为默认"))
                                     0
                                 }
+                        ).then(
+                            ClientCommandManager.literal("auto-pause")
+                                .then(
+                                    argument("autoPause", BoolArgumentType.bool())
+                                        .executes { context ->
+                                            val settings = context.getArgument("autoPause", Boolean::class.java)
+                                            val currentConfig = RMusic.configManager.read()
+                                            val afterConfig = currentConfig.copy(autoPause = settings)
+                                            RMusic.configManager.write(afterConfig)
+                                            context.source.sendFeedback(Text.literal("auto-pause设置成功: $settings"))
+                                            0
+                                        }
+                                )
                         )
+                ).then(
+                    ClientCommandManager.literal("clean-cache")
+                        .then(
+                            ClientCommandManager.literal("confirm")
+                                .executes { context ->
+                                    val files = File("./config/rmusic/")
+                                        .listFiles()
+                                        .filter { file -> file.isFile && !file.name.endsWith(".json") }
+                                    files.forEach { file -> file.delete() }
+                                    context.source.sendFeedback(
+                                        Text.literal("已删除").append(
+                                            Text.literal("${files.size}")
+                                                .styled {
+                                                    it.withColor(Formatting.RED)
+                                                        .withHoverEvent(
+                                                            HoverEvent(
+                                                                HoverEvent.Action.SHOW_TEXT,
+                                                                Text.literal(files.joinToString(separator = "\n") { file -> file.name })
+                                                            )
+                                                        )
+                                                }).append("个音频文件")
+                                    )
+                                    0
+                                }
+                        )
+                        .executes { context ->
+                            context.source.sendFeedback(
+                                Text.literal("本操作会清空所有已缓存到本地的音频文件, 点击").append(
+                                    Text.literal("[这里]").styled {
+                                        it.withColor(Formatting.GREEN)
+                                            .withHoverEvent(
+                                                HoverEvent(
+                                                    HoverEvent.Action.SHOW_TEXT,
+                                                    Text.literal("点击确认").styled {
+                                                        it.withColor(Formatting.GREEN)
+                                                    })
+                                            )
+                                            .withClickEvent(
+                                                ClickEvent(
+                                                    ClickEvent.Action.RUN_COMMAND,
+                                                    "/rm clean-cache confirm"
+                                                )
+                                            )
+                                    }).append("来确认操作")
+                            )
+                            0
+                        }
+                ).then(
+                    ClientCommandManager.literal("reload")
+                        .executes { context ->
+                            RMusic.configManager.reload()
+                            context.source.sendFeedback(Text.literal("已重新加载配置文件"))
+                            0
+                        }
                 )
         )
     }

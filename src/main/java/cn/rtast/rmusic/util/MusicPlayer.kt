@@ -18,6 +18,7 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.minecraftClient
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
@@ -33,6 +34,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     private var lyric: Map<Int, String>? = null
     private var currentMusicFileName: String? = null
+    private var currentSongDetail: SongDetail? = null
 
     init {
         this.addStreamPlayerListener(this)
@@ -40,6 +42,11 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
         RMusic.logger.info("Opened")
+        minecraftClient.inGameHud.setOverlayMessage(
+            Text.literal("正在播放: ")
+                .append(Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists}")),
+            true
+        )
     }
 
     override fun progress(
@@ -52,7 +59,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         for (key in lyric!!.keys) {
             if (currentSecond == key) {
                 val lyric = Text.literal(lyric!![key] ?: continue)
-                    .styled { it.withColor(Formatting.YELLOW) }
+                    .styled { it.withColor(Formatting.AQUA) }
                 minecraftClient.inGameHud.setOverlayMessage(lyric, false)
             }
         }
@@ -60,13 +67,18 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     override fun statusUpdated(event: StreamPlayerEvent) {
         if (event.playerStatus == Status.STOPPED) {
+            minecraftClient.inGameHud.setOverlayMessage(
+                Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists} 已播放完毕"),
+                true
+            )
             loadCover = false
             loadSongDetail = false
             File("./config/rmusic", currentMusicFileName!!).delete()
         }
     }
 
-    fun playMusic(songUrl: String, lyric: Map<Int, String>) {
+    fun playMusic(songUrl: String, lyric: Map<Int, String>, songDetail: SongDetail) {
+        this.currentSongDetail = songDetail
         val filename = songUrl.split("/").last().split("?").first()
         val musicFile = File("./config/rmusic", filename)
         URI(songUrl).toURL().openStream().use { inputStream ->

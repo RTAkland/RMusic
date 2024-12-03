@@ -23,6 +23,7 @@ import kotlin.math.sin
 var loadQRCode = true
 var loadCover = true
 var loadSongDetail = true
+var songInfo: SongDetail? = null
 
 private val renderLayer = RenderLayer::getGuiTexturedOverlay
 
@@ -55,7 +56,7 @@ fun destroyTexture(id: Identifier) {
     minecraftClient.execute { minecraftClient.textureManager.destroyTexture(id) }
 }
 
-fun renderSongDetail(detail: SongDetail) {
+fun renderSongDetail() {
     loadSongDetail = true
     var colorCycle = 0f
     val colorChangeSpeed = 0.01f
@@ -69,13 +70,18 @@ fun renderSongDetail(detail: SongDetail) {
         val color = ((255 shl 24) or (red.toInt() shl 16) or (green.toInt() shl 8) or blue.toInt())
         context.drawText(
             minecraftClient.textRenderer,
-            Text.literal("《${detail.name}》"),
+            Text.literal("↓ 正在播放 ↓"),
             5, 73, color, true
         )
         context.drawText(
             minecraftClient.textRenderer,
-            Text.literal(detail.artists),
+            Text.literal("《${songInfo?.name}》"),
             5, 83, color, true
+        )
+        context.drawText(
+            minecraftClient.textRenderer,
+            Text.literal(songInfo?.artists),
+            5, 93, color, true
         )
     }
 }

@@ -14,16 +14,18 @@ class ConfigManager {
 
     private val dir = File("./config/rmusic").apply { mkdirs() }
     private val file = File(dir, "config.json")
+    var config: Config? = null
 
     init {
         if (!file.exists()) {
             file.createNewFile()
             this.default()
         }
+        config = this.read()
     }
 
     fun default() {
-        file.writeText(Config("https://ncm.rtast.cn").toJson())
+        file.writeText(Config("https://ncm.rtast.cn", true).toJson())
     }
 
     fun write(data: Config) {
@@ -32,5 +34,9 @@ class ConfigManager {
 
     fun read(): Config {
         return file.readText().fromJson<Config>()
+    }
+
+    fun reload() {
+        this.config = this.read()
     }
 }

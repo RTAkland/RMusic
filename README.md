@@ -6,13 +6,18 @@
 
 > 服务器不需要安装任何模组
 
-/rm login  # 登录
+/rm login # 登录
 
-/rm search  # 搜索
+/rm search # 搜索
 
-/rm stop  # 停止播放音乐
+/rm stop # 停止播放音乐
 
-/rm pause  # 暂停播放音乐
+/rm pause # 暂停播放音乐
 
-/rm resume  # 继续播放音乐
+/rm resume # 继续播放音乐
+
+> 在设置中调整`唱片机/音符盒`的音量可以调整音乐的声音大小
+
+> 按下esc会自动暂停音乐播放, 使用`/rm config auto-pause false` 来取消设置自动暂停, 设置成功后
+> 使用`/rm reload`来重新加载配置文件
 

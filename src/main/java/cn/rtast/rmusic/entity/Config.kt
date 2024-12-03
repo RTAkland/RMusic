@@ -9,4 +9,5 @@ package cn.rtast.rmusic.entity
 
 data class Config(
     val api: String,
+    val autoPause: Boolean,
 )
