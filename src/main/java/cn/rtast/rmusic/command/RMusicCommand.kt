@@ -8,6 +8,7 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusic
+import cn.rtast.rmusic.entity.Config
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import com.mojang.brigadier.CommandDispatcher
@@ -37,29 +38,45 @@ class RMusicCommand {
                         .then(
                             argument("keyword", StringArgumentType.string()).executes { context ->
                                 val keyword = context.getArgument("keyword", String::class.java)
-                                context.source.sendFeedback(Text.literal("正在搜索: $keyword"))
+                                context.source.sendFeedback(
+                                    Text.literal("正在搜索: ").append(Text.literal(keyword).styled {
+                                        it.withColor(Formatting.YELLOW)
+                                    })
+                                )
                                 scope.launch {
-                                    val result = NCMusic.search(keyword)
-                                    val text = Text.literal("搜索到如下结果: \n")
-                                    result.take(5).forEach { r ->
-                                        val songText = Text.of("${r.name} - ${r.artists}")
-                                        val clickableText = Text.literal(" [▶]").styled {
-                                            it.withColor(Formatting.YELLOW)
-                                                .withClickEvent(
-                                                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${r.id}")
-                                                )
-                                                .withHoverEvent(
-                                                    HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
-                                                        Text.literal("点击播放")
-                                                            .styled { it.withColor(Formatting.GREEN) })
-                                                )
+                                    try {
+                                        val result = NCMusic.search(keyword)
+                                        val text = Text.literal("搜索到如下结果:")
+                                        context.source.sendFeedback(text)
+                                        result.take(5).forEach { r ->
+                                            val songText =
+                                                Text.literal("歌曲名: ").styled {
+                                                    it.withColor(Formatting.GREEN)
+                                                }.append(Text.literal("${r.name} ").styled {
+                                                    it.withColor(Formatting.AQUA)
+                                                }).append(" 歌手: ")
+                                                    .append(Text.literal(r.artists).styled {
+                                                        it.withColor(Formatting.AQUA)
+                                                    })
+                                            val clickableText = Text.literal(" [▶]").styled {
+                                                it.withColor(Formatting.DARK_PURPLE)
+                                                    .withClickEvent(
+                                                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${r.id}")
+                                                    )
+                                                    .withHoverEvent(
+                                                        HoverEvent(
+                                                            HoverEvent.Action.SHOW_TEXT,
+                                                            Text.literal("点击播放音乐")
+                                                                .styled { it.withColor(Formatting.YELLOW) })
+                                                    )
+                                            }
+                                            songText.append(clickableText)
+                                            context.source.sendFeedback(songText)
                                         }
-                                        text.append(songText).append(clickableText).append(Text.literal("\n"))
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
                                     }
-                                    context.source.sendFeedback(text)
                                 }
-
                                 0
                             }
                         )
@@ -70,19 +87,30 @@ class RMusicCommand {
                                 val songId = context.getArgument("songId", Long::class.java)
                                 scope.launch {
                                     try {
-                                        context.source.sendFeedback(Text.literal("正在获取歌曲信息..."))
+                                        context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
                                         val songUrl = NCMusic.getSongUrl(songId)
                                         val lyric = NCMusic.getLyric(songId)
-                                        RMusic.player.playMusic(songUrl, lyric)
                                         val songDetail = NCMusic.getSongDetail(songId)
-                                        renderSongDetail(songDetail)
-                                        val coverBytes =
-                                            URI(songDetail.cover + "?param=128y128").toURL()
-                                                .readBytes().toPNG()
+                                        context.source.player.sendMessage(
+                                            Text.literal("正在播放: 《${songDetail.name}》 - ${songDetail.artists}")
+                                                .styled {
+                                                    it.withColor(Formatting.AQUA)
+                                                }, true
+                                        )
+                                        RMusic.player.playMusic(songUrl, lyric)
+                                        val coverBytes = URI(songDetail.cover + "?param=128y128")
+                                            .toURL().readBytes().toPNG()
                                         renderCover(coverBytes)
-                                        context.source.sendFeedback(Text.literal("正在播放: ${songDetail.name} - 《${songDetail.artists}》"))
+                                        context.source.sendFeedback(
+                                            Text.literal("正在播放: ").append(
+                                                Text.literal("${songDetail.name} - 《${songDetail.artists}》").styled {
+                                                    it.withColor(Formatting.YELLOW).withItalic(true)
+                                                })
+                                        )
                                     } catch (_: NullPointerException) {
                                         context.source.sendFeedback(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
                                     }
                                 }
                                 0
@@ -114,26 +142,31 @@ class RMusicCommand {
                         .executes { context ->
                             context.source.sendFeedback(Text.literal("正在获取二维码..."))
                             scope.launch {
-                                loadQRCode = false
-                                val (key, qrcode) = NCMusic.loginByQRCode()
-                                renderQRCode(qrcode)
-                                context.source.sendFeedback(
-                                    Text.literal("扫码并登录完成后点击").append(Text.literal("[这里]").styled {
-                                        it.withColor(Formatting.GREEN).withHoverEvent(
-                                            HoverEvent(
-                                                HoverEvent.Action.SHOW_TEXT,
-                                                Text.literal("点击这里确认登录状态")
-                                                    .styled { it.withColor(Formatting.GREEN) }
+                                try {
+                                    loadQRCode = false
+                                    val (key, qrcode) = NCMusic.loginByQRCode()
+                                    println(key)
+                                    renderQRCode(qrcode)
+                                    context.source.sendFeedback(
+                                        Text.literal("扫码并登录完成后点击").append(Text.literal("[这里]").styled {
+                                            it.withColor(Formatting.GREEN).withHoverEvent(
+                                                HoverEvent(
+                                                    HoverEvent.Action.SHOW_TEXT,
+                                                    Text.literal("点击这里确认登录状态")
+                                                        .styled { it.withColor(Formatting.GREEN) }
+                                                )
+                                            ).withClickEvent(
+                                                ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
                                             )
-                                        ).withClickEvent(
-                                            ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
-                                        )
-                                    })
-                                )
+                                        })
+                                    )
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                             0
                         }.then(
-                            ClientCommandManager.literal("state")
+                            ClientCommandManager.literal("status")
                                 .executes { context ->
                                     if (RMusic.loginManager.getCookie() != null) {
                                         context.source.sendFeedback(Text.literal("你已登录"))
@@ -155,21 +188,51 @@ class RMusicCommand {
                                     argument("qrcodeKey", StringArgumentType.string()).executes { context ->
                                         context.source.sendFeedback(Text.literal("正在检查登录状态中"))
                                         scope.launch {
-                                            loadQRCode = false
-                                            destroyTexture(qrcodeId)
-                                            val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
-                                            val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
-                                            if (cookie != null) {
-                                                RMusic.loginManager.login(cookie)
-                                                val accountInfo = NCMusic.getUserAccount()
-                                                context.source.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
-                                            } else {
-                                                context.source.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))
+                                            try {
+                                                loadQRCode = false
+                                                destroyTexture(qrcodeId)
+                                                val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
+                                                val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
+                                                if (cookie != null) {
+                                                    RMusic.loginManager.login(cookie)
+                                                    val accountInfo = NCMusic.getUserAccount()
+                                                    context.source.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
+                                                } else {
+                                                    context.source.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))
+                                                }
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
                                             }
                                         }
                                         0
                                     }
                                 )
+                        )
+                ).then(
+                    ClientCommandManager.literal("config")
+                        .then(
+                            ClientCommandManager.literal("set-api")
+                                .then(
+                                    argument("apiHost", StringArgumentType.string())
+                                        .executes { context ->
+                                            try {
+                                                val apiHost = context.getArgument("apiHost", String::class.java)
+                                                val config = Config(apiHost)
+                                                RMusic.configManager.write(config)
+                                                context.source.sendFeedback(Text.literal("设置api地址成功: $apiHost"))
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                            }
+                                            0
+                                        }
+                                )
+                        ).then(
+                            ClientCommandManager.literal("default")
+                                .executes { context ->
+                                    RMusic.configManager.default()
+                                    context.source.sendFeedback(Text.literal("已将配置文件设置为默认"))
+                                    0
+                                }
                         )
                 )
         )

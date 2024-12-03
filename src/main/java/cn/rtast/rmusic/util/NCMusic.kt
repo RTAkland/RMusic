@@ -7,7 +7,7 @@
 
 package cn.rtast.rmusic.util
 
-import cn.rtast.rmusic.NCM_API
+import cn.rtast.rmusic.RMusic
 import cn.rtast.rmusic.entity.ncm.*
 
 object NCMusic {
@@ -19,6 +19,7 @@ object NCMusic {
     private const val GET_LYRIC_PATH = "lyric"
     private const val DETAIL_PATH = "song/detail"
     private const val USER_ACCOUNT_PATH = "user/account"
+    private val NCM_API get() = RMusic.configManager.read().api
 
     fun loginByQRCode(): Pair<String, ByteArray> {
         val key = Http.get<GetQRKey>("$NCM_API/$QRCODE_KEY_PATH").data.uniKey

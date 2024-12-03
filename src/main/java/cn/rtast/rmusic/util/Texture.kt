@@ -44,11 +44,11 @@ fun renderQRCode(qrcode: ByteArray) {
 
 fun renderCover(cover: ByteArray) {
     loadCover = true
+    registerTexture(cover, defaultCoverId)
     HudRenderCallback.EVENT.register { context, tickDeltaManager ->
         if (!loadCover) return@register
         context.drawTexture(renderLayer, defaultCoverId, 5, 20, 0f, 0f, 48, 48, 48, 48)
     }
-    registerTexture(cover, defaultCoverId)
 }
 
 fun destroyTexture(id: Identifier) {
@@ -69,18 +69,13 @@ fun renderSongDetail(detail: SongDetail) {
         val color = ((255 shl 24) or (red.toInt() shl 16) or (green.toInt() shl 8) or blue.toInt())
         context.drawText(
             minecraftClient.textRenderer,
-            Text.literal("正在播放: ↓"),
+            Text.literal("《${detail.name}》"),
             5, 73, color, true
         )
         context.drawText(
             minecraftClient.textRenderer,
-            Text.literal("《${detail.name}》"),
+            Text.literal(detail.artists),
             5, 83, color, true
-        )
-        context.drawText(
-            minecraftClient.textRenderer,
-            Text.literal("by: ${detail.artists}"),
-            5, 93, color, true
         )
     }
 }

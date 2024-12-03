@@ -16,6 +16,7 @@
 package cn.rtast.rmusic
 
 import cn.rtast.rmusic.command.RMusicCommand
+import cn.rtast.rmusic.util.ConfigManager
 import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
@@ -30,10 +31,11 @@ class RMusic : ClientModInitializer {
         val logger: Logger = LoggerFactory.getLogger("RMusic-main")
         val player = MusicPlayer()
         val loginManager = CookieManager()
+        val configManager = ConfigManager()
     }
 
     override fun onInitializeClient() {
-        logger.info("RMusic($VERSION) 已加载!")
+        logger.info("RMusic 已加载!")
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, registryAccess ->
             RMusicCommand().register(dispatcher)
         }

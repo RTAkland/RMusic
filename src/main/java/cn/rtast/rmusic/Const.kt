@@ -22,10 +22,6 @@ import com.google.gson.GsonBuilder
 import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Identifier
 
-const val VERSION = "1.0.0"  // Don't change it
-
-const val NCM_API = "https://ncm.rtast.cn"
-
 val gson: Gson = GsonBuilder()
     .disableHtmlEscaping()
     .create()

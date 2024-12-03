@@ -16,6 +16,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import java.time.Instant
 
 
 /**
@@ -40,8 +41,10 @@ object Http {
             RMusic.loginManager.getCookie()?.let {
                 paramsUrl.append("cookie=$it&")
             }
+            paramsUrl.append("timestamp=${Instant.now().epochSecond}&")
             paramsUrl.dropLast(1)
         }
+        println(paramsUrl)
         return if (params != null) paramsUrl.toString() else url
     }
 
