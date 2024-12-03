@@ -14,7 +14,7 @@
     "sources": "https://repo.rtast.cn/RTAkland/rmusic"
   },
   "license": "Apache-2.0",
-  "icon": "icon.png",
+  "icon": "assets/rmusic/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [
