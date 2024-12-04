@@ -19,6 +19,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import org.joml.Quaternionf
 import java.io.File
 import java.net.URI
 import kotlin.math.sin
@@ -65,13 +66,25 @@ fun renderQRCode(qrcode: ByteArray) {
 fun renderCover(songDetail: SongDetail) {
     loadCover = true
     val cachedCover = File(cacheDir, "${songDetail.id}.png")
+    var rotationAngle = 0f
     HudRenderCallback.EVENT.register { context, _ ->
         if (!loadCover) return@register
+        rotationAngle += 1f
+        if (rotationAngle >= 360f) rotationAngle = 0f
+        val matrix = context.matrices
+        matrix.push()
+        matrix.translate(5f + 24f, 20f + 24f, 0f)
+        val quaternion = Quaternionf().apply {
+            rotateZ(Math.toRadians(rotationAngle.toDouble()).toFloat())
+        }
+        matrix.multiply(quaternion)
+        matrix.translate(-(5f + 24f), -(20f + 24f), 0f)
         context.drawTexture(
             renderLayer, defaultCoverId, 5,
             20, 0f, 0f, 48,
             48, 48, 48
         )
+        matrix.pop()
     }
     val cover = if (cachedCover.exists()) cachedCover.readBytes() else {
         val coverBytes = URI(songDetail.cover + "?param=128y128")
