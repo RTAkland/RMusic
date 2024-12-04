@@ -22,7 +22,7 @@ import cn.rtast.rmusic.util.ConfigManager
 import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -37,7 +37,14 @@ class RMusicClient : ClientModInitializer {
 
     override fun onInitializeClient() {
         registerClientReceiver()
-        ClientCommandRegistrationCallback.EVENT.register(RMusicCommand())
+        CommandRegistrationCallback.EVENT.register(RMusicCommand())
+//        CommandRegistrationCallback.EVENT.register { dispatcher, _, _ ->
+//            dispatcher.register(CommandManager.literal("s").executes {
+//                val feedbackSupplier: () -> Text = { Text.literal("Command executed successfully!") }
+//                it.source.sendFeedback(feedbackSupplier, false)
+//                0
+//            })
+//        }
         logger.info("RMusic 已加载!")
     }
 }

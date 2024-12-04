@@ -5,9 +5,9 @@
  */
 
 
-package cn.rtast.rmusic.entity
+package cn.rtast.rmusic.entity.payload
 
-data class SongInfo(
+data class ShareMusicPacket(
     val name: String,
     val id: Long,
     val artists: String,

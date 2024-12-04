@@ -11,7 +11,8 @@ import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.Config
 import cn.rtast.rmusic.entity.MusicPayload
-import cn.rtast.rmusic.entity.SongInfo
+import cn.rtast.rmusic.entity.payload.ShareMusicCustomPayload
+import cn.rtast.rmusic.entity.payload.ShareMusicPacket
 import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.network.minecraftClient
 import cn.rtast.rmusic.qrcodeId
@@ -26,43 +27,43 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
+import net.minecraft.server.command.CommandManager
+import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.io.File
 
-class RMusicCommand : ClientCommandRegistrationCallback {
+class RMusicCommand : CommandRegistrationCallback {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun register(
-        dispatcher: CommandDispatcher<FabricClientCommandSource>,
-        registryAccess: CommandRegistryAccess
+        dispatcher: CommandDispatcher<ServerCommandSource>,
+        registryAccess: CommandRegistryAccess,
+        environment: CommandManager.RegistrationEnvironment
     ) {
         dispatcher.register(
-            ClientCommandManager.literal("rm")
+            CommandManager.literal("rm")
                 .then(
-                    ClientCommandManager.literal("search")
+                    CommandManager.literal("search")
                         .then(
-                            argument("keyword", StringArgumentType.string()).executes { context ->
+                            CommandManager.argument("keyword", StringArgumentType.string()).executes { context ->
                                 val keyword = context.getArgument("keyword", String::class.java)
                                 context.source.sendFeedback(
                                     Text.literal("正在搜索: ").append(Text.literal(keyword).styled {
                                         it.withColor(Formatting.YELLOW)
-                                    })
+                                    }).createSupplierText(), false
                                 )
                                 scope.launch {
                                     try {
                                         val result = NCMusic.search(keyword)
                                         val text = Text.literal("搜索到如下结果:")
-                                        context.source.sendFeedback(text)
+                                        context.source.sendFeedback(text.createSupplierText(), false)
                                         result.take(5).forEach { r ->
                                             val songText =
                                                 Text.literal("歌曲名: ").styled {
@@ -107,7 +108,7 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                     )
                                             }
                                             songText.append(shareButton)
-                                            context.source.sendFeedback(songText)
+                                            context.source.sendFeedback(songText.createSupplierText(), false)
                                         }
                                     } catch (e: Exception) {
                                         e.printStackTrace()
@@ -117,9 +118,9 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                             }
                         )
                 ).then(
-                    ClientCommandManager.literal("play")
+                    CommandManager.literal("play")
                         .then(
-                            argument("songId", LongArgumentType.longArg(0)).executes { context ->
+                            CommandManager.argument("songId", LongArgumentType.longArg(0)).executes { context ->
                                 if (RMusicClient.player.isOpened || RMusicClient.player.isPausedOrPlaying) {
                                     context.source.sendFeedback(
                                         Text.literal("你已经在播放歌曲啦!, 你可以点")
@@ -138,14 +139,16 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                             "/rm stop"
                                                         )
                                                     )
-                                            }).append(Text.literal("来停止播放当前歌曲"))
+                                            }).append(Text.literal("来停止播放当前歌曲")).createSupplierText(), false
                                     )
                                     return@executes 0
                                 }
                                 val songId = context.getArgument("songId", Long::class.java)
                                 scope.launch {
                                     try {
-                                        context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
+                                        context.source.sendFeedback(
+                                            Text.literal("正在下载歌曲到本地...").createSupplierText(), false
+                                        )
                                         val songDetail = NCMusic.getSongDetail(songId)
                                         songInfo = songDetail
                                         minecraftClient.textureManager.registerTexture(
@@ -157,7 +160,10 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         RMusicClient.player.playMusic(lyric, songDetail)
                                     } catch (e: NullPointerException) {
                                         e.printStackTrace()
-                                        context.source.sendFeedback(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
+                                        context.source.sendFeedback(
+                                            Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)")
+                                                .createSupplierText(), false
+                                        )
                                     } catch (e: Exception) {
                                         e.printStackTrace()
                                     }
@@ -166,30 +172,30 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                             }
                         )
                 ).then(
-                    ClientCommandManager.literal("pause")
+                    CommandManager.literal("pause")
                         .executes { context ->
                             RMusicClient.player.pause()
-                            context.source.sendFeedback(Text.literal("已暂停"))
+                            context.source.sendFeedback(Text.literal("已暂停").createSupplierText(), false)
                             0
                         }
                 ).then(
-                    ClientCommandManager.literal("resume")
+                    CommandManager.literal("resume")
                         .executes { context ->
                             RMusicClient.player.resume()
-                            context.source.sendFeedback(Text.literal("已恢复播放"))
+                            context.source.sendFeedback(Text.literal("已恢复播放").createSupplierText(), false)
                             0
                         }
                 ).then(
-                    ClientCommandManager.literal("stop")
+                    CommandManager.literal("stop")
                         .executes { context ->
                             RMusicClient.player.stop()
-                            context.source.sendFeedback(Text.literal("已停止播放"))
+                            context.source.sendFeedback(Text.literal("已停止播放").createSupplierText(), false)
                             0
                         }
                 ).then(
-                    ClientCommandManager.literal("login")
+                    CommandManager.literal("login")
                         .executes { context ->
-                            context.source.sendFeedback(Text.literal("正在获取二维码..."))
+                            context.source.sendFeedback(Text.literal("正在获取二维码...").createSupplierText(), false)
                             scope.launch {
                                 try {
                                     loadQRCode = false
@@ -208,7 +214,7 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                 ).withClickEvent(
                                                     ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
                                                 )
-                                            })
+                                            }).createSupplierText(), false
                                     )
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -216,54 +222,69 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                             }
                             0
                         }.then(
-                            ClientCommandManager.literal("status")
+                            CommandManager.literal("status")
                                 .executes { context ->
                                     if (RMusicClient.loginManager.getCookie() != null) {
-                                        context.source.sendFeedback(Text.literal("你已登录"))
+                                        context.source.sendFeedback(
+                                            Text.literal("你已登录").createSupplierText(),
+                                            false
+                                        )
                                     } else {
-                                        context.source.sendFeedback(Text.literal("你还未登录"))
+                                        context.source.sendFeedback(
+                                            Text.literal("你还未登录").createSupplierText(),
+                                            false
+                                        )
                                     }
                                     0
                                 }
                         ).then(
-                            ClientCommandManager.literal("logout")
+                            CommandManager.literal("logout")
                                 .executes { context ->
                                     RMusicClient.loginManager.logout()
-                                    context.source.sendFeedback(Text.literal("已退出登录"))
+                                    context.source.sendFeedback(Text.literal("已退出登录").createSupplierText(), false)
                                     0
                                 }
                         ).then(
-                            ClientCommandManager.literal("confirm")
+                            CommandManager.literal("confirm")
                                 .then(
-                                    argument("qrcodeKey", StringArgumentType.string()).executes { context ->
-                                        context.source.sendFeedback(Text.literal("正在检查登录状态中"))
-                                        scope.launch {
-                                            try {
-                                                loadQRCode = false
-                                                destroyTexture(qrcodeId)
-                                                val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
-                                                val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
-                                                if (cookie != null) {
-                                                    RMusicClient.loginManager.login(cookie)
-                                                    val accountInfo = NCMusic.getUserAccount()
-                                                    context.source.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
-                                                } else {
-                                                    context.source.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))
+                                    CommandManager.argument("qrcodeKey", StringArgumentType.string())
+                                        .executes { context ->
+                                            context.source.sendFeedback(
+                                                Text.literal("正在检查登录状态中").createSupplierText(), false
+                                            )
+                                            scope.launch {
+                                                try {
+                                                    loadQRCode = false
+                                                    destroyTexture(qrcodeId)
+                                                    val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
+                                                    val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
+                                                    if (cookie != null) {
+                                                        RMusicClient.loginManager.login(cookie)
+                                                        val accountInfo = NCMusic.getUserAccount()
+                                                        context.source.sendFeedback(
+                                                            Text.literal("登陆成功, 用户名: $accountInfo")
+                                                                .createSupplierText(), false
+                                                        )
+                                                    } else {
+                                                        context.source.sendFeedback(
+                                                            Text.literal("验证失败, 请检查是否扫码并成功登录")
+                                                                .createSupplierText(), false
+                                                        )
+                                                    }
+                                                } catch (e: Exception) {
+                                                    e.printStackTrace()
                                                 }
-                                            } catch (e: Exception) {
-                                                e.printStackTrace()
                                             }
+                                            0
                                         }
-                                        0
-                                    }
                                 )
                         )
                 ).then(
-                    ClientCommandManager.literal("config")
+                    CommandManager.literal("config")
                         .then(
-                            ClientCommandManager.literal("set-api")
+                            CommandManager.literal("set-api")
                                 .then(
-                                    argument("apiHost", StringArgumentType.string())
+                                    CommandManager.argument("apiHost", StringArgumentType.string())
                                         .executes { context ->
                                             try {
                                                 val apiHost = context.getArgument("apiHost", String::class.java)
@@ -276,7 +297,10 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                         currentConfig.position
                                                     )
                                                 RMusicClient.configManager.write(afterConfig)
-                                                context.source.sendFeedback(Text.literal("设置api地址成功: $apiHost"))
+                                                context.source.sendFeedback(
+                                                    Text.literal("设置api地址成功: $apiHost").createSupplierText(),
+                                                    false
+                                                )
                                             } catch (e: Exception) {
                                                 e.printStackTrace()
                                             }
@@ -284,16 +308,18 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         }
                                 )
                         ).then(
-                            ClientCommandManager.literal("default")
+                            CommandManager.literal("default")
                                 .executes { context ->
                                     RMusicClient.configManager.default()
-                                    context.source.sendFeedback(Text.literal("已将配置文件设置为默认"))
+                                    context.source.sendFeedback(
+                                        Text.literal("已将配置文件设置为默认").createSupplierText(), false
+                                    )
                                     0
                                 }
                         ).then(
-                            ClientCommandManager.literal("auto-pause")
+                            CommandManager.literal("auto-pause")
                                 .then(
-                                    argument("autoPause", BoolArgumentType.bool())
+                                    CommandManager.argument("autoPause", BoolArgumentType.bool())
                                         .executes { context ->
                                             val settings = context.getArgument("autoPause", Boolean::class.java)
                                             val currentConfig = RMusicClient.configManager.read()
@@ -305,14 +331,17 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                     currentConfig.position
                                                 )
                                             RMusicClient.configManager.write(afterConfig)
-                                            context.source.sendFeedback(Text.literal("auto-pause设置成功: $settings"))
+                                            context.source.sendFeedback(
+                                                Text.literal("auto-pause设置成功: $settings").createSupplierText(),
+                                                false
+                                            )
                                             0
                                         }
                                 )
                         ).then(
-                            ClientCommandManager.literal("lyric-position")
+                            CommandManager.literal("lyric-position")
                                 .then(
-                                    argument("lyric-position", StringArgumentType.word())
+                                    CommandManager.argument("lyric-position", StringArgumentType.word())
                                         .suggests { _, builder ->
                                             builder.suggest("action-bar")
                                             builder.suggest("top-left")
@@ -333,15 +362,18 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                 lyricPosition
                                             )
                                             RMusicClient.configManager.write(afterConfig)
-                                            context.source.sendFeedback(Text.literal("成功设置歌词位置为: ${lyricPosition.translation}, 需要使用/rm reload 之后播放下一首歌才能生效"))
+                                            context.source.sendFeedback(
+                                                Text.literal("成功设置歌词位置为: ${lyricPosition.translation}, 需要使用/rm reload 之后播放下一首歌才能生效")
+                                                    .createSupplierText(), false
+                                            )
                                             0
                                         }
                                 )
                         )
                 ).then(
-                    ClientCommandManager.literal("clean-cache")
+                    CommandManager.literal("clean-cache")
                         .then(
-                            ClientCommandManager.literal("confirm")
+                            CommandManager.literal("confirm")
                                 .executes { context ->
                                     val files = File("./config/rmusic/cache").listFiles()
                                         ?.filter { it.isFile } ?: emptyList()
@@ -357,7 +389,7 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                                 Text.literal(files.joinToString(separator = "\n") { file -> file.name })
                                                             )
                                                         )
-                                                }).append("个文件")
+                                                }).append("个文件").createSupplierText(), false
                                     )
                                     0
                                 }
@@ -380,38 +412,44 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                     "/rm clean-cache confirm"
                                                 )
                                             )
-                                    }).append("来确认操作")
+                                    }).append("来确认操作").createSupplierText(), false
                             )
                             0
                         }
                 ).then(
-                    ClientCommandManager.literal("reload")
+                    CommandManager.literal("reload")
                         .executes { context ->
                             RMusicClient.configManager.reload()
-                            context.source.sendFeedback(Text.literal("已重新加载配置文件"))
+                            context.source.sendFeedback(Text.literal("已重新加载配置文件").createSupplierText(), false)
                             0
                         }
                 ).then(
-                    ClientCommandManager.literal("share")
+                    CommandManager.literal("share")
                         .then(
-                            argument("songId", LongArgumentType.longArg())
+                            CommandManager.argument("songId", LongArgumentType.longArg())
                                 .executes { context ->
                                     val songId = context.getArgument("songId", Long::class.java)
-                                    context.source.sendFeedback(Text.literal("正在准备一些必要的信息用于分享给其他玩家"))
+                                    context.source.sendFeedback(
+                                        Text.literal("正在准备一些必要的信息用于分享给其他玩家").createSupplierText(),
+                                        false
+                                    )
                                     scope.launch {
                                         try {
                                             val detail = NCMusic.getSongDetail(songId)
                                             val songUrl = NCMusic.getSongUrl(songId)
-                                            val payload = SongInfo(
+                                            val payload = ShareMusicPacket(
                                                 detail.name,
                                                 songId,
                                                 detail.artists,
                                                 songUrl,
-                                                context.source.player.name.string
+                                                context.source.player?.name?.string ?: "Unknown",
                                             ).toJson().encodeToBase64()
-                                            val packet = MusicPayload(payload)
+                                            val packet = ShareMusicCustomPayload(payload)
                                             ClientPlayNetworking.send(packet)
-                                            context.source.sendFeedback(Text.literal("已经成功分享到服务器内其他的玩家了"))
+                                            context.source.sendFeedback(
+                                                Text.literal("已经成功分享到服务器内其他的玩家了").createSupplierText(),
+                                                false
+                                            )
                                         } catch (e: Exception) {
                                             e.printStackTrace()
                                         }
@@ -420,9 +458,9 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                 }
                         )
                 ).then(
-                    ClientCommandManager.literal("qq-search")
+                    CommandManager.literal("qq-search")
                         .then(
-                            argument("qq-search-keyword", StringArgumentType.string())
+                            CommandManager.argument("qq-search-keyword", StringArgumentType.string())
                                 .executes { context ->
 
                                     0
