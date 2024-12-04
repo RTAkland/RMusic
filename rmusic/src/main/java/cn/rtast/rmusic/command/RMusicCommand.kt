@@ -8,10 +8,12 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusicClient
+import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.Config
 import cn.rtast.rmusic.entity.MusicPayload
 import cn.rtast.rmusic.entity.SongInfo
 import cn.rtast.rmusic.enums.LyricPosition
+import cn.rtast.rmusic.network.minecraftClient
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.music.NCMusic
@@ -146,11 +148,15 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
                                         val songDetail = NCMusic.getSongDetail(songId)
                                         songInfo = songDetail
+                                        minecraftClient.textureManager.registerTexture(
+                                            defaultCoverId, minecraftClient.textureManager.getTexture(defaultCoverId)
+                                        )
                                         renderCover(songDetail)
                                         renderSongDetail()
                                         val lyric = NCMusic.getLyric(songId)
                                         RMusicClient.player.playMusic(lyric, songDetail)
-                                    } catch (_: NullPointerException) {
+                                    } catch (e: NullPointerException) {
+                                        e.printStackTrace()
                                         context.source.sendFeedback(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
                                     } catch (e: Exception) {
                                         e.printStackTrace()

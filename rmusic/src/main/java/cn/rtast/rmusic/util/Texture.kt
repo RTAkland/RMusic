@@ -34,6 +34,9 @@ var loadCurrentLyric = ""
 private val renderLayer = RenderLayer::getGuiTexturedOverlay
 private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
 
+/**
+ * 动态注册材质到注册表内
+ */
 private fun registerTexture(textureResource: ByteArray, id: Identifier) {
     destroyTexture(qrcodeId)
     val nativeImage = NativeImage.read(textureResource)
@@ -41,6 +44,9 @@ private fun registerTexture(textureResource: ByteArray, id: Identifier) {
     minecraftClient.execute { minecraftClient.textureManager.registerTexture(id, nativeImageTexture) }
 }
 
+/**
+ * 渲染二维码到游戏界面内
+ */
 fun renderQRCode(qrcode: ByteArray) {
     registerTexture(qrcode, qrcodeId)
     loadQRCode = true
@@ -50,27 +56,43 @@ fun renderQRCode(qrcode: ByteArray) {
     }
 }
 
+/**
+ * 渲染专辑封面到游戏界面内
+ * 在专辑封面加载的时候先使用默认的
+ * loading.png渲染加载完成后再
+ * 使用下载好的专辑封面渲染到游戏内
+ */
 fun renderCover(songDetail: SongDetail) {
     loadCover = true
     val cachedCover = File(cacheDir, "${songDetail.id}.png")
+    HudRenderCallback.EVENT.register { context, _ ->
+        if (!loadCover) return@register
+        context.drawTexture(
+            renderLayer, defaultCoverId, 5,
+            20, 0f, 0f, 48,
+            48, 48, 48
+        )
+    }
     val cover = if (cachedCover.exists()) cachedCover.readBytes() else {
-        val coverBytes = URI(songDetail.cover + "?param=128y128").toURL().readBytes()
-            .toPNG().cropToCircle().toBufferedImage()
-            .createRecordImage().toByteArray()
+        val coverBytes = URI(songDetail.cover + "?param=128y128")
+            .toURL().readBytes().toPNG().cropToCircle()
+            .toBufferedImage().createRecordImage().toByteArray()
         cachedCover.writeBytes(coverBytes)
         coverBytes
     }
     registerTexture(cover, defaultCoverId)
-    HudRenderCallback.EVENT.register { context, _ ->
-        if (!loadCover) return@register
-        context.drawTexture(renderLayer, defaultCoverId, 5, 20, 0f, 0f, 48, 48, 48, 48)
-    }
 }
 
+/**
+ * 销毁资源材质
+ */
 fun destroyTexture(id: Identifier) {
     minecraftClient.execute { minecraftClient.textureManager.destroyTexture(id) }
 }
 
+/**
+ * 渲染歌曲详细信息
+ */
 fun renderSongDetail() {
     loadSongDetail = true
     var colorCycle = 0f
@@ -101,6 +123,9 @@ fun renderSongDetail() {
     }
 }
 
+/**
+ * 渲染歌词(左上角)
+ */
 fun renderLyric() {
     loadLyric = true
     HudRenderCallback.EVENT.register { context, _ ->
