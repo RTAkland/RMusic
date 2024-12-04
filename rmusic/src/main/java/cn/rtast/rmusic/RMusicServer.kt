@@ -7,7 +7,6 @@
 
 package cn.rtast.rmusic
 
-import cn.rtast.rmusic.RMusicClient.Companion.logger
 import cn.rtast.rmusic.entity.MusicPayload
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry

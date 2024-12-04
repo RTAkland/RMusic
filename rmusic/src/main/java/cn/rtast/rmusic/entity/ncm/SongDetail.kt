@@ -9,7 +9,7 @@ package cn.rtast.rmusic.entity.ncm
 
 data class SongDetail(
     val name: String,
-    val id: Long,
+    val id: String,
     val cover: String,
     val artists: String,
 )

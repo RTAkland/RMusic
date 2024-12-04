@@ -50,7 +50,7 @@ object NCMusic {
         }
     }
 
-    fun getSongUrl(id: Long): String {
+    fun getSongUrl(id: String): String {
         return Http.get<GetSongUrl>("$NCM_API/$GET_SONG_URL_PATH", mapOf("id" to id)).data.first().url
     }
 
@@ -59,9 +59,9 @@ object NCMusic {
         return LyricParser.parse(lyric)
     }
 
-    fun getSongDetail(id: Long): SongDetail {
+    fun getSongDetail(id: String): SongDetail {
         val result = Http.get<GetSongDetail>("$NCM_API/$DETAIL_PATH", mapOf("ids" to id)).songs.first()
-        return SongDetail(result.name, result.id, result.al.cover, result.ar.joinToString(", ") { it.name })
+        return SongDetail(result.name, result.id.toString(), result.al.cover, result.ar.joinToString(", ") { it.name })
     }
 
     fun getUserAccount(): String {

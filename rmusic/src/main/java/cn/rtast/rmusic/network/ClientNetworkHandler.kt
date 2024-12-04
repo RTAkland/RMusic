@@ -9,6 +9,7 @@ package cn.rtast.rmusic.network
 
 import cn.rtast.rmusic.entity.MusicPayload
 import cn.rtast.rmusic.entity.SongInfo
+import cn.rtast.rmusic.enums.PlayType
 import cn.rtast.rmusic.util.str.decodeToString
 import cn.rtast.rmusic.util.str.fromJson
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
@@ -25,7 +26,7 @@ val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
 fun registerClientReceiver() {
     ClientPlayNetworking.registerGlobalReceiver(MusicPayload.ID) { payload, context ->
         minecraftClient.player?.playSoundToPlayer(
-            SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(),
+            SoundEvents.ENTITY_WITCH_HURT,
             SoundCategory.BLOCKS, 1f, 1f
         )
         val packet = payload.payload.decodeToString().fromJson<SongInfo>()
@@ -40,7 +41,12 @@ fun registerClientReceiver() {
                         HoverEvent.Action.SHOW_TEXT,
                         Text.literal("点击播放: 《${packet.name}》- ${packet.artists}")
                     )
-                ).withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${packet.id}"))
+                )
+                if (packet.type == PlayType.Netease) {
+                    it.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${packet.id}"))
+                } else {
+                    it.withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play qq ${packet.id}"))
+                }
         }).append(Text.literal("来播放这首歌"))
         context.player()?.sendMessage(musicText, false)
     }

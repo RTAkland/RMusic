@@ -8,9 +8,12 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.cacheDir
-import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.ncm.SongDetail
+import cn.rtast.rmusic.enums.PlayType
+import cn.rtast.rmusic.loadingCoverId
 import cn.rtast.rmusic.qrcodeId
+import cn.rtast.rmusic.util.music.QQMusic
+import cn.rtast.rmusic.util.str.decodeToByteArray
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayer
@@ -19,6 +22,7 @@ import net.minecraft.client.texture.NativeImageBackedTexture
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
+import okio.ByteString.Companion.decodeBase64
 import java.io.File
 import java.net.URI
 import kotlin.math.sin
@@ -33,6 +37,12 @@ var loadCurrentLyric = ""
 
 private val renderLayer = RenderLayer::getGuiTexturedOverlay
 private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
+
+fun registerDefaultCover() {
+    minecraftClient.textureManager.registerTexture(
+        loadingCoverId, minecraftClient.textureManager.getTexture(loadingCoverId)
+    )
+}
 
 /**
  * 动态注册材质到注册表内
@@ -68,7 +78,7 @@ fun renderCover(songDetail: SongDetail) {
     HudRenderCallback.EVENT.register { context, _ ->
         if (!loadCover) return@register
         context.drawTexture(
-            renderLayer, defaultCoverId, 5,
+            renderLayer, loadingCoverId, 5,
             20, 0f, 0f, 48,
             48, 48, 48
         )
@@ -80,7 +90,24 @@ fun renderCover(songDetail: SongDetail) {
         cachedCover.writeBytes(coverBytes)
         coverBytes
     }
-    registerTexture(cover, defaultCoverId)
+    registerTexture(cover, loadingCoverId)
+}
+
+fun renderQQCover(cover: ByteArray?) {
+    loadCover = true
+    HudRenderCallback.EVENT.register { context, _ ->
+        if (!loadCover) return@register
+        context.drawTexture(
+            renderLayer, loadingCoverId, 5,
+            20, 0f, 0f, 48,
+            48, 48, 48
+        )
+    }
+    if (cover == null) {
+        registerDefaultCover()
+    } else {
+        registerTexture(cover, loadingCoverId)
+    }
 }
 
 /**

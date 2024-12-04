@@ -25,6 +25,8 @@ data class RawQQMusicSearch(
     )
 
     data class SongItem(
+        @SerializedName("albummid")
+        val albumMid: String,
         @SerializedName("albumname")
         val albumName: String,
         val singer: List<Singer>,

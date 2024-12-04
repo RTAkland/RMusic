@@ -21,7 +21,9 @@ import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.cacheDir
 import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.enums.LyricPosition
+import cn.rtast.rmusic.enums.PlayType
 import cn.rtast.rmusic.util.music.NCMusic
+import cn.rtast.rmusic.util.music.QQMusic
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
@@ -86,22 +88,30 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         }
     }
 
-    fun playMusic(lyric: Map<Int, String>, songDetail: SongDetail) {
+    fun playMusic(lyric: Map<Int, String>, songDetail: SongDetail, playType: PlayType = PlayType.Netease) {
         this.currentSongDetail = songDetail
         this.lyric = lyric
-        val cachedSongFile = File(cacheDir, songDetail.id.toString())
+        val cachedSongFile = File(cacheDir, songDetail.id)
         if (cachedSongFile.exists()) {
             this.open(cachedSongFile)
             this.play()
         } else {
-            val songUrl = NCMusic.getSongUrl(songDetail.id)
-            URI(songUrl).toURL().openStream().use { inputStream ->
-                FileOutputStream(cachedSongFile).use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
+            val songUrl = if (playType == PlayType.QQ) {
+                QQMusic.getSongUrl(songDetail.id)
+            } else {
+                NCMusic.getSongUrl(songDetail.id)
             }
-            this.open(cachedSongFile)
-            this.play()
+            if (songUrl != null) {
+                URI(songUrl).toURL().openStream().use { inputStream ->
+                    FileOutputStream(cachedSongFile).use { outputStream ->
+                        inputStream.copyTo(outputStream)
+                    }
+                }
+                this.open(cachedSongFile)
+                this.play()
+            } else {
+                minecraftClient.player?.sendMessage(Text.literal("这首歌暂时不支持播放哦"), true)
+            }
         }
     }
 }

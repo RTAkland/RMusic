@@ -8,21 +8,23 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusicClient
-import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.Config
 import cn.rtast.rmusic.entity.MusicPayload
 import cn.rtast.rmusic.entity.SongInfo
+import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.enums.LyricPosition
-import cn.rtast.rmusic.network.minecraftClient
+import cn.rtast.rmusic.enums.PlayType
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.music.NCMusic
+import cn.rtast.rmusic.util.music.QQMusic
 import cn.rtast.rmusic.util.str.encodeToBase64
 import cn.rtast.rmusic.util.str.toJson
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
+import com.mojang.brigadier.context.CommandContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,106 +53,135 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                 .then(
                     ClientCommandManager.literal("search")
                         .then(
-                            argument("keyword", StringArgumentType.string()).executes { context ->
-                                val keyword = context.getArgument("keyword", String::class.java)
-                                context.source.sendFeedback(
-                                    Text.literal("正在搜索: ").append(Text.literal(keyword).styled {
-                                        it.withColor(Formatting.YELLOW)
-                                    })
-                                )
-                                scope.launch {
-                                    try {
-                                        val result = NCMusic.search(keyword)
-                                        val text = Text.literal("搜索到如下结果:")
-                                        context.source.sendFeedback(text)
-                                        result.take(5).forEach { r ->
-                                            val songText =
-                                                Text.literal("歌曲名: ").styled {
-                                                    it.withColor(Formatting.GREEN)
-                                                }.append(Text.literal("${r.name} ").styled {
-                                                    it.withColor(Formatting.AQUA)
-                                                }).append(" 歌手: ")
-                                                    .append(Text.literal(r.artists).styled {
-                                                        it.withColor(Formatting.AQUA)
-                                                    })
-                                            val playButton = Text.literal(" [▶]").styled { style ->
-                                                style.withColor(Formatting.DARK_PURPLE)
-                                                    .withClickEvent(
-                                                        ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${r.id}")
+                            ClientCommandManager.literal("qq")
+                                .then(
+                                    argument("qq-keyword", StringArgumentType.string())
+                                        .executes { context ->
+                                            val qqKeyword = context.getArgument("qq-keyword", String::class.java)
+                                            scope.launch {
+                                                val result = QQMusic.search(qqKeyword)
+                                                context.source.sendFeedback(Text.literal("在QQ音乐中搜索到以下结果: "))
+                                                result.take(5).forEach {
+                                                    context.source.sendFeedback(
+                                                        Text.literal("歌曲:《${it.name}》 - ${it.artists}")
+                                                            .styled { style ->
+                                                                style.withColor(Formatting.AQUA)
+                                                            }.append(Text.literal(" [▶]").styled { style ->
+                                                                style.withColor(Formatting.GREEN)
+                                                                    .withClickEvent(
+                                                                        ClickEvent(
+                                                                            ClickEvent.Action.RUN_COMMAND,
+                                                                            "/rm play qq \"${it.id}\" \"${it.artists}\" \"${it.name}\""
+                                                                        )
+                                                                    ).withHoverEvent(
+                                                                        HoverEvent(
+                                                                            HoverEvent.Action.SHOW_TEXT,
+                                                                            Text.literal("点击播放")
+                                                                        )
+                                                                    )
+                                                            }).append(Text.literal(" [[↗]]").styled { style ->
+                                                                style.withColor(Formatting.GREEN)
+                                                                    .withClickEvent(
+                                                                        ClickEvent(
+                                                                            ClickEvent.Action.RUN_COMMAND,
+                                                                            "/rm share qq \"${it.id}\""
+                                                                        )
+                                                                    )
+                                                                    .withHoverEvent(
+                                                                        HoverEvent(
+                                                                            HoverEvent.Action.SHOW_TEXT,
+                                                                            Text.literal("点击分享给服务器内其他的玩家")
+                                                                        )
+                                                                    )
+                                                            })
                                                     )
-                                                    .withHoverEvent(
-                                                        HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            Text.literal("点击播放音乐")
-                                                                .styled { it.withColor(Formatting.YELLOW) })
-                                                    )
+                                                }
                                             }
-                                            songText.append(playButton)
-                                            val shareButton = Text.literal(" [↗]").styled { style ->
-                                                style.withColor(Formatting.AQUA)
-                                                    .withClickEvent(
-                                                        ClickEvent(
-                                                            ClickEvent.Action.RUN_COMMAND,
-                                                            "/rm share ${r.id}"
-                                                        )
-                                                    )
-                                                    .withHoverEvent(
-                                                        HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            Text.literal("点击分享给服务器内的其他玩家\n")
-                                                                .append(
-                                                                    Text.literal("注意: 只有服务器安装了RMusic并且其他玩家安装了RMusic客户端模组的玩家才能收到分享消息")
-                                                                        .styled {
-                                                                            it.withColor(Formatting.RED)
-                                                                        })
-                                                        )
-                                                    )
-                                            }
-                                            songText.append(shareButton)
-                                            context.source.sendFeedback(songText)
+                                            0
                                         }
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
+                                )
+                        ).then(
+                            argument("keyword", StringArgumentType.string())
+                                .executes { context ->
+                                    val keyword = context.getArgument("keyword", String::class.java)
+                                    context.source.sendFeedback(
+                                        Text.literal("正在搜索: ").append(Text.literal(keyword).styled {
+                                            it.withColor(Formatting.YELLOW)
+                                        })
+                                    )
+                                    scope.launch {
+                                        try {
+                                            val result = NCMusic.search(keyword)
+                                            val text = Text.literal("搜索到如下结果:")
+                                            context.source.sendFeedback(text)
+                                            result.take(5).forEach { r ->
+                                                val songText =
+                                                    Text.literal("歌曲名: ").styled {
+                                                        it.withColor(Formatting.GREEN)
+                                                    }.append(Text.literal("${r.name} ").styled {
+                                                        it.withColor(Formatting.AQUA)
+                                                    }).append(" 歌手: ")
+                                                        .append(Text.literal(r.artists).styled {
+                                                            it.withColor(Formatting.AQUA)
+                                                        })
+                                                val playButton = Text.literal(" [▶]").styled { style ->
+                                                    style.withColor(Formatting.DARK_PURPLE)
+                                                        .withClickEvent(
+                                                            ClickEvent(
+                                                                ClickEvent.Action.RUN_COMMAND,
+                                                                "/rm play ${r.id}"
+                                                            )
+                                                        )
+                                                        .withHoverEvent(
+                                                            HoverEvent(
+                                                                HoverEvent.Action.SHOW_TEXT,
+                                                                Text.literal("点击播放音乐")
+                                                                    .styled { it.withColor(Formatting.YELLOW) })
+                                                        )
+                                                }
+                                                songText.append(playButton)
+                                                val shareButton = Text.literal(" [↗]").styled { style ->
+                                                    style.withColor(Formatting.AQUA)
+                                                        .withClickEvent(
+                                                            ClickEvent(
+                                                                ClickEvent.Action.RUN_COMMAND,
+                                                                "/rm share ${r.id} netease"
+                                                            )
+                                                        )
+                                                        .withHoverEvent(
+                                                            HoverEvent(
+                                                                HoverEvent.Action.SHOW_TEXT,
+                                                                Text.literal("点击分享给服务器内的其他玩家\n")
+                                                                    .append(
+                                                                        Text.literal("注意: 只有服务器安装了RMusic并且其他玩家安装了RMusic客户端模组的玩家才能收到分享消息")
+                                                                            .styled {
+                                                                                it.withColor(Formatting.RED)
+                                                                            })
+                                                            )
+                                                        )
+                                                }
+                                                songText.append(shareButton)
+                                                context.source.sendFeedback(songText)
+                                            }
+                                        } catch (e: Exception) {
+                                            e.printStackTrace()
+                                        }
                                     }
+                                    0
                                 }
-                                0
-                            }
                         )
                 ).then(
                     ClientCommandManager.literal("play")
                         .then(
                             argument("songId", LongArgumentType.longArg(0)).executes { context ->
-                                if (RMusicClient.player.isOpened || RMusicClient.player.isPausedOrPlaying) {
-                                    context.source.sendFeedback(
-                                        Text.literal("你已经在播放歌曲啦!, 你可以点")
-                                            .append(Text.literal("[这里]").styled { style ->
-                                                style.withColor(Formatting.GREEN)
-                                                    .withHoverEvent(
-                                                        HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            Text.literal("点击停止播放当前正在播放的歌曲").styled {
-                                                                it.withColor(Formatting.YELLOW)
-                                                            })
-                                                    )
-                                                    .withClickEvent(
-                                                        ClickEvent(
-                                                            ClickEvent.Action.RUN_COMMAND,
-                                                            "/rm stop"
-                                                        )
-                                                    )
-                                            }).append(Text.literal("来停止播放当前歌曲"))
-                                    )
-                                    return@executes 0
-                                }
+                                if (this.checkIsPlaying(context)) return@executes 0
                                 val songId = context.getArgument("songId", Long::class.java)
                                 scope.launch {
                                     try {
                                         context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
-                                        val songDetail = NCMusic.getSongDetail(songId)
+                                        val songDetail = NCMusic.getSongDetail(songId.toString())
                                         songInfo = songDetail
-                                        minecraftClient.textureManager.registerTexture(
-                                            defaultCoverId, minecraftClient.textureManager.getTexture(defaultCoverId)
-                                        )
+                                        registerDefaultCover()
                                         renderCover(songDetail)
                                         renderSongDetail()
                                         val lyric = NCMusic.getLyric(songId)
@@ -164,6 +195,46 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                 }
                                 0
                             }
+                        ).then(
+                            ClientCommandManager.literal("qq")
+                                .then(
+                                    argument("qq-song-mid", StringArgumentType.string())
+                                        .then(
+                                            argument("qq-singer", StringArgumentType.string())
+                                                .then(
+                                                    argument("qq-album-name", StringArgumentType.string())
+                                                        .executes { context ->
+                                                            if (this.checkIsPlaying(context)) return@executes 0
+                                                            val songMid =
+                                                                context.getArgument("qq-song-mid", String::class.java)
+                                                            val albumName =
+                                                                context.getArgument("qq-album-name", String::class.java)
+                                                            val singerName =
+                                                                context.getArgument("qq-singer", String::class.java)
+                                                            scope.launch {
+                                                                context.source.sendFeedback(Text.literal("正在获取QQ音乐歌曲信息..."))
+                                                                val cover = QQMusic.getCover(songMid)
+                                                                val lyric = QQMusic.getLyric(songMid)
+                                                                val songDetail = SongDetail(
+                                                                    albumName,
+                                                                    songMid,
+                                                                    cover?.encodeToBase64() ?: "",
+                                                                    singerName
+                                                                )
+                                                                registerDefaultCover()
+                                                                renderQQCover(cover)
+                                                                renderSongDetail()
+                                                                RMusicClient.player.playMusic(
+                                                                    lyric.mapKeys { (key, _) -> key.toInt() },
+                                                                    songDetail, PlayType.QQ
+                                                                )
+                                                            }
+                                                            0
+                                                        }
+                                                )
+
+                                        )
+                                )
                         )
                 ).then(
                     ClientCommandManager.literal("pause")
@@ -206,7 +277,10 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                             .styled { it.withColor(Formatting.GREEN) }
                                                     )
                                                 ).withClickEvent(
-                                                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm $key")
+                                                    ClickEvent(
+                                                        ClickEvent.Action.RUN_COMMAND,
+                                                        "/rm login confirm $key"
+                                                    )
                                                 )
                                             })
                                     )
@@ -241,7 +315,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                             try {
                                                 loadQRCode = false
                                                 destroyTexture(qrcodeId)
-                                                val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
+                                                val qrCodeKey =
+                                                    context.getArgument("qrcodeKey", String::class.java)
                                                 val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
                                                 if (cookie != null) {
                                                     RMusicClient.loginManager.login(cookie)
@@ -319,7 +394,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                             builder.buildFuture()
                                         }
                                         .executes { context ->
-                                            val rawPosition = context.getArgument("lyric-position", String::class.java)
+                                            val rawPosition =
+                                                context.getArgument("lyric-position", String::class.java)
                                             val lyricPosition = when (rawPosition) {
                                                 "action-bar" -> LyricPosition.ActionBar
                                                 "top-left" -> LyricPosition.TopLeft
@@ -394,41 +470,72 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                 ).then(
                     ClientCommandManager.literal("share")
                         .then(
-                            argument("songId", LongArgumentType.longArg())
-                                .executes { context ->
-                                    val songId = context.getArgument("songId", Long::class.java)
-                                    context.source.sendFeedback(Text.literal("正在准备一些必要的信息用于分享给其他玩家"))
-                                    scope.launch {
-                                        try {
-                                            val detail = NCMusic.getSongDetail(songId)
-                                            val songUrl = NCMusic.getSongUrl(songId)
-                                            val payload = SongInfo(
-                                                detail.name,
-                                                songId,
-                                                detail.artists,
-                                                songUrl,
-                                                context.source.player.name.string
-                                            ).toJson().encodeToBase64()
-                                            val packet = MusicPayload(payload)
-                                            ClientPlayNetworking.send(packet)
-                                            context.source.sendFeedback(Text.literal("已经成功分享到服务器内其他的玩家了"))
-                                        } catch (e: Exception) {
-                                            e.printStackTrace()
+                            argument("songId", StringArgumentType.string())
+                                .then(
+                                    argument("share-type", StringArgumentType.word())
+                                        .suggests { _, builder ->
+                                            builder.suggest("qq")
+                                            builder.suggest("netease")
+                                            builder.buildFuture()
+                                        }.executes { context ->
+                                            val songId = context.getArgument("songId", String::class.java)
+                                            val shareType =
+                                                when (context.getArgument("share-type", String::class.java)) {
+                                                    "qq" -> PlayType.QQ
+                                                    "netease" -> PlayType.Netease
+                                                    else -> PlayType.Netease
+                                                }
+                                            context.source.sendFeedback(Text.literal("正在准备一些必要的信息用于分享给其他玩家"))
+                                            scope.launch {
+                                                try {
+                                                    val detail = NCMusic.getSongDetail(songId.toString())
+                                                    val songUrl = NCMusic.getSongUrl(songId.toString())
+                                                    val payload = SongInfo(
+                                                        detail.name,
+                                                        songId,
+                                                        detail.artists,
+                                                        songUrl,
+                                                        context.source.player.name.string,
+                                                        shareType
+                                                    ).toJson().encodeToBase64()
+                                                    val packet = MusicPayload(payload)
+                                                    ClientPlayNetworking.send(packet)
+                                                    context.source.sendFeedback(Text.literal("已经成功分享到服务器内其他的玩家了"))
+                                                } catch (e: Exception) {
+                                                    e.printStackTrace()
+                                                }
+                                            }
+                                            0
                                         }
-                                    }
-                                    0
-                                }
-                        )
-                ).then(
-                    ClientCommandManager.literal("qq-search")
-                        .then(
-                            argument("qq-search-keyword", StringArgumentType.string())
-                                .executes { context ->
-
-                                    0
-                                }
+                                )
                         )
                 )
         )
+    }
+
+    private fun checkIsPlaying(context: CommandContext<FabricClientCommandSource>): Boolean {
+        if (RMusicClient.player.isOpened || RMusicClient.player.isPausedOrPlaying) {
+            context.source.sendFeedback(
+                Text.literal("你已经在播放歌曲啦!, 你可以点")
+                    .append(Text.literal("[这里]").styled { style ->
+                        style.withColor(Formatting.GREEN)
+                            .withHoverEvent(
+                                HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    Text.literal("点击停止播放当前正在播放的歌曲").styled {
+                                        it.withColor(Formatting.YELLOW)
+                                    })
+                            )
+                            .withClickEvent(
+                                ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/rm stop"
+                                )
+                            )
+                    }).append(Text.literal("来停止播放当前歌曲"))
+            )
+            return true
+        }
+        return false
     }
 }
