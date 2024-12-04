@@ -10,14 +10,14 @@ package cn.rtast.rmusic.command
 import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.Config
-import cn.rtast.rmusic.entity.MusicPayload
-import cn.rtast.rmusic.entity.SongInfo
+import cn.rtast.rmusic.entity.payload.RMusicPayload
+import cn.rtast.rmusic.entity.payload.ShareMusicPacket
+import cn.rtast.rmusic.enums.Action
 import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.network.minecraftClient
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.music.NCMusic
-import cn.rtast.rmusic.util.str.encodeToBase64
 import cn.rtast.rmusic.util.str.toJson
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.BoolArgumentType
@@ -402,14 +402,15 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         try {
                                             val detail = NCMusic.getSongDetail(songId)
                                             val songUrl = NCMusic.getSongUrl(songId)
-                                            val payload = SongInfo(
+                                            val musicSharePayload = ShareMusicPacket(
                                                 detail.name,
                                                 songId,
                                                 detail.artists,
                                                 songUrl,
                                                 context.source.player.name.string
-                                            ).toJson().encodeToBase64()
-                                            val packet = MusicPayload(payload)
+                                            ).toJson()
+                                            val actionPacket = createActionPacket(Action.SHARE, musicSharePayload)
+                                            val packet = RMusicPayload(actionPacket)
                                             ClientPlayNetworking.send(packet)
                                             context.source.sendFeedback(Text.literal("已经成功分享到服务器内其他的玩家了"))
                                         } catch (e: Exception) {

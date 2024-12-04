@@ -9,12 +9,17 @@ configurations {
     compile.extendsFrom(embed)
 }
 
+repositories {
+    maven { url = "https://maven.andante.dev/releases/" }
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:$minecraftVersion")
     mappings("net.fabricmc:yarn:$yarnMappings:v2")
     modImplementation("net.fabricmc:fabric-loader:$loaderVersion")
     modImplementation("net.fabricmc.fabric-api:fabric-api:$fabricVersion")
     modImplementation("net.fabricmc:fabric-language-kotlin:$fabricLanguageKotlinVersion")
+    include modImplementation("net.mcbrawls:slate:$slateVersion")
     implementation("com.github.goxr3plus:java-stream-player:10.0.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
     embed(implementation("com.github.goxr3plus:java-stream-player:10.0.2"))
