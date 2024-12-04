@@ -1,0 +1,12 @@
+{
+  "id": "rmusic",
+  "name": "RMusic",
+  "version": "$version",
+  "description": "游戏内听歌(但是vc版)",
+  "url": "https://repo.rtast.cn/RTAkland/rmusic",
+  "authors": [
+    "RTAkland"
+  ],
+  "dependencies": [],
+  "main": "cn.rtast.rmusic.RMusicVelocity"
+}

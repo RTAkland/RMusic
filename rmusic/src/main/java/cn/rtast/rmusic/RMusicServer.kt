@@ -12,8 +12,10 @@ import cn.rtast.rmusic.entity.MusicPayload
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import org.slf4j.LoggerFactory
 
 class RMusicServer: ModInitializer {
+    private val logger = LoggerFactory.getLogger("RMusic-server")
     override fun onInitialize() {
         PayloadTypeRegistry.playC2S().register(MusicPayload.ID, MusicPayload.CODEC)
         PayloadTypeRegistry.playS2C().register(MusicPayload.ID, MusicPayload.CODEC)

@@ -8,8 +8,10 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusicClient
+import cn.rtast.rmusic.entity.Config
 import cn.rtast.rmusic.entity.MusicPayload
 import cn.rtast.rmusic.entity.SongInfo
+import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.music.NCMusic
@@ -260,7 +262,13 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                             try {
                                                 val apiHost = context.getArgument("apiHost", String::class.java)
                                                 val currentConfig = RMusicClient.configManager.read()
-                                                val afterConfig = currentConfig.copy(api = apiHost)
+                                                val afterConfig =
+                                                    Config(
+                                                        apiHost,
+                                                        currentConfig.autoPause,
+                                                        currentConfig.qqMusicApi,
+                                                        currentConfig.position
+                                                    )
                                                 RMusicClient.configManager.write(afterConfig)
                                                 context.source.sendFeedback(Text.literal("设置api地址成功: $apiHost"))
                                             } catch (e: Exception) {
@@ -283,9 +291,43 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         .executes { context ->
                                             val settings = context.getArgument("autoPause", Boolean::class.java)
                                             val currentConfig = RMusicClient.configManager.read()
-                                            val afterConfig = currentConfig.copy(autoPause = settings)
+                                            val afterConfig =
+                                                Config(
+                                                    currentConfig.api,
+                                                    settings,
+                                                    currentConfig.qqMusicApi,
+                                                    currentConfig.position
+                                                )
                                             RMusicClient.configManager.write(afterConfig)
                                             context.source.sendFeedback(Text.literal("auto-pause设置成功: $settings"))
+                                            0
+                                        }
+                                )
+                        ).then(
+                            ClientCommandManager.literal("lyric-position")
+                                .then(
+                                    argument("lyric-position", StringArgumentType.word())
+                                        .suggests { _, builder ->
+                                            builder.suggest("action-bar")
+                                            builder.suggest("top-left")
+                                            builder.buildFuture()
+                                        }
+                                        .executes { context ->
+                                            val rawPosition = context.getArgument("lyric-position", String::class.java)
+                                            val lyricPosition = when (rawPosition) {
+                                                "action-bar" -> LyricPosition.ActionBar
+                                                "top-left" -> LyricPosition.TopLeft
+                                                else -> LyricPosition.ActionBar
+                                            }
+                                            val currentConfig = RMusicClient.configManager.read()
+                                            val afterConfig = Config(
+                                                currentConfig.api,
+                                                currentConfig.autoPause,
+                                                currentConfig.qqMusicApi,
+                                                lyricPosition
+                                            )
+                                            RMusicClient.configManager.write(afterConfig)
+                                            context.source.sendFeedback(Text.literal("成功设置歌词位置为: ${lyricPosition.translation}, 需要使用/rm reload 之后播放下一首歌才能生效"))
                                             0
                                         }
                                 )
@@ -309,7 +351,7 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                                                 Text.literal(files.joinToString(separator = "\n") { file -> file.name })
                                                             )
                                                         )
-                                                }).append("个音频文件")
+                                                }).append("个文件")
                                     )
                                     0
                                 }

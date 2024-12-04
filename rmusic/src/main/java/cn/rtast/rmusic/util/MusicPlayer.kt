@@ -17,8 +17,10 @@
 
 package cn.rtast.rmusic.util
 
+import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.cacheDir
 import cn.rtast.rmusic.entity.ncm.SongDetail
+import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.util.music.NCMusic
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
@@ -47,6 +49,10 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
                 .append(Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists}")),
             true
         )
+        if (RMusicClient.configManager.config?.position == LyricPosition.TopLeft) {
+            renderLyric()
+        }
+        minecraftClient.soundManager.stopAll()
     }
 
     override fun progress(
@@ -58,9 +64,11 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         val currentSecond = (microsecondPosition / 1000000).toInt()
         for (key in lyric!!.keys) {
             if (currentSecond == key) {
-                val lyric = Text.literal(lyric!![key] ?: continue)
-                    .styled { it.withColor(Formatting.AQUA) }
-                minecraftClient.inGameHud.setOverlayMessage(lyric, false)
+                loadCurrentLyric = lyric!![key] ?: continue
+                val lyric = Text.literal(loadCurrentLyric).styled { it.withColor(Formatting.YELLOW) }
+                if (RMusicClient.configManager.config?.position == LyricPosition.ActionBar) {
+                    minecraftClient.inGameHud.setOverlayMessage(lyric, false)
+                }
             }
         }
     }
@@ -73,6 +81,8 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
             )
             loadCover = false
             loadSongDetail = false
+            loadLyric = false
+            loadCurrentLyric = ""
         }
     }
 

@@ -17,6 +17,7 @@ import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.texture.NativeImage
 import net.minecraft.client.texture.NativeImageBackedTexture
 import net.minecraft.text.Text
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import java.io.File
 import java.net.URI
@@ -27,6 +28,8 @@ var loadQRCode = true
 var loadCover = true
 var loadSongDetail = true
 var songInfo: SongDetail? = null
+var loadLyric = true
+var loadCurrentLyric = ""
 
 private val renderLayer = RenderLayer::getGuiTexturedOverlay
 private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
@@ -95,5 +98,14 @@ fun renderSongDetail() {
             Text.literal(songInfo?.artists),
             5, 93, color, true
         )
+    }
+}
+
+fun renderLyric() {
+    loadLyric = true
+    HudRenderCallback.EVENT.register { context, _ ->
+        if (!loadLyric) return@register
+        val lyric = Text.literal(loadCurrentLyric).styled { it.withColor(Formatting.YELLOW) }
+        context.drawText(minecraftClient.textRenderer, lyric, 5, 103, 0xffffff, true)
     }
 }

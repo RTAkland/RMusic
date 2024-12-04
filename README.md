@@ -16,9 +16,15 @@
 
 /rm resume # 继续播放音乐
 
+/rm config # 配置
+
 > 在设置中调整`唱片机/音符盒`的音量可以调整音乐的声音大小
 
 > 按下esc会自动暂停音乐播放, 使用`/rm config auto-pause false` 来取消设置自动暂停, 设置成功后
 > 使用`/rm reload`来重新加载配置文件
 
 ![showcase](public/showcase.png)
+
+# velocity
+
+> 支持在velocity上安装插件然后客户端安装RMusic模组即可分享
