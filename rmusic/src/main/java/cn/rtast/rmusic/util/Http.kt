@@ -27,7 +27,7 @@ import java.time.Instant
 object Http {
 
     val jsonMediaType = "application/json; charset=utf-8".toMediaType()
-    val jsonHeader = mapOf(
+    private val jsonHeader = mapOf(
         "Content-Type" to "application/json; charset=utf-8",
         "Accept" to "application/json"
     )
@@ -45,7 +45,6 @@ object Http {
             paramsUrl.append("timestamp=${Instant.now().epochSecond}&")
             paramsUrl.dropLast(1)
         }
-        println(paramsUrl)
         return if (params != null) paramsUrl.toString() else url
     }
 

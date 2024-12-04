@@ -151,6 +151,11 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         minecraftClient.textureManager.registerTexture(
                                             defaultCoverId, minecraftClient.textureManager.getTexture(defaultCoverId)
                                         )
+                                        minecraftClient.inGameHud.setOverlayMessage(
+                                            Text.literal("正在播放: ")
+                                                .append(Text.literal("《${songDetail.name}》 - ${songDetail.artists}")),
+                                            true
+                                        )
                                         renderCover(songDetail)
                                         renderSongDetail()
                                         val lyric = NCMusic.getLyric(songId)
@@ -194,7 +199,6 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                 try {
                                     loadQRCode = false
                                     val (key, qrcode) = NCMusic.loginByQRCode()
-                                    println(key)
                                     renderQRCode(qrcode)
                                     context.source.sendFeedback(
                                         Text.literal("扫码并登录完成后点击")

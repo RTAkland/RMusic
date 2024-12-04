@@ -7,7 +7,6 @@
 
 package cn.rtast.rmusic.command
 
-import cn.rtast.rmusic.entity.payload.ActionPacket
 import cn.rtast.rmusic.entity.payload.QRCodeLoginPacket
 import cn.rtast.rmusic.entity.payload.RMusicPayload
 import cn.rtast.rmusic.enums.Action
@@ -27,6 +26,7 @@ import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.item.Items
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 
 class ServerRMusicCommand : CommandRegistrationCallback {
@@ -61,20 +61,23 @@ class ServerRMusicCommand : CommandRegistrationCallback {
                             }
                             this[3, 2] = tile(Items.HONEY_BLOCK) {
                                 tooltip("邮箱&密码")
-                                onGenericClick { _, _, context ->
-
+                                onGenericClick { slate, _, context ->
+                                    context.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                                    slate.close(context.player)
                                 }
                             }
                             this[5, 2] = tile(Items.REDSTONE_BLOCK) {
                                 tooltip("手机号&密码")
-                                onGenericClick { _, _, context ->
-
+                                onGenericClick { slate, _, context ->
+                                    context.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                                    slate.close(context.player)
                                 }
                             }
                             this[7, 2] = tile(Items.SLIME_BLOCK) {
                                 tooltip("手机号&验证码")
-                                onGenericClick { _, _, context ->
-
+                                onGenericClick { slate, _, context ->
+                                    context.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                                    slate.close(context.player)
                                 }
                             }
                         }
@@ -83,5 +86,13 @@ class ServerRMusicCommand : CommandRegistrationCallback {
                     0
                 }
         )
+    }
+
+    private fun openPhoneNumberSlate(player: ServerPlayerEntity) {
+        val slate = slate {
+            title
+        }
+        slate.open(player)
+        TODO("Not complete yet")
     }
 }

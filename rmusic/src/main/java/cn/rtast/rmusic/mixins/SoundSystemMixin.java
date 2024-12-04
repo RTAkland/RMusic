@@ -33,17 +33,6 @@ public abstract class SoundSystemMixin {
         }
     }
 
-    @Inject(method = "updateSoundVolume", at = @At("HEAD"))
-    public void updateSoundVolume(SoundCategory category, float volume, CallbackInfo ci) {
-        if (category == SoundCategory.RECORDS) {
-            if (volume == 0.0f) {
-                RMusicClient.Companion.getPlayer().setMute(true);
-            } else {
-                RMusicClient.Companion.getPlayer().setMute(false);
-                RMusicClient.Companion.getPlayer().setGain(volume);
-            }
-        }
-    }
     @Inject(method = "tick()V", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo ci) {
         if (RMusicClient.Companion.getPlayer().isPlaying()) {

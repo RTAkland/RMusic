@@ -27,6 +27,7 @@ import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
 import net.minecraft.client.MinecraftClient
+import net.minecraft.sound.SoundCategory
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.io.File
@@ -44,11 +45,6 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
     }
 
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
-        minecraftClient.inGameHud.setOverlayMessage(
-            Text.literal("正在播放: ")
-                .append(Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists}")),
-            true
-        )
         if (RMusicClient.configManager.config?.position == LyricPosition.TopLeft) {
             renderLyric()
         }
@@ -61,6 +57,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         pcmData: ByteArray,
         properties: MutableMap<String, Any>
     ) {
+        setGain(minecraftClient.options.getSoundVolume(SoundCategory.RECORDS).toDouble())
         val currentSecond = (microsecondPosition / 1000000).toInt()
         for (key in lyric!!.keys) {
             if (currentSecond == key) {

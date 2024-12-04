@@ -23,6 +23,7 @@ object NCMusic {
     private const val GET_LYRIC_PATH = "lyric"
     private const val DETAIL_PATH = "song/detail"
     private const val USER_ACCOUNT_PATH = "user/account"
+    private const val CAPTCHA_SENT_PATH = "captcha/sent"
     private val NCM_API get() = RMusicClient.configManager.read().api
 
     fun loginByQRCode(): Pair<String, ByteArray> {
@@ -33,6 +34,14 @@ object NCMusic {
         ).data.base64Image.replace("data:image/png;base64,", "").decodeToByteArray()
         return key to qrcode
     }
+
+    fun sendCaptcha(phone: String) {
+        Http.get("$NCM_API/$CAPTCHA_SENT_PATH", mapOf("phone" to phone))
+    }
+
+//    fun verifyCaptcha(phone: String, captcha: String): String? {
+//
+//    }
 
     fun checkQRCodeStatus(key: String): String? {
         val result = Http.get<CheckQRCodeStatus>("$NCM_API/$CHECK_QRCODE_PATH?key=$key")
