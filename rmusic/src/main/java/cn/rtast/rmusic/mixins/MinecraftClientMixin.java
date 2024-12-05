@@ -22,7 +22,8 @@ import java.util.Objects;
 @Mixin(MinecraftClient.class)
 public abstract class MinecraftClientMixin extends ReentrantThreadExecutor<Runnable> implements WindowEventHandler {
 
-    @Shadow public abstract boolean isPaused();
+    @Shadow
+    public abstract boolean isPaused();
 
     public MinecraftClientMixin(String string) {
         super(string);

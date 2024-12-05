@@ -8,7 +8,7 @@
 
 package cn.rtast.rmusic.util.str
 
-import java.util.Base64
+import java.util.*
 
 fun String.encodeToBase64(): String {
     return Base64.getEncoder().encodeToString(this.toByteArray(Charsets.UTF_8))

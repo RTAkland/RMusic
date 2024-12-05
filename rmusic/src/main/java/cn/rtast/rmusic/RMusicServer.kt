@@ -25,7 +25,7 @@ class RMusicServer : ModInitializer {
                 ServerPlayNetworking.send(it, payload)
             }
         }
-        CommandRegistrationCallback.EVENT.register(ServerRMusicCommand())//
+        CommandRegistrationCallback.EVENT.register(ServerRMusicCommand())
         logger.info("RMusic 已加载!")
     }
 }
