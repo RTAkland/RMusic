@@ -19,7 +19,6 @@ package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.cacheDir
-import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.util.music.NCMusic

@@ -13,6 +13,7 @@ import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.text.Text
 import org.slf4j.LoggerFactory
 
 class RMusicServer : ModInitializer {
@@ -26,6 +27,6 @@ class RMusicServer : ModInitializer {
             }
         }
         CommandRegistrationCallback.EVENT.register(ServerRMusicCommand())//
-        logger.info("RMusic 已加载!")
+        logger.info(Text.translatable("rmusic.loaded").string)
     }
 }

@@ -60,7 +60,7 @@ object Renderer {
             val color = ((255 shl 24) or (red.toInt() shl 16) or (green.toInt() shl 8) or blue.toInt())
             context.drawText(
                 minecraftClient.textRenderer,
-                Text.literal("↓ 正在播放 ↓"),
+                Text.translatable("rmusic.now_playing"),
                 5, 73, color, true
             )
             context.drawText(

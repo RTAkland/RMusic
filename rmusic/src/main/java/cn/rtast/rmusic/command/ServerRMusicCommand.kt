@@ -42,12 +42,12 @@ class ServerRMusicCommand : CommandRegistrationCallback {
             CommandManager.literal("rm-login")
                 .executes { context ->
                     val slate = slate {
-                        title = Text.literal("选择你的登录方式")
+                        title = Text.translatable("rmusic.select_a_method_to_login")
                         tiles {
                             this[1, 2] = tile(Items.NETHERITE_BLOCK) {
-                                tooltip("二维码")
+                                tooltip(Text.translatable("rmusic.login_type.qrcode"))
                                 onGenericClick { slate, _, context ->
-                                    context.player.sendMessage(Text.literal("正在获取二维码..."))
+                                    context.player.sendMessage(Text.translatable("rmusic.get_qrcode"))
                                     scope.launch {
                                         val (key, qrcode) = NCMusic.loginByQRCode()
                                         val qrcodeBase64 = qrcode.encodeToBase64()
@@ -60,23 +60,23 @@ class ServerRMusicCommand : CommandRegistrationCallback {
                                 }
                             }
                             this[3, 2] = tile(Items.HONEY_BLOCK) {
-                                tooltip("邮箱&密码")
+                                tooltip(Text.translatable("rmusic.login_type.email"))
                                 onGenericClick { slate, _, context ->
-                                    context.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                                    context.player.sendMessage(Text.translatable("rmusic.login_type.not_support"))
                                     slate.close(context.player)
                                 }
                             }
                             this[5, 2] = tile(Items.REDSTONE_BLOCK) {
-                                tooltip("手机号&密码")
+                                tooltip(Text.translatable("rmusic.login_type.phone_passwd"))
                                 onGenericClick { slate, _, context ->
-                                    context.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                                    context.player.sendMessage(Text.translatable("rmusic.login_type.not_support"))
                                     slate.close(context.player)
                                 }
                             }
                             this[7, 2] = tile(Items.SLIME_BLOCK) {
-                                tooltip("手机号&验证码")
+                                tooltip(Text.translatable("rmusic.login_type.phone_captcha"))
                                 onGenericClick { slate, _, context ->
-                                    context.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                                    context.player.sendMessage(Text.translatable("rmusic.login_type.not_support"))
                                     slate.close(context.player)
                                 }
                             }

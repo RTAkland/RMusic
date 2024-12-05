@@ -41,12 +41,12 @@ fun registerClientReceiver() {
                 Renderer.renderQRCode(packet.qrcode.decodeToByteArray())
                 try {
                     context.player().sendMessage(
-                        Text.literal("扫码并登录完成后点击")
-                            .append(Text.literal("[这里]").styled { style ->
+                        Text.translatable("rmusic.after_scan_qrcode")
+                            .append(Text.translatable("rmusic.here").styled { style ->
                                 style.withColor(Formatting.GREEN).withHoverEvent(
                                     HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,
-                                        Text.literal("点击这里确认登录状态")
+                                        Text.translatable("to_confirm")
                                             .styled { it.withColor(Formatting.GREEN) }
                                     )
                                 ).withClickEvent(
@@ -65,19 +65,19 @@ fun registerClientReceiver() {
 
             Action.SHARE -> {
                 val packet = dispatchPacket.body.decodeToString().fromJson<ShareMusicPacket>()
-                val musicText = Text.literal("玩家 ").append(Text.literal(packet.fromWho).styled {
+                val musicText = Text.translatable("rmusic.player_literal").append(Text.literal(packet.fromWho).styled {
                     it.withColor(Formatting.YELLOW)
-                }).append("向你分享了一首歌: ").append("《${packet.name}》- ${packet.artists}")
+                }).append(Text.translatable("rmusic.shared_a_song")).append("《${packet.name}》- ${packet.artists}")
                     .styled { it.withColor(Formatting.AQUA) }
-                    .append("点击").append(Text.literal("[这里]").styled {
+                    .append(Text.translatable("rmusic.click")).append(Text.translatable("rmusic.here").styled {
                         it.withColor(Formatting.GREEN)
                             .withHoverEvent(
                                 HoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    Text.literal("点击播放: 《${packet.name}》- ${packet.artists}")
+                                    Text.translatable("rmusic.click_to_play", packet.name, packet.artists)
                                 )
                             ).withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${packet.id}"))
-                    }).append(Text.literal("来播放这首歌"))
+                    }).append(Text.translatable("rmusic.to_play_song"))
                 context.player()?.sendMessage(musicText, false)
             }
         }

@@ -23,6 +23,7 @@ import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.minecraft.text.Text
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -38,6 +39,6 @@ class RMusicClient : ClientModInitializer {
     override fun onInitializeClient() {
         registerClientReceiver()
         ClientCommandRegistrationCallback.EVENT.register(RMusicCommand())
-        logger.info("RMusic 已加载!")
+        logger.info(Text.translatable("rmusic.loaded").string)
     }
 }
