@@ -7,9 +7,9 @@
 
 package cn.rtast.rmusic.entity.payload
 
-import cn.rtast.rmusic.enums.Action
+import cn.rtast.rmusic.enums.IntentAction
 
 data class ActionPacket(
-    val action: Action,
+    val action: IntentAction,
     val body: String,
 )

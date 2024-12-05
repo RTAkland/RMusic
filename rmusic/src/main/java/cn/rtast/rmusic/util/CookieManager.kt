@@ -7,7 +7,7 @@
 
 package cn.rtast.rmusic.util
 
-import cn.rtast.rmusic.entity.LoginState
+import cn.rtast.rmusic.entity.Cookie
 import cn.rtast.rmusic.util.str.fromJson
 import cn.rtast.rmusic.util.str.toJson
 import java.io.File
@@ -18,7 +18,7 @@ class CookieManager {
     private val file = File(dir, "cookie.json")
 
     fun login(cookie: String) {
-        val state = LoginState(cookie).toJson()
+        val state = Cookie(cookie).toJson()
         file.delete()
         file.createNewFile()
         file.writeText(state)
@@ -27,7 +27,7 @@ class CookieManager {
     fun getCookie(): String? {
         file.createNewFile()
         return try {
-            file.readText().fromJson<LoginState>().cookie
+            file.readText().fromJson<Cookie>().cookie
         } catch (_: Exception) {
             null
         }

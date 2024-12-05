@@ -7,7 +7,6 @@
 
 package cn.rtast.rmusic.util.music
 
-import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.entity.SearchResult
 import cn.rtast.rmusic.entity.qq.GetSongLyric
 import cn.rtast.rmusic.entity.qq.RawQQMusicSearch
@@ -16,7 +15,7 @@ import cn.rtast.rmusic.util.str.LyricParser
 
 object QQMusic {
 
-    private val API_HOST get() = RMusicClient.configManager.read().qqMusicApi
+    private val API_HOST get() = ""
     private const val SEARCH_PATH = "getSearchByKey"
     private const val LYRIC_PATH = "getLyric"
 

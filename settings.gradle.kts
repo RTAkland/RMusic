@@ -12,4 +12,3 @@ plugins {
 rootProject.name = "RMusic"
 
 include(":rmusic")
-include(":velocity")

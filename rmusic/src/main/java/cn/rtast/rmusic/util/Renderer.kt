@@ -7,11 +7,7 @@
 
 package cn.rtast.rmusic.util
 
-import cn.rtast.rmusic.RMusicClient
-import cn.rtast.rmusic.cacheDir
 import cn.rtast.rmusic.defaultCoverId
-import cn.rtast.rmusic.entity.ncm.SongDetail
-import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.qrcodeId
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.client.MinecraftClient
@@ -22,15 +18,14 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import org.joml.Quaternionf
-import java.io.File
-import java.net.URI
 import kotlin.math.sin
 
 object Renderer {
     var loadQRCode = false
     var loadCover = false
     var loadSongDetail = false
-    var songInfo: SongDetail? = null
+    var currentSongName: String? = null
+    var currentArtistName: String? = null
     var loadLyric = false
     var loadCurrentLyric = ""
 
@@ -43,11 +38,9 @@ object Renderer {
         var rotationAngle = 0f
         HudRenderCallback.EVENT.register { context, _ ->
             if (!loadLyric) return@register
-            if (RMusicClient.configManager.config?.position == LyricPosition.TopLeft) {
-                val lyric = Text.literal(loadCurrentLyric)
-                    .styled { it.withColor(Formatting.YELLOW) }
-                context.drawText(minecraftClient.textRenderer, lyric, 5, 103, 0xffffff, true)
-            }
+            val lyric = Text.literal(loadCurrentLyric)
+                .styled { it.withColor(Formatting.YELLOW) }
+            context.drawText(minecraftClient.textRenderer, lyric, 5, 103, 0xffffff, true)
         }
 
         HudRenderCallback.EVENT.register { context, tickDeltaManager ->
@@ -65,12 +58,12 @@ object Renderer {
             )
             context.drawText(
                 minecraftClient.textRenderer,
-                Text.literal("《${songInfo?.name}》"),
+                Text.literal("《${this.currentSongName}》"),
                 5, 83, color, true
             )
             context.drawText(
                 minecraftClient.textRenderer,
-                Text.literal(songInfo?.artists),
+                Text.literal(this.currentArtistName),
                 5, 93, color, true
             )
         }
@@ -146,16 +139,8 @@ object Renderer {
      * loading.png渲染加载完成后再
      * 使用下载好的专辑封面渲染到游戏内
      */
-    fun renderCover(songDetail: SongDetail) {
+    fun renderCover(cover: ByteArray) {
         loadCover = true
-        val cachedCover = File(cacheDir, "${songDetail.id}.png")
-        val cover = if (cachedCover.exists()) cachedCover.readBytes() else {
-            val coverBytes = URI(songDetail.cover + "?param=128y128")
-                .toURL().readBytes().toPNG().cropToCircle()
-                .toBufferedImage().createRecordImage().toByteArray()
-            cachedCover.writeBytes(coverBytes)
-            coverBytes
-        }
         registerTexture(cover, defaultCoverId)
     }
 

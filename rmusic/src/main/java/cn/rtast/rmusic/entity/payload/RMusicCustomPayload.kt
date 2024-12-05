@@ -13,15 +13,15 @@ import net.minecraft.network.codec.PacketCodec
 import net.minecraft.network.packet.CustomPayload
 
 @JvmRecord
-data class RMusicPayload(val payload: String) : CustomPayload {
+data class RMusicCustomPayload(val payload: String) : CustomPayload {
     override fun getId(): CustomPayload.Id<out CustomPayload> {
         return ID
     }
 
     companion object {
-        val ID = CustomPayload.Id<RMusicPayload>(networkingId)
-        val CODEC: PacketCodec<PacketByteBuf, RMusicPayload> = PacketCodec.of({ value, buf ->
+        val ID = CustomPayload.Id<RMusicCustomPayload>(networkingId)
+        val CODEC: PacketCodec<PacketByteBuf, RMusicCustomPayload> = PacketCodec.of({ value, buf ->
             buf.writeString(value.payload)
-        }, { buf -> return@of RMusicPayload(buf.readString()) })
+        }, { buf -> return@of RMusicCustomPayload(buf.readString()) })
     }
 }

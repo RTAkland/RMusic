@@ -36,10 +36,10 @@ public abstract class MinecraftClientMixin extends ReentrantThreadExecutor<Runna
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void tickMixin(CallbackInfo ci) {
-        if (isPaused() && Objects.requireNonNull(RMusicClient.Companion.getConfigManager().getConfig()).getAutoPause()) {
-            RMusicClient.Companion.getPlayer().pause();
-        } else {
-            RMusicClient.Companion.getPlayer().resume();
-        }
+//        if (isPaused() && Objects.requireNonNull(RMusicClient.Companion.getConfigManager().getConfig()).getAutoPause()) {
+//            RMusicClient.Companion.getPlayer().pause();
+//        } else {
+//            RMusicClient.Companion.getPlayer().resume();
+//        }
     }
 }

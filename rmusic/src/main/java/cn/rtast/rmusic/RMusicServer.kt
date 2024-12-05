@@ -7,25 +7,27 @@
 
 package cn.rtast.rmusic
 
-import cn.rtast.rmusic.command.ServerRMusicCommand
-import cn.rtast.rmusic.entity.payload.RMusicPayload
+import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
+import cn.rtast.rmusic.network.registerServerReceiver
+import cn.rtast.rmusic.util.CookieManager
+import cn.rtast.rmusic.util.config.ServerConfigManager
 import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class RMusicServer : ModInitializer {
-    private val logger = LoggerFactory.getLogger("RMusic-server")
+
+    companion object {
+        val logger: Logger = LoggerFactory.getLogger("RMusic-main")
+        val loginManager = CookieManager()
+        val configManager = ServerConfigManager()
+    }
+
     override fun onInitialize() {
-        PayloadTypeRegistry.playC2S().register(RMusicPayload.ID, RMusicPayload.CODEC)
-        PayloadTypeRegistry.playS2C().register(RMusicPayload.ID, RMusicPayload.CODEC)
-        ServerPlayNetworking.registerGlobalReceiver(RMusicPayload.ID) { payload, context ->
-            context.server().playerManager.playerList.forEach {
-                ServerPlayNetworking.send(it, payload)
-            }
-        }
-        CommandRegistrationCallback.EVENT.register(ServerRMusicCommand())
+        PayloadTypeRegistry.playC2S().register(RMusicCustomPayload.ID, RMusicCustomPayload.CODEC)
+        PayloadTypeRegistry.playS2C().register(RMusicCustomPayload.ID, RMusicCustomPayload.CODEC)
+        registerServerReceiver()
         logger.info("RMusic 已加载!")
     }
 }

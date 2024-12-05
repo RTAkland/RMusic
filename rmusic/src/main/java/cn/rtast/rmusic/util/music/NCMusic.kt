@@ -7,7 +7,7 @@
 
 package cn.rtast.rmusic.util.music
 
-import cn.rtast.rmusic.RMusicClient
+import cn.rtast.rmusic.RMusicServer
 import cn.rtast.rmusic.entity.SearchResult
 import cn.rtast.rmusic.entity.ncm.*
 import cn.rtast.rmusic.util.Http
@@ -25,7 +25,7 @@ object NCMusic {
     private const val DETAIL_PATH = "song/detail"
     private const val USER_ACCOUNT_PATH = "user/account"
     private const val CAPTCHA_SENT_PATH = "captcha/sent"
-    private val NCM_API get() = RMusicClient.configManager.read().api
+    private val NCM_API get() = RMusicServer.configManager.read().api
 
     fun loginByQRCode(): Pair<String, ByteArray> {
         val key = Http.get<GetQRKey>("$NCM_API/$QRCODE_KEY_PATH").data.uniKey

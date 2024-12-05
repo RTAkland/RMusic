@@ -17,11 +17,7 @@
 
 package cn.rtast.rmusic.util
 
-import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.cacheDir
-import cn.rtast.rmusic.entity.ncm.SongDetail
-import cn.rtast.rmusic.enums.LyricPosition
-import cn.rtast.rmusic.util.music.NCMusic
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
@@ -29,7 +25,6 @@ import com.goxr3plus.streamplayer.stream.StreamPlayerListener
 import net.minecraft.client.MinecraftClient
 import net.minecraft.sound.SoundCategory
 import net.minecraft.text.Text
-import net.minecraft.util.Formatting
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URI
@@ -37,18 +32,17 @@ import java.net.URI
 class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     private var lyric: Map<Int, String>? = null
-    private var currentSongDetail: SongDetail? = null
     private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
+    private var currentSongName: String? = null
+    private var currentArtistName: String? = null
 
     init {
         this.addStreamPlayerListener(this)
     }
 
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
-        if (RMusicClient.configManager.config?.position == LyricPosition.TopLeft) {
-            Renderer.renderLyric()
-        }
         minecraftClient.soundManager.stopAll()
+        Renderer.renderLyric()
     }
 
     override fun progress(
@@ -62,11 +56,6 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         for (key in lyric!!.keys) {
             if (currentSecond == key) {
                 Renderer.loadCurrentLyric = lyric!![key] ?: continue
-                val lyric = Text.literal(Renderer.loadCurrentLyric)
-                    .styled { it.withColor(Formatting.YELLOW) }
-                if (RMusicClient.configManager.config?.position == LyricPosition.ActionBar) {
-                    minecraftClient.inGameHud.setOverlayMessage(lyric, false)
-                }
             }
         }
     }
@@ -74,27 +63,28 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
     override fun statusUpdated(event: StreamPlayerEvent) {
         if (event.playerStatus == Status.STOPPED) {
             minecraftClient.inGameHud.setOverlayMessage(
-                Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists} 已播放完毕"),
+                Text.literal("《${this.currentSongName}》 - ${this.currentArtistName} 已播放完毕"),
                 true
             )
             Renderer.loadCover = false
             Renderer.loadSongDetail = false
             Renderer.loadLyric = false
             Renderer.loadCurrentLyric = ""
-            Renderer.songInfo = null
             Renderer.registerLoadingCover()
         }
     }
 
-    fun playMusic(lyric: Map<Int, String>, songDetail: SongDetail) {
-        this.currentSongDetail = songDetail
+    fun playMusic(lyric: Map<Int, String>, songName: String, songArtist: String, songId: String, songUrl: String) {
         this.lyric = lyric
-        val cachedSongFile = File(cacheDir, songDetail.id.toString())
+        this.currentSongName = songName
+        this.currentArtistName = songArtist
+        Renderer.currentSongName = songName
+        Renderer.currentArtistName = songArtist
+        val cachedSongFile = File(cacheDir, songId)
         if (cachedSongFile.exists()) {
             this.open(cachedSongFile)
             this.play()
         } else {
-            val songUrl = NCMusic.getSongUrl(songDetail.id)
             URI(songUrl).toURL().openStream().use { inputStream ->
                 FileOutputStream(cachedSongFile).use { outputStream ->
                     inputStream.copyTo(outputStream)

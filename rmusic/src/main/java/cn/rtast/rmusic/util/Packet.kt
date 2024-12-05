@@ -8,10 +8,32 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.entity.payload.ActionPacket
-import cn.rtast.rmusic.enums.Action
+import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
+import cn.rtast.rmusic.enums.IntentAction
+import cn.rtast.rmusic.util.str.decodeToString
 import cn.rtast.rmusic.util.str.encodeToBase64
+import cn.rtast.rmusic.util.str.fromJson
 import cn.rtast.rmusic.util.str.toJson
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 
-fun createActionPacket(action: Action, payload: String): String {
-    return ActionPacket(action, payload.encodeToBase64()).toJson()
+fun Any.createActionPacket(action: IntentAction): ActionPacket {
+    return ActionPacket(action, this.toJson().encodeToBase64())
 }
+
+fun ActionPacket.sendToServer() {
+    ClientPlayNetworking.send(RMusicCustomPayload(this.toJson()))
+}
+
+fun ActionPacket.sendToClient(context: ServerPlayNetworking.Context) {
+    ServerPlayNetworking.send(context.player(), RMusicCustomPayload(this.toJson()))
+}
+
+fun RMusicCustomPayload.decodeRawPacket(): ActionPacket {
+    return this.payload.fromJson<ActionPacket>()
+}
+
+inline fun <reified T> ActionPacket.decode(): T {
+    return this.body.decodeToString().fromJson<T>()
+}
+

@@ -5,11 +5,11 @@
  */
 
 
-package cn.rtast.rmusic.entity.payload
+package cn.rtast.rmusic.entity.payload.outbound
 
-data class ShareMusicPacket(
+data class ShareMusicOutbound(
     val name: String,
-    val id: Long,
+    val id: String,
     val artists: String,
     val songUrl: String,
     val fromWho: String,

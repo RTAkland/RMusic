@@ -18,26 +18,22 @@ package cn.rtast.rmusic
 
 import cn.rtast.rmusic.command.RMusicCommand
 import cn.rtast.rmusic.network.registerClientReceiver
-import cn.rtast.rmusic.util.ConfigManager
-import cn.rtast.rmusic.util.CookieManager
 import cn.rtast.rmusic.util.MusicPlayer
 import net.fabricmc.api.ClientModInitializer
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 
 class RMusicClient : ClientModInitializer {
     companion object {
-        val logger: Logger = LoggerFactory.getLogger("RMusic-main")
+        val logger: Logger = LoggerFactory.getLogger("RMusic-client")
         val player = MusicPlayer()
-        val loginManager = CookieManager()
-        val configManager = ConfigManager()
     }
 
     override fun onInitializeClient() {
         registerClientReceiver()
-        ClientCommandRegistrationCallback.EVENT.register(RMusicCommand())
+        CommandRegistrationCallback.EVENT.register(RMusicCommand())
         logger.info("RMusic 已加载!")
     }
 }
