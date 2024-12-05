@@ -8,7 +8,6 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusicClient
-import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.Config
 import cn.rtast.rmusic.entity.payload.RMusicPayload
 import cn.rtast.rmusic.entity.payload.ShareMusicPacket
@@ -16,7 +15,8 @@ import cn.rtast.rmusic.enums.Action
 import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.network.minecraftClient
 import cn.rtast.rmusic.qrcodeId
-import cn.rtast.rmusic.util.*
+import cn.rtast.rmusic.util.Renderer
+import cn.rtast.rmusic.util.createActionPacket
 import cn.rtast.rmusic.util.music.NCMusic
 import cn.rtast.rmusic.util.str.toJson
 import com.mojang.brigadier.CommandDispatcher
@@ -147,17 +147,15 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                     try {
                                         context.source.sendFeedback(Text.literal("正在下载歌曲到本地..."))
                                         val songDetail = NCMusic.getSongDetail(songId)
-                                        songInfo = songDetail
-                                        minecraftClient.textureManager.registerTexture(
-                                            defaultCoverId, minecraftClient.textureManager.getTexture(defaultCoverId)
-                                        )
+                                        Renderer.songInfo = songDetail
+                                        Renderer.registerLoadingCover()
                                         minecraftClient.inGameHud.setOverlayMessage(
                                             Text.literal("正在播放: ")
                                                 .append(Text.literal("《${songDetail.name}》 - ${songDetail.artists}")),
                                             true
                                         )
-                                        renderCover(songDetail)
-                                        renderSongDetail()
+                                        Renderer.renderCover(songDetail)
+                                        Renderer.renderSongDetail()
                                         val lyric = NCMusic.getLyric(songId)
                                         RMusicClient.player.playMusic(lyric, songDetail)
                                     } catch (e: NullPointerException) {
@@ -197,9 +195,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                             context.source.sendFeedback(Text.literal("正在获取二维码..."))
                             scope.launch {
                                 try {
-                                    loadQRCode = false
                                     val (key, qrcode) = NCMusic.loginByQRCode()
-                                    renderQRCode(qrcode)
+                                    Renderer.renderQRCode(qrcode)
                                     context.source.sendFeedback(
                                         Text.literal("扫码并登录完成后点击")
                                             .append(Text.literal("[这里]").styled { style ->
@@ -243,8 +240,8 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         context.source.sendFeedback(Text.literal("正在检查登录状态中"))
                                         scope.launch {
                                             try {
-                                                loadQRCode = false
-                                                destroyTexture(qrcodeId)
+                                                Renderer.loadQRCode = false
+                                                Renderer.destroyTexture(qrcodeId)
                                                 val qrCodeKey = context.getArgument("qrcodeKey", String::class.java)
                                                 val cookie = NCMusic.checkQRCodeStatus(qrCodeKey)
                                                 if (cookie != null) {
@@ -271,10 +268,12 @@ class RMusicCommand : ClientCommandRegistrationCallback {
                                         .executes { context ->
                                             try {
                                                 val apiHost = context.getArgument("apiHost", String::class.java)
+                                                val afterApiHost =
+                                                    if (apiHost.endsWith("/")) apiHost.dropLast(1) else apiHost
                                                 val currentConfig = RMusicClient.configManager.read()
                                                 val afterConfig =
                                                     Config(
-                                                        apiHost,
+                                                        afterApiHost,
                                                         currentConfig.autoPause,
                                                         currentConfig.qqMusicApi,
                                                         currentConfig.position

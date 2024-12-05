@@ -26,21 +26,22 @@ import java.time.Instant
  */
 object Http {
 
-    val jsonMediaType = "application/json; charset=utf-8".toMediaType()
+    private val protocolRegex = Regex("^[a-zA-Z]+://")
     private val jsonHeader = mapOf(
         "Content-Type" to "application/json; charset=utf-8",
         "Accept" to "application/json"
     )
+    val jsonMediaType = "application/json; charset=utf-8".toMediaType()
     val okHttpClient = OkHttpClient()
 
     fun buildParams(url: String, params: Map<String, Any>?): String {
         val paramsUrl = StringBuilder("$url?")
-        params?.let {
-            it.forEach { (key, value) ->
+        params?.let { param ->
+            param.forEach { (key, value) ->
                 paramsUrl.append("$key=$value&")
             }
-            RMusicClient.loginManager.getCookie()?.let {
-                paramsUrl.append("cookie=$it&")
+            RMusicClient.loginManager.getCookie()?.let { cookie ->
+                paramsUrl.append("cookie=$cookie&")
             }
             paramsUrl.append("timestamp=${Instant.now().epochSecond}&")
             paramsUrl.dropLast(1)

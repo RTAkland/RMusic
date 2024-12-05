@@ -19,6 +19,7 @@ package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.cacheDir
+import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.enums.LyricPosition
 import cn.rtast.rmusic.util.music.NCMusic
@@ -46,7 +47,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
         if (RMusicClient.configManager.config?.position == LyricPosition.TopLeft) {
-            renderLyric()
+            Renderer.renderLyric()
         }
         minecraftClient.soundManager.stopAll()
     }
@@ -61,8 +62,9 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         val currentSecond = (microsecondPosition / 1000000).toInt()
         for (key in lyric!!.keys) {
             if (currentSecond == key) {
-                loadCurrentLyric = lyric!![key] ?: continue
-                val lyric = Text.literal(loadCurrentLyric).styled { it.withColor(Formatting.YELLOW) }
+                Renderer.loadCurrentLyric = lyric!![key] ?: continue
+                val lyric = Text.literal(Renderer.loadCurrentLyric)
+                    .styled { it.withColor(Formatting.YELLOW) }
                 if (RMusicClient.configManager.config?.position == LyricPosition.ActionBar) {
                     minecraftClient.inGameHud.setOverlayMessage(lyric, false)
                 }
@@ -76,10 +78,12 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
                 Text.literal("《${currentSongDetail?.name}》 - ${currentSongDetail?.artists} 已播放完毕"),
                 true
             )
-            loadCover = false
-            loadSongDetail = false
-            loadLyric = false
-            loadCurrentLyric = ""
+            Renderer.loadCover = false
+            Renderer.loadSongDetail = false
+            Renderer.loadLyric = false
+            Renderer.loadCurrentLyric = ""
+            Renderer.songInfo = null
+            Renderer.registerLoadingCover()
         }
     }
 

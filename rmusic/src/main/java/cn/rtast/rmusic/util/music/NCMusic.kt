@@ -14,6 +14,7 @@ import cn.rtast.rmusic.util.Http
 import cn.rtast.rmusic.util.str.LyricParser
 import cn.rtast.rmusic.util.str.decodeToByteArray
 
+
 object NCMusic {
     private const val QRCODE_KEY_PATH = "login/qr/key"
     private const val CREATE_QRCODE_PATH = "login/qr/create"
