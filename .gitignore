@@ -9,3 +9,4 @@ remappedSrc/
 **/remappedSrc/
 **/.gradle/
 **/.kotlin/
+**/logs/

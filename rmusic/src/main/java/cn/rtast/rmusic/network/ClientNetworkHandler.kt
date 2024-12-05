@@ -12,8 +12,7 @@ import cn.rtast.rmusic.entity.payload.QRCodeLoginPacket
 import cn.rtast.rmusic.entity.payload.RMusicPayload
 import cn.rtast.rmusic.entity.payload.ShareMusicPacket
 import cn.rtast.rmusic.enums.Action
-import cn.rtast.rmusic.util.loadQRCode
-import cn.rtast.rmusic.util.renderQRCode
+import cn.rtast.rmusic.util.Renderer
 import cn.rtast.rmusic.util.str.decodeToByteArray
 import cn.rtast.rmusic.util.str.decodeToString
 import cn.rtast.rmusic.util.str.fromJson
@@ -38,8 +37,8 @@ fun registerClientReceiver() {
         when (dispatchPacket.action) {
             Action.LOGIN_QRCODE -> {
                 val packet = dispatchPacket.body.decodeToString().fromJson<QRCodeLoginPacket>()
-                loadQRCode = false
-                renderQRCode(packet.qrcode.decodeToByteArray())
+                Renderer.loadQRCode = false
+                Renderer.renderQRCode(packet.qrcode.decodeToByteArray())
                 try {
                     context.player().sendMessage(
                         Text.literal("扫码并登录完成后点击")
