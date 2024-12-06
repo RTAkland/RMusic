@@ -11,7 +11,6 @@ import cn.rtast.rmusic.RMusicServer
 import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
 import cn.rtast.rmusic.entity.payload.inbound.*
 import cn.rtast.rmusic.entity.payload.outbound.PlayMusicOutbound
-import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound
 import cn.rtast.rmusic.entity.payload.outbound.SearchResultOutbound
 import cn.rtast.rmusic.entity.payload.outbound.ShareMusicOutbound
 import cn.rtast.rmusic.entity.payload.side.Mute2Side
@@ -21,11 +20,11 @@ import cn.rtast.rmusic.entity.payload.side.StopPlay2Side
 import cn.rtast.rmusic.enums.IntentAction
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.music.NCMusic
-import cn.rtast.rmusic.util.str.encodeToBase64
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
@@ -36,13 +35,7 @@ fun registerServerReceiver() {
         val dispatchPacket = payload.decodeRawPacket()
         when (dispatchPacket.action) {
             IntentAction.LOGIN -> {
-                context.sendMessage(Text.literal("正在获取二维码..."))
-                scope.launch {
-                    val (key, qrcode) = NCMusic.loginByQRCode()
-                    QRCodeLoginOutbound(key, qrcode.encodeToBase64())
-                        .createActionPacket(IntentAction.LOGIN)
-                        .sendToClient(context)
-                }
+                openMusicPlatformMenu(context.player())
             }
 
             IntentAction.SHARE -> {
@@ -62,6 +55,7 @@ fun registerServerReceiver() {
             }
 
             IntentAction.PLAY -> {
+                context.player().playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 1f, 1f)
                 scope.launch {
                     val songId = dispatchPacket.decode<PlayMusicInbound>().id
                     val songUrl = NCMusic.getSongUrl(songId.toLong())

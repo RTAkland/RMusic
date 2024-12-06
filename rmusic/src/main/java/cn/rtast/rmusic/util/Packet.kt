@@ -16,6 +16,7 @@ import cn.rtast.rmusic.util.str.fromJson
 import cn.rtast.rmusic.util.str.toJson
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.server.network.ServerPlayerEntity
 
 fun Any.createActionPacket(action: IntentAction): ActionPacket {
     return ActionPacket(action, this.toJson().encodeToBase64())
@@ -27,6 +28,10 @@ fun ActionPacket.sendToServer() {
 
 fun ActionPacket.sendToClient(context: ServerPlayNetworking.Context) {
     ServerPlayNetworking.send(context.player(), RMusicCustomPayload(this.toJson()))
+}
+
+fun ActionPacket.sendToClient(player: ServerPlayerEntity) {
+    ServerPlayNetworking.send(player, RMusicCustomPayload(this.toJson()))
 }
 
 fun RMusicCustomPayload.decodeRawPacket(): ActionPacket {

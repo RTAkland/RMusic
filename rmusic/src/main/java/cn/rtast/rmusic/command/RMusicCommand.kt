@@ -43,8 +43,7 @@ class RMusicCommand : CommandRegistrationCallback {
         registryAccess: CommandRegistryAccess,
         environment: CommandManager.RegistrationEnvironment
     ) {
-        dispatcher.register(
-
+        val shortNode = dispatcher.register(
             CommandManager.literal("rm")
                 .then(
                     CommandManager.literal("search")
@@ -85,7 +84,7 @@ class RMusicCommand : CommandRegistrationCallback {
                 ).then(
                     CommandManager.literal("login").requires { it.hasPermissionLevel(3) }
                         .executes { _ ->
-                            QRCodeLoginInbound().createActionPacket(IntentAction.LOGIN).sendToServer()
+                            LoginInbound().createActionPacket(IntentAction.LOGIN).sendToServer()
                             0
                         }.then(
                             CommandManager.literal("confirm")
@@ -170,7 +169,7 @@ class RMusicCommand : CommandRegistrationCallback {
                             0
                         }
                 ).then(
-                    CommandManager.literal("reload")
+                    CommandManager.literal("reload").requires { it.hasPermissionLevel(3) }
                         .executes { context ->
                             RMusicServer.configManager.reload()
                             context.source.sendFeedback(Text.literal("已重新加载配置文件").supplier(), false)
@@ -189,5 +188,6 @@ class RMusicCommand : CommandRegistrationCallback {
                         )
                 )
         )
+        dispatcher.register(CommandManager.literal("rmusic").redirect(shortNode))
     }
 }

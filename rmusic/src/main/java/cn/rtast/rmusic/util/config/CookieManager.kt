@@ -5,7 +5,7 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.config
 
 import cn.rtast.rmusic.entity.Cookie
 import cn.rtast.rmusic.util.str.fromJson

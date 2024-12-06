@@ -7,7 +7,7 @@
 
 package cn.rtast.rmusic.entity.payload.inbound
 
-class QRCodeLoginInbound {
+class LoginInbound {
     override fun toString(): String {
         return "QRCodeLoginPacket"
     }

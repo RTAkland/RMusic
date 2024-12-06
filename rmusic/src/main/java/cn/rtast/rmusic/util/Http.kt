@@ -10,6 +10,7 @@ package cn.rtast.rmusic.util
 
 
 import cn.rtast.rmusic.RMusicServer
+import cn.rtast.rmusic.RMusicServer.Companion.publicIp
 import cn.rtast.rmusic.util.str.fromJson
 import okhttp3.FormBody
 import okhttp3.MediaType.Companion.toMediaType
@@ -26,7 +27,6 @@ import java.time.Instant
  */
 object Http {
 
-    private val protocolRegex = Regex("^[a-zA-Z]+://")
     private val jsonHeader = mapOf(
         "Content-Type" to "application/json; charset=utf-8",
         "Accept" to "application/json"
@@ -44,6 +44,7 @@ object Http {
                 paramsUrl.append("cookie=$cookie&")
             }
             paramsUrl.append("timestamp=${Instant.now().epochSecond}&")
+            paramsUrl.append("realIp=$publicIp&")
             paramsUrl.dropLast(1)
         }
         return if (params != null) paramsUrl.toString() else url
