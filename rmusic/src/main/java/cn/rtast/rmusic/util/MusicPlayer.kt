@@ -63,7 +63,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
     override fun statusUpdated(event: StreamPlayerEvent) {
         if (event.playerStatus == Status.STOPPED) {
             minecraftClient.inGameHud.setOverlayMessage(
-                Text.literal("《${this.currentSongName}》 - ${this.currentArtistName} 已播放完毕"),
+                Text.literal("《${this.currentSongName}》 by: ${this.currentArtistName} 已播放完毕"),
                 true
             )
             Renderer.loadCover = false
