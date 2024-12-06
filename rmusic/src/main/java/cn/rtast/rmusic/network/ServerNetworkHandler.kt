@@ -60,11 +60,10 @@ fun registerServerReceiver() {
                     val songId = dispatchPacket.decode<PlayMusicInbound>().id
                     val songUrl = NCMusic.getSongUrl(songId.toLong())
                     val songDetail = NCMusic.getSongDetail(songId.toLong())
-                    context.sendMessage(Text.literal("正在播放: ${songDetail.name}"))
                     val lyric = NCMusic.getLyric(songId.toLong())
                     PlayMusicOutbound(
                         songUrl, songId, songDetail.name,
-                        songDetail.artists, songDetail.cover, lyric
+                        songDetail.artists, songDetail.cover, lyric, songDetail.duration.toMinuteSecond()
                     ).createActionPacket(IntentAction.PLAY).sendToClient(context)
                 }
             }
@@ -91,7 +90,7 @@ fun registerServerReceiver() {
                     it.withColor(Formatting.YELLOW)
                 }))
                 scope.launch {
-                    val result = NCMusic.search(keyword)
+                    val result = NCMusic.search(keyword).take(8)
                     SearchResultOutbound(result.map {
                         SearchResultOutbound.Result(
                             it.id,

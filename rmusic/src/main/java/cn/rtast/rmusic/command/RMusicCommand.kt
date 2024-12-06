@@ -19,7 +19,6 @@ import cn.rtast.rmusic.util.createActionPacket
 import cn.rtast.rmusic.util.sendToServer
 import cn.rtast.rmusic.util.str.supplier
 import com.mojang.brigadier.CommandDispatcher
-import com.mojang.brigadier.arguments.LongArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,9 +56,9 @@ class RMusicCommand : CommandRegistrationCallback {
                 ).then(
                     CommandManager.literal("play")
                         .then(
-                            CommandManager.argument("songId", LongArgumentType.longArg(0)).executes { context ->
-                                val songId = context.getArgument("songId", Long::class.java)
-                                PlayMusicInbound(songId.toString()).createActionPacket(IntentAction.PLAY).sendToServer()
+                            CommandManager.argument("songId", StringArgumentType.string()).executes { context ->
+                                val songId = context.getArgument("songId", String::class.java)
+                                PlayMusicInbound(songId).createActionPacket(IntentAction.PLAY).sendToServer()
                                 0
                             }
                         )
@@ -178,10 +177,10 @@ class RMusicCommand : CommandRegistrationCallback {
                 ).then(
                     CommandManager.literal("share")
                         .then(
-                            CommandManager.argument("songId", LongArgumentType.longArg())
+                            CommandManager.argument("songId", StringArgumentType.string())
                                 .executes { context ->
-                                    val songId = context.getArgument("songId", Long::class.java)
-                                    ShareMusicInbound(songId.toString()).createActionPacket(IntentAction.SHARE)
+                                    val songId = context.getArgument("songId", String::class.java)
+                                    ShareMusicInbound(songId).createActionPacket(IntentAction.SHARE)
                                         .sendToServer()
                                     0
                                 }

@@ -71,7 +71,7 @@ object NCMusic {
 
     fun getSongDetail(id: Long): SongDetail {
         val result = Http.get<GetSongDetail>("$NCM_API/$DETAIL_PATH", mapOf("ids" to id)).songs.first()
-        return SongDetail(result.name, result.id, result.al.cover, result.ar.joinToString(", ") { it.name })
+        return SongDetail(result.name, result.id, result.al.cover, result.ar.joinToString(", ") { it.name }, result.dt)
     }
 
     fun getUserAccount(): String {

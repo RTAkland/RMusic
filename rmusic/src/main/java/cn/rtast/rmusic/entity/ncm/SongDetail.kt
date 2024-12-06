@@ -12,4 +12,5 @@ data class SongDetail(
     val id: Long,
     val cover: String,
     val artists: String,
+    val duration: Long,
 )

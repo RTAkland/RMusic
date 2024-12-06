@@ -16,7 +16,8 @@ data class GetSongDetail(
         val name: String,
         val id: Long,
         val ar: List<Artist>,
-        val al: Album
+        val al: Album,
+        val dt: Long,
     )
 
     data class Artist(

@@ -31,7 +31,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 import java.net.URI
 
-val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
+private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
 private val scope = CoroutineScope(Dispatchers.IO)
 
 fun registerClientReceiver() {
@@ -40,7 +40,7 @@ fun registerClientReceiver() {
         when (dispatchPacket.action) {
             IntentAction.LOGIN -> {
                 val loginPacket = dispatchPacket.decode<QRCodeLoginOutbound>()
-                    Renderer.renderQRCode(loginPacket.qrcodeBase64.decodeToByteArray())
+                Renderer.renderQRCode(loginPacket.qrcodeBase64.decodeToByteArray())
                 try {
                     context.player().sendMessage(
                         Text.literal("扫码并登录完成后点击")
@@ -112,7 +112,9 @@ fun registerClientReceiver() {
                             Renderer.registerLoadingCover()
                             minecraftClient.inGameHud.setOverlayMessage(
                                 Text.literal("正在播放: ")
-                                    .append(Text.literal("《${playPacket.songName}》 - ${playPacket.artistName}")),
+                                    .append(Text.literal("《${playPacket.songName}》by: ${playPacket.artistName}"))
+                                    .append(
+                                        Text.literal(" - ${playPacket.duration}")),
                                 true
                             )
                             val coverBytes = URI("${playPacket.cover}?param=128x128").toURL()
@@ -163,7 +165,7 @@ fun registerClientReceiver() {
                 try {
                     val text = Text.literal("搜索到如下结果:")
                     context.sendMessage(text)
-                    searchResult.take(5).forEach { r ->
+                    searchResult.forEach { r ->
                         val songText =
                             Text.literal("歌曲名: ").styled {
                                 it.withColor(Formatting.GREEN)
@@ -193,8 +195,7 @@ fun registerClientReceiver() {
                                         ClickEvent.Action.RUN_COMMAND,
                                         "/rm share ${r.id}"
                                     )
-                                )
-                                .withHoverEvent(
+                                ).withHoverEvent(
                                     HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,
                                         Text.literal("点击分享给服务器内的其他玩家\n")

@@ -14,4 +14,5 @@ data class PlayMusicOutbound(
     val artistName: String,
     val cover: String,  // url
     val lyric: Map<Int, String>,
+    val duration: String,
 )

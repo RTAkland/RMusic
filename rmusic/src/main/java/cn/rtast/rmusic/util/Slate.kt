@@ -55,7 +55,7 @@ private val specialCharGrid = mapOf(
 fun openMusicPlatformMenu(player: ServerPlayerEntity) {
     player.playPLing()
     val slate = slate {
-        title = Text.literal("选择你的登陆方式")
+        title = Text.literal("选择需要登陆的平台")
         tiles {
             this[3, 2] = tile(Items.RED_CONCRETE) {
                 tooltip("网易云音乐")
@@ -67,7 +67,7 @@ fun openMusicPlatformMenu(player: ServerPlayerEntity) {
             this[5, 2] = tile(Items.LIME_CONCRETE) {
                 tooltip("QQ音乐")
                 onGenericClick { slate, _, slateContext ->
-                    slateContext.player.sendMessage(Text.literal("暂不支持QQ音乐"))
+                    slateContext.player.sendPrefixMessage(Text.literal("暂不支持QQ音乐"))
                     slate.close(player)
                 }
             }
@@ -79,7 +79,7 @@ fun openMusicPlatformMenu(player: ServerPlayerEntity) {
 fun openNeteaseLoginTypeMenu(player: ServerPlayerEntity) {
     player.playPLing()
     val slate = slate {
-        title = Text.literal("选择你的登录方式")
+        title = Text.literal("选择登陆方式")
         tiles {
             this[1, 2] = tile(Items.NETHERITE_BLOCK) {
                 tooltip("二维码")
@@ -100,7 +100,7 @@ fun openNeteaseLoginTypeMenu(player: ServerPlayerEntity) {
                 tooltip("邮箱&密码")
                 onGenericClick { slate, _, slateContext ->
                     player.playButtonSound()
-                    slateContext.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                    slateContext.player.sendPrefixMessage(Text.literal("暂不支持此方式登录!"))
                     slate.close(slateContext.player)
                 }
             }
@@ -108,7 +108,7 @@ fun openNeteaseLoginTypeMenu(player: ServerPlayerEntity) {
                 tooltip("手机号&密码")
                 onGenericClick { slate, _, slateContext ->
                     player.playButtonSound()
-                    slateContext.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                    slateContext.player.sendPrefixMessage(Text.literal("暂不支持此方式登录!"))
                     slate.close(slateContext.player)
                 }
             }
@@ -116,7 +116,7 @@ fun openNeteaseLoginTypeMenu(player: ServerPlayerEntity) {
                 tooltip("手机号&验证码")
                 onGenericClick { slate, _, slateContext ->
                     player.playButtonSound()
-                    slateContext.player.sendMessage(Text.literal("暂不支持此方式登录!"))
+                    slateContext.player.sendPrefixMessage(Text.literal("暂不支持此方式登录!"))
                     slate.close(slateContext.player)
                 }
             }
