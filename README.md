@@ -24,7 +24,3 @@
 > 使用`/rm reload`来重新加载配置文件
 
 ![showcase](public/showcase.png)
-
-# velocity
-
-> 支持在velocity上安装插件然后客户端安装RMusic模组即可分享
