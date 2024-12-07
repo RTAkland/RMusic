@@ -11,12 +11,9 @@ import cn.rtast.rmusic.RMusicClient
 import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
 import cn.rtast.rmusic.entity.payload.outbound.PlayMusicOutbound
 import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound
-import cn.rtast.rmusic.entity.payload.outbound.SearchResultOutbound
 import cn.rtast.rmusic.entity.payload.outbound.ShareMusicOutbound
 import cn.rtast.rmusic.entity.payload.side.Mute2Side
 import cn.rtast.rmusic.enums.IntentAction
-import cn.rtast.rmusic.enums.MusicPlatform
-import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.mc.Renderer
 import cn.rtast.rmusic.util.mc.decode
@@ -173,70 +170,6 @@ fun registerClientReceiver() {
                 val mutePacket = dispatchPacket.decode<Mute2Side>()
                 RMusicClient.player.mute = mutePacket.isMuted
                 context.sendMessage(Text.literal("成功设置静音状态为: ${mutePacket.isMuted}"))
-            }
-
-            IntentAction.SEARCH -> {
-                val searchResult = dispatchPacket.decode<SearchResultOutbound>().result
-                try {
-                    val text = Text.literal("搜索到如下结果:")
-                    context.sendMessage(text)
-                    searchResult.forEach { r ->
-                        val songText =
-                            Text.literal("歌曲名: ").styled {
-                                it.withColor(Formatting.GREEN)
-                            }.append(Text.literal("${r.songName} ").styled {
-                                it.withColor(Formatting.AQUA)
-                            }).append(" 歌手: ")
-                                .append(Text.literal(r.artistName).styled {
-                                    it.withColor(Formatting.AQUA)
-                                })
-                        val playButton = Text.literal(" [▶]").styled { style ->
-                            style.withColor(Formatting.DARK_PURPLE)
-                                .withHoverEvent(
-                                    HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        Text.literal("点击播放音乐")
-                                            .styled { it.withColor(Formatting.YELLOW) })
-                                ).withClickEvent(
-                                    ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND,
-                                        "/rm play${if (r.platform == MusicPlatform.QQ) " ${r.platform.platform}" else ""} ${r.id}"
-                                    )
-                                )
-                        }
-                        songText.append(playButton)
-                        val shareButton = Text.literal(" [↗]").styled { style ->
-                            style.withColor(Formatting.AQUA)
-                                .withClickEvent(
-                                    ClickEvent(
-                                        ClickEvent.Action.RUN_COMMAND,
-                                        "/rm ${if (r.platform == MusicPlatform.QQ) "qq-share" else "share"} ${r.id}"
-                                    )
-                                ).withHoverEvent(
-                                    HoverEvent(
-                                        HoverEvent.Action.SHOW_TEXT,
-                                        Text.literal("点击分享给服务器内的其他玩家\n")
-                                            .append(
-                                                Text.literal("注意: 只有服务器安装了RMusic并且其他玩家安装了RMusic客户端模组的玩家才能收到分享消息")
-                                                    .styled { it.withColor(Formatting.RED) })
-                                    )
-                                )
-                        }
-                        songText.append(shareButton)
-                        context.sendMessage(songText)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-
-            IntentAction.SET_CONFIG -> {
-                TODO("unreachable")
-            }
-
-            IntentAction.CONFIRM_QRCODE -> {
-                Renderer.loadQRCode = false
-                Renderer.destroyTexture(qrcodeId)
             }
         }
     }

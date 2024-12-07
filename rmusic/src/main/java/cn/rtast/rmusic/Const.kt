@@ -17,16 +17,18 @@
 
 package cn.rtast.rmusic
 
+import cn.rtast.rmusic.entity.Config
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import net.minecraft.util.Identifier
 import java.io.File
 
-val gson: Gson = GsonBuilder()
-    .disableHtmlEscaping()
-    .create()
-
+val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
 val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
 val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/default.png")
 val networkingId: Identifier = Identifier.of("rmusic", "networking")
 val cacheDir = File("./config/rmusic/cache").apply { mkdirs() }
+val defaultConfig = Config(
+    "https://ncm.rtast.cn",
+    "http://127.0.0.1:6868"
+)

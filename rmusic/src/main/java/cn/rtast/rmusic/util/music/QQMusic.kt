@@ -17,7 +17,7 @@ import cn.rtast.rmusic.util.toMilliseconds
 
 object QQMusic {
 
-    private val API_HOST get() = RMusicServer.configManager.config?.qqApi
+    private val API_HOST get() = RMusicServer.configManager.config!!.qqMusicAPI
     private const val SEARCH_PATH = "getSearchByKey"
     private const val LYRIC_PATH = "getLyric"
     private const val COVER_PATH = "getImageUrl"

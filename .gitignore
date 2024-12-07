@@ -10,3 +10,4 @@ remappedSrc/
 **/.gradle/
 **/.kotlin/
 **/logs/
+config/

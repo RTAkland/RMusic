@@ -40,13 +40,14 @@ object Http {
             param.forEach { (key, value) ->
                 paramsUrl.append("$key=$value&")
             }
-            RMusicServer.loginManager.getCookie()?.let { cookie ->
-                paramsUrl.append("cookie=$cookie&")
+            if (!RMusicServer.cookieManager.currentCookie.isNullOrBlank()) {
+                paramsUrl.append("cookie=${RMusicServer.cookieManager.currentCookie}&")
             }
             paramsUrl.append("timestamp=${Instant.now().epochSecond}&")
             paramsUrl.append("realIp=$publicIp&")
             paramsUrl.dropLast(1)
         }
+        println(paramsUrl)
         return if (params != null) paramsUrl.toString() else url
     }
 

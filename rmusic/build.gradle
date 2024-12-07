@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("fabric-loom") version "1.9-SNAPSHOT"
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.1.0"
 }
 
 configurations {
@@ -22,8 +23,10 @@ dependencies {
     include modImplementation("net.mcbrawls:slate:$slateVersion")
     implementation("com.github.goxr3plus:java-stream-player:10.0.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
+    implementation("net.mamoe.yamlkt:yamlkt:0.13.0")
     embed(implementation("com.github.goxr3plus:java-stream-player:10.0.2"))
     embed(implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11"))
+    embed(implementation("net.mamoe.yamlkt:yamlkt:0.13.0"))
 }
 
 processResources {
