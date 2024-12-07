@@ -16,7 +16,7 @@ class CookieManager {
 
     private val dir = File("./config/rmusic").apply { mkdirs() }
     private val file = File(dir, "cookie")
-    var currentCookie: String? = null
+    var currentCookie: Cookie? = null
 
     init {
         if (!this.file.exists()) {
@@ -24,10 +24,10 @@ class CookieManager {
             val defaultEmptyCookie = Cookie("").toJson()
             this.file.writeText(defaultEmptyCookie)
         }
-        this.currentCookie = this.file.readText().fromJson<Cookie>().cookie
+        this.currentCookie = this.file.readText().fromJson<Cookie>()
     }
 
-    fun login(cookie: String) {
+    fun login(cookie: String, ) {
         val state = Cookie(cookie).toJson()
         file.delete()
         file.createNewFile()
@@ -36,7 +36,7 @@ class CookieManager {
 
     private fun getCookie(): String {
         file.createNewFile()
-        return file.readText().fromJson<Cookie>().cookie
+        return file.readText().fromJson<Cookie>().neteaseCookie
     }
 
     fun logout() {

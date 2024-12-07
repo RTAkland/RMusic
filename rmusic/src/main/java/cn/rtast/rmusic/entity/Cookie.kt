@@ -8,5 +8,6 @@
 package cn.rtast.rmusic.entity
 
 data class Cookie(
-    val cookie: String,
+    val neteaseCookie: String,
+    val kugouCookie: String,
 )
