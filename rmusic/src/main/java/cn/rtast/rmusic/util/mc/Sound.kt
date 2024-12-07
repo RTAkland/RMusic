@@ -5,7 +5,7 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.mc
 
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.sound.SoundEvents

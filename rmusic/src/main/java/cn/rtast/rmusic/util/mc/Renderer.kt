@@ -5,7 +5,7 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.mc
 
 import cn.rtast.rmusic.defaultCoverId
 import cn.rtast.rmusic.qrcodeId
@@ -58,12 +58,12 @@ object Renderer {
             )
             context.drawText(
                 minecraftClient.textRenderer,
-                Text.literal("《${this.currentSongName}》"),
+                Text.literal("《${currentSongName}》"),
                 5, 83, color, true
             )
             context.drawText(
                 minecraftClient.textRenderer,
-                Text.literal(this.currentArtistName),
+                Text.literal(currentArtistName),
                 5, 93, color, true
             )
         }
@@ -139,9 +139,13 @@ object Renderer {
      * loading.png渲染加载完成后再
      * 使用下载好的专辑封面渲染到游戏内
      */
-    fun renderCover(cover: ByteArray) {
+    fun renderCover(cover: ByteArray?) {
         loadCover = true
-        registerTexture(cover, defaultCoverId)
+        if (cover == null) {
+            registerLoadingCover()
+        } else {
+            registerTexture(cover, defaultCoverId)
+        }
     }
 
     fun registerLoadingCover() {

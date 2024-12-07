@@ -15,12 +15,18 @@ import cn.rtast.rmusic.entity.payload.outbound.SearchResultOutbound
 import cn.rtast.rmusic.entity.payload.outbound.ShareMusicOutbound
 import cn.rtast.rmusic.entity.payload.side.Mute2Side
 import cn.rtast.rmusic.enums.IntentAction
+import cn.rtast.rmusic.enums.MusicPlatform
 import cn.rtast.rmusic.qrcodeId
 import cn.rtast.rmusic.util.*
+import cn.rtast.rmusic.util.mc.Renderer
+import cn.rtast.rmusic.util.mc.decode
+import cn.rtast.rmusic.util.mc.decodeRawPacket
+import cn.rtast.rmusic.util.mc.sendMessage
 import cn.rtast.rmusic.util.str.decodeToByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.io.files.FileNotFoundException
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.sound.SoundCategory
@@ -76,9 +82,14 @@ fun registerClientReceiver() {
                             .withHoverEvent(
                                 HoverEvent(
                                     HoverEvent.Action.SHOW_TEXT,
-                                    Text.literal("点击播放: 《${sharePacket.name}》- ${sharePacket.artists}")
+                                    Text.literal("点击播放: 《${sharePacket.name}》- ${sharePacket.artists} (来自: ${sharePacket.platform})")
                                 )
-                            ).withClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${sharePacket.id}"))
+                            ).withClickEvent(
+                                ClickEvent(
+                                    ClickEvent.Action.RUN_COMMAND,
+                                    "/rm play${if (sharePacket.platform.platform.isNotEmpty()) " ${sharePacket.platform.platform}" else ""} ${sharePacket.id}"
+                                )
+                            )
                     }).append(Text.literal("来播放这首歌"))
                 context.sendMessage(musicText, false)
             }
@@ -114,13 +125,18 @@ fun registerClientReceiver() {
                                 Text.literal("正在播放: ")
                                     .append(Text.literal("《${playPacket.songName}》by: ${playPacket.artistName}"))
                                     .append(
-                                        Text.literal(" - ${playPacket.duration}")),
+                                        Text.literal(" - ${playPacket.duration}")
+                                    ),
                                 true
                             )
-                            val coverBytes = URI("${playPacket.cover}?param=128x128").toURL()
-                                .readBytes().toPNG().cropToCircle()
-                                .toBufferedImage().createRecordImage().toByteArray()
-                            Renderer.renderCover(coverBytes)
+                            try {
+                                val coverBytes = URI("${playPacket.cover}?param=128x128")
+                                    .toURL().readBytes().toPNG().cropToCircle()
+                                    .toBufferedImage().createRecordImage().toByteArray()
+                                Renderer.renderCover(coverBytes)
+                            } catch (_: FileNotFoundException) {
+                                Renderer.renderCover(null)
+                            }
                             Renderer.renderSongDetail()
                             RMusicClient.player.playMusic(
                                 playPacket.lyric,
@@ -129,11 +145,9 @@ fun registerClientReceiver() {
                                 playPacket.id,
                                 playPacket.url
                             )
-                        } catch (e: NullPointerException) {
-                            e.printStackTrace()
-                            context.sendMessage(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
                         } catch (e: Exception) {
                             e.printStackTrace()
+                            context.sendMessage(Text.literal("播放音乐失败(可能是没有登陆播放了付费歌曲)"))
                         }
                     }
                 }
@@ -177,14 +191,16 @@ fun registerClientReceiver() {
                                 })
                         val playButton = Text.literal(" [▶]").styled { style ->
                             style.withColor(Formatting.DARK_PURPLE)
-                                .withClickEvent(
-                                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm play ${r.id}")
-                                )
                                 .withHoverEvent(
                                     HoverEvent(
                                         HoverEvent.Action.SHOW_TEXT,
                                         Text.literal("点击播放音乐")
                                             .styled { it.withColor(Formatting.YELLOW) })
+                                ).withClickEvent(
+                                    ClickEvent(
+                                        ClickEvent.Action.RUN_COMMAND,
+                                        "/rm play${if (r.platform == MusicPlatform.QQ) " ${r.platform.platform}" else ""} ${r.id}"
+                                    )
                                 )
                         }
                         songText.append(playButton)
@@ -193,7 +209,7 @@ fun registerClientReceiver() {
                                 .withClickEvent(
                                     ClickEvent(
                                         ClickEvent.Action.RUN_COMMAND,
-                                        "/rm share ${r.id}"
+                                        "/rm ${if (r.platform == MusicPlatform.QQ) "qq-share" else "share"} ${r.id}"
                                     )
                                 ).withHoverEvent(
                                     HoverEvent(

@@ -14,9 +14,10 @@ import cn.rtast.rmusic.entity.payload.side.Pause2Side
 import cn.rtast.rmusic.entity.payload.side.ResumePlay2Side
 import cn.rtast.rmusic.entity.payload.side.StopPlay2Side
 import cn.rtast.rmusic.enums.IntentAction
-import cn.rtast.rmusic.util.Renderer
-import cn.rtast.rmusic.util.createActionPacket
-import cn.rtast.rmusic.util.sendToServer
+import cn.rtast.rmusic.enums.MusicPlatform
+import cn.rtast.rmusic.util.mc.Renderer
+import cn.rtast.rmusic.util.mc.createActionPacket
+import cn.rtast.rmusic.util.mc.sendToServer
 import cn.rtast.rmusic.util.str.supplier
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
@@ -47,44 +48,70 @@ class RMusicCommand : CommandRegistrationCallback {
                 .then(
                     CommandManager.literal("search")
                         .then(
-                            CommandManager.argument("keyword", StringArgumentType.string()).executes { context ->
-                                val keyword = context.getArgument("keyword", String::class.java)
-                                SearchPayloadInbound(keyword).createActionPacket(IntentAction.SEARCH).sendToServer()
-                                0
-                            }
+                            CommandManager.literal("163")
+                                .then(
+                                    CommandManager.argument("keyword", StringArgumentType.string())
+                                        .executes { context ->
+                                            val keyword = context.getArgument("keyword", String::class.java)
+                                            SearchPayloadInbound(keyword, MusicPlatform.Netease)
+                                                .createActionPacket(IntentAction.SEARCH)
+                                                .sendToServer()
+                                        }
+                                )
+                        ).then(
+                            CommandManager.literal("qq")
+                                .then(
+                                    CommandManager.argument("qq-keyword", StringArgumentType.string())
+                                        .executes { context ->
+                                            val keyword = context.getArgument("qq-keyword", String::class.java)
+                                            SearchPayloadInbound(keyword, MusicPlatform.QQ)
+                                                .createActionPacket(IntentAction.SEARCH)
+                                                .sendToServer()
+                                        }
+                                )
                         )
+
                 ).then(
                     CommandManager.literal("play")
                         .then(
                             CommandManager.argument("songId", StringArgumentType.string()).executes { context ->
                                 val songId = context.getArgument("songId", String::class.java)
-                                PlayMusicInbound(songId).createActionPacket(IntentAction.PLAY).sendToServer()
-                                0
+                                PlayMusicInbound(songId, MusicPlatform.Netease).createActionPacket(IntentAction.PLAY)
+                                    .sendToServer()
                             }
+                        ).then(
+                            CommandManager.literal("qq")
+                                .then(
+                                    CommandManager.argument("qq-song-id", StringArgumentType.string())
+                                        .executes { context ->
+                                            val songId = context.getArgument("qq-song-id", String::class.java)
+                                            PlayMusicInbound(
+                                                songId,
+                                                MusicPlatform.QQ
+                                            ).createActionPacket(IntentAction.PLAY)
+                                                .sendToServer()
+                                        }
+                                )
                         )
                 ).then(
                     CommandManager.literal("pause")
                         .executes { _ ->
                             Pause2Side().createActionPacket(IntentAction.PAUSE).sendToServer()
-                            0
                         }
                 ).then(
                     CommandManager.literal("resume")
                         .executes { _ ->
                             ResumePlay2Side().createActionPacket(IntentAction.RESUME).sendToServer()
-                            0
                         }
                 ).then(
                     CommandManager.literal("stop")
                         .executes { _ ->
                             StopPlay2Side().createActionPacket(IntentAction.STOP).sendToServer()
-                            0
                         }
                 ).then(
                     CommandManager.literal("login").requires { it.hasPermissionLevel(3) }
                         .executes { _ ->
                             LoginInbound().createActionPacket(IntentAction.LOGIN).sendToServer()
-                            0
                         }.then(
                             CommandManager.literal("confirm")
                                 .then(
@@ -94,7 +121,6 @@ class RMusicCommand : CommandRegistrationCallback {
                                             Renderer.loadQRCode = false
                                             ConfirmQRCodeInbound(key).createActionPacket(IntentAction.CONFIRM_QRCODE)
                                                 .sendToServer()
-                                            0
                                         }
                                 )
                         )
@@ -180,9 +206,20 @@ class RMusicCommand : CommandRegistrationCallback {
                             CommandManager.argument("songId", StringArgumentType.string())
                                 .executes { context ->
                                     val songId = context.getArgument("songId", String::class.java)
-                                    ShareMusicInbound(songId).createActionPacket(IntentAction.SHARE)
+                                    ShareMusicInbound(songId, MusicPlatform.Netease)
+                                        .createActionPacket(IntentAction.SHARE)
                                         .sendToServer()
-                                    0
+                                }
+                        )
+                ).then(
+                    CommandManager.literal("qq-share")
+                        .then(
+                            CommandManager.argument("qq-song-mid", StringArgumentType.string())
+                                .executes { context ->
+                                    val songMid = context.getArgument("qq-song-mid", String::class.java)
+                                    ShareMusicInbound(songMid, MusicPlatform.QQ)
+                                        .createActionPacket(IntentAction.SHARE)
+                                        .sendToServer()
                                 }
                         )
                 )

@@ -18,13 +18,15 @@ import cn.rtast.rmusic.entity.payload.side.Pause2Side
 import cn.rtast.rmusic.entity.payload.side.ResumePlay2Side
 import cn.rtast.rmusic.entity.payload.side.StopPlay2Side
 import cn.rtast.rmusic.enums.IntentAction
-import cn.rtast.rmusic.util.*
+import cn.rtast.rmusic.enums.MusicPlatform
+import cn.rtast.rmusic.util.mc.*
 import cn.rtast.rmusic.util.music.NCMusic
+import cn.rtast.rmusic.util.music.QQMusic
+import cn.rtast.rmusic.util.toMinuteSecond
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.sound.SoundEvents
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
@@ -40,31 +42,66 @@ fun registerServerReceiver() {
 
             IntentAction.SHARE -> {
                 context.sendMessage(Text.literal("正在准备一些必要的信息用于分享给其他玩家"))
-                scope.launch {
-                    val songId = dispatchPacket.decode<ShareMusicInbound>().id
-                    val songUrl = NCMusic.getSongUrl(songId.toLong())
-                    val songDetail = NCMusic.getSongDetail(songId.toLong())
-                    ShareMusicOutbound(
-                        songDetail.name,
-                        songId,
-                        songDetail.artists,
-                        songUrl,
-                        context.player().name.string
-                    ).createActionPacket(IntentAction.SHARE).sendToClient(context)
+                val sharePacket = dispatchPacket.decode<ShareMusicInbound>()
+                when (sharePacket.musicPlatform) {
+                    MusicPlatform.Netease -> {
+                        scope.launch {
+                            val songUrl = NCMusic.getSongUrl(sharePacket.id.toLong())
+                            val songDetail = NCMusic.getSongDetail(sharePacket.id.toLong())
+                            ShareMusicOutbound(
+                                songDetail.name,
+                                sharePacket.id,
+                                songDetail.artists,
+                                songUrl,
+                                context.player().name.string,
+                                MusicPlatform.Netease
+                            ).createActionPacket(IntentAction.SHARE).sendToClient(context)
+                        }
+                    }
+
+                    MusicPlatform.QQ -> {
+                        scope.launch {
+                            val songUrl = QQMusic.getSongUrl(sharePacket.id)
+                            val songDetail = QQMusic.getSongInfo(sharePacket.id)
+                            ShareMusicOutbound(
+                                songDetail.name,
+                                sharePacket.id,
+                                songDetail.artists,
+                                songUrl,
+                                context.player().name.string,
+                                MusicPlatform.QQ
+                            ).createActionPacket(IntentAction.SHARE).sendToClient(context)
+                        }
+                    }
                 }
             }
 
             IntentAction.PLAY -> {
-                context.player().playSound(SoundEvents.BLOCK_NOTE_BLOCK_PLING.value(), 1f, 1f)
-                scope.launch {
-                    val songId = dispatchPacket.decode<PlayMusicInbound>().id
-                    val songUrl = NCMusic.getSongUrl(songId.toLong())
-                    val songDetail = NCMusic.getSongDetail(songId.toLong())
-                    val lyric = NCMusic.getLyric(songId.toLong())
-                    PlayMusicOutbound(
-                        songUrl, songId, songDetail.name,
-                        songDetail.artists, songDetail.cover, lyric, songDetail.duration.toMinuteSecond()
-                    ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                val playPacket = dispatchPacket.decode<PlayMusicInbound>()
+                when (playPacket.platform) {
+                    MusicPlatform.Netease -> {
+                        scope.launch {
+                            val songUrl = NCMusic.getSongUrl(playPacket.id.toLong())
+                            val songDetail = NCMusic.getSongDetail(playPacket.id.toLong())
+                            val lyric = NCMusic.getLyric(playPacket.id.toLong())
+                            PlayMusicOutbound(
+                                songUrl, playPacket.id, songDetail.name,
+                                songDetail.artists, songDetail.cover, lyric, songDetail.duration.toMinuteSecond()
+                            ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                        }
+                    }
+
+                    MusicPlatform.QQ -> {
+                        scope.launch {
+                            val songUrl = QQMusic.getSongUrl(playPacket.id)
+                            val songDetail = QQMusic.getSongInfo(playPacket.id)
+                            val lyric = QQMusic.getLyric(playPacket.id)
+                            PlayMusicOutbound(
+                                songUrl, playPacket.id, songDetail.name,
+                                songDetail.artists, songDetail.cover, lyric, songDetail.duration.toMinuteSecond()
+                            ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                        }
+                    }
                 }
             }
 
@@ -85,19 +122,38 @@ fun registerServerReceiver() {
             }
 
             IntentAction.SEARCH -> {
-                val keyword = dispatchPacket.decode<SearchPayloadInbound>().keyword
-                context.sendMessage(Text.literal("正在搜索: ").append(Text.literal(keyword).styled {
+                val searchPacket = dispatchPacket.decode<SearchPayloadInbound>()
+                context.sendMessage(Text.literal("正在搜索: ").append(Text.literal(searchPacket.keyword).styled {
                     it.withColor(Formatting.YELLOW)
                 }))
-                scope.launch {
-                    val result = NCMusic.search(keyword).take(8)
-                    SearchResultOutbound(result.map {
-                        SearchResultOutbound.Result(
-                            it.id,
-                            it.name,
-                            it.artists,
-                        )
-                    }).createActionPacket(IntentAction.SEARCH).sendToClient(context)
+                when (searchPacket.searchPlatform) {
+                    MusicPlatform.Netease -> {
+                        scope.launch {
+                            val result = NCMusic.search(searchPacket.keyword).take(8)
+                            SearchResultOutbound(result.map {
+                                SearchResultOutbound.Result(
+                                    it.id,
+                                    it.name,
+                                    it.artists,
+                                    MusicPlatform.Netease
+                                )
+                            }).createActionPacket(IntentAction.SEARCH).sendToClient(context)
+                        }
+                    }
+
+                    MusicPlatform.QQ -> {
+                        scope.launch {
+                            val result = QQMusic.search(searchPacket.keyword).take(8)
+                            SearchResultOutbound(result.map {
+                                SearchResultOutbound.Result(
+                                    it.id,
+                                    it.name,
+                                    it.artists,
+                                    MusicPlatform.QQ
+                                )
+                            }).createActionPacket(IntentAction.SEARCH).sendToClient(context)
+                        }
+                    }
                 }
             }
 

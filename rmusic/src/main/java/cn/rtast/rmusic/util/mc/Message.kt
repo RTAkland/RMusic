@@ -5,7 +5,7 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.mc
 
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking

@@ -7,6 +7,8 @@
 
 package cn.rtast.rmusic.entity.payload.outbound
 
+import cn.rtast.rmusic.enums.MusicPlatform
+
 data class SearchResultOutbound(
     val result: List<Result>
 ) {
@@ -14,5 +16,6 @@ data class SearchResultOutbound(
         val id: String,
         val songName: String,
         val artistName: String,
+        val platform: MusicPlatform
     )
 }

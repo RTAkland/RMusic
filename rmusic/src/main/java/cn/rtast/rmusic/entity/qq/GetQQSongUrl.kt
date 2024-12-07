@@ -7,7 +7,7 @@
 
 package cn.rtast.rmusic.entity.qq
 
-data class QQGetSongUrl(
+data class GetQQSongUrl(
     val data: Data
 ) {
     data class Data(

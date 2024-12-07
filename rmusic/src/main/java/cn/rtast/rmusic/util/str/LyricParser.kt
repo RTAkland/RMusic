@@ -53,17 +53,20 @@ object LyricParser {
         return shiftedLyricsMap
     }
 
-    fun parseQQLyric(lyrics: String): Map<Float, String> {
-        val lyricsMap = mutableMapOf<Float, String>()
-        val regex = """\[(\d{2}):(\d{2}\.\d{2})](.*)""".toRegex()
+    fun parseQQLyric(lyrics: String): Map<Int, String> {
+        val lyricsMap = mutableMapOf<Int, String>()
+        val regex = """\[(\d{2}):(\d{2})\.(\d{2})](.*)""".toRegex()
         lyrics.lines().forEach { line ->
             val matchResult = regex.find(line)
             if (matchResult != null) {
                 val minute = matchResult.groups[1]?.value?.toInt() ?: 0
-                val second = matchResult.groups[2]?.value?.toFloat() ?: 0f
-                val lyricText = matchResult.groups[3]?.value?.trim() ?: ""
-                val totalSeconds = minute * 60 + second
-                lyricsMap[totalSeconds] = lyricText
+                val second = matchResult.groups[2]?.value?.toInt() ?: 0
+                val millis = matchResult.groups[3]?.value?.toInt() ?: 0
+                val lyricText = matchResult.groups[4]?.value?.trim() ?: ""
+                val totalSeconds = minute * 60 + second + if (millis >= 50) 1 else 0
+                if (lyricText.isNotEmpty()) {
+                    lyricsMap[totalSeconds] = lyricText
+                }
             }
         }
         return lyricsMap

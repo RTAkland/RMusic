@@ -5,7 +5,7 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.mc
 
 import cn.rtast.rmusic.entity.payload.ActionPacket
 import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
@@ -22,16 +22,19 @@ fun Any.createActionPacket(action: IntentAction): ActionPacket {
     return ActionPacket(action, this.toJson().encodeToBase64())
 }
 
-fun ActionPacket.sendToServer() {
+fun ActionPacket.sendToServer(): Int {
     ClientPlayNetworking.send(RMusicCustomPayload(this.toJson()))
+    return 0
 }
 
-fun ActionPacket.sendToClient(context: ServerPlayNetworking.Context) {
+fun ActionPacket.sendToClient(context: ServerPlayNetworking.Context): Int {
     ServerPlayNetworking.send(context.player(), RMusicCustomPayload(this.toJson()))
+    return 0
 }
 
-fun ActionPacket.sendToClient(player: ServerPlayerEntity) {
+fun ActionPacket.sendToClient(player: ServerPlayerEntity): Int {
     ServerPlayNetworking.send(player, RMusicCustomPayload(this.toJson()))
+    return 0
 }
 
 fun RMusicCustomPayload.decodeRawPacket(): ActionPacket {

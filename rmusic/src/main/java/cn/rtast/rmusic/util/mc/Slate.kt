@@ -5,7 +5,7 @@
  */
 
 
-package cn.rtast.rmusic.util
+package cn.rtast.rmusic.util.mc
 
 import cn.rtast.rmusic.entity.KeyboardState
 import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound

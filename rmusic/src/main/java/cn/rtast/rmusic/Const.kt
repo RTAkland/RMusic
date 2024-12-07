@@ -27,6 +27,6 @@ val gson: Gson = GsonBuilder()
     .create()
 
 val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
-val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/loading.png")
+val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/default.png")
 val networkingId: Identifier = Identifier.of("rmusic", "networking")
 val cacheDir = File("./config/rmusic/cache").apply { mkdirs() }

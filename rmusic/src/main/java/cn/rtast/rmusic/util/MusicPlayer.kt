@@ -18,6 +18,7 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.cacheDir
+import cn.rtast.rmusic.util.mc.Renderer
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent

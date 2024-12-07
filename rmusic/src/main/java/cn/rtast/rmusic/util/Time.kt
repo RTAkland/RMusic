@@ -13,6 +13,8 @@ fun Long.toMinuteSecond(): String {
     return "${minutes}分${seconds}秒"
 }
 
+fun Long.toMilliseconds() = this * 1000L
+
 fun main() {
     println(280762L.toMinuteSecond())
 }

@@ -7,6 +7,9 @@
 
 package cn.rtast.rmusic.entity.payload.inbound
 
+import cn.rtast.rmusic.enums.MusicPlatform
+
 data class SearchPayloadInbound(
     val keyword: String,
+    val searchPlatform: MusicPlatform,
 )
