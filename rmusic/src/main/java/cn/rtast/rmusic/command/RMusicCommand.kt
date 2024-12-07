@@ -129,20 +129,45 @@ class RMusicCommand : CommandRegistrationCallback {
                         .then(
                             CommandManager.literal("set-api")
                                 .then(
-                                    CommandManager.argument("apiHost", StringArgumentType.string())
-                                        .executes { context ->
-                                            try {
-                                                val apiHost = context.getArgument("apiHost", String::class.java)
-                                                val afterApiHost =
-                                                    if (apiHost.endsWith("/")) apiHost.dropLast(1) else apiHost
-                                                val afterConfig = ServerConfig(afterApiHost)
-                                                SetConfigInbound(afterConfig).createActionPacket(IntentAction.SET_CONFIG)
-                                                    .sendToServer()
-                                            } catch (e: Exception) {
-                                                e.printStackTrace()
-                                            }
-                                            0
-                                        }
+                                    CommandManager.literal("qq-api")
+                                        .then(
+                                            CommandManager.argument("host", StringArgumentType.string())
+                                                .executes { context ->
+                                                    try {
+                                                        val apiHost = context.getArgument("host", String::class.java)
+                                                        val afterApiHost =
+                                                            if (apiHost.endsWith("/")) apiHost.dropLast(1) else apiHost
+                                                        val currentConfig = RMusicServer.configManager.read()
+                                                        val afterConfig =
+                                                            ServerConfig(currentConfig.api, afterApiHost)
+                                                        SetConfigInbound(afterConfig).createActionPacket(IntentAction.SET_CONFIG)
+                                                            .sendToServer()
+                                                    } catch (e: Exception) {
+                                                        e.printStackTrace()
+                                                    }
+                                                    0
+                                                }
+                                        )
+                                ).then(
+                                    CommandManager.literal("163-api")
+                                        .then(
+                                            CommandManager.argument("apiHost", StringArgumentType.string())
+                                                .executes { context ->
+                                                    try {
+                                                        val apiHost = context.getArgument("apiHost", String::class.java)
+                                                        val afterApiHost =
+                                                            if (apiHost.endsWith("/")) apiHost.dropLast(1) else apiHost
+                                                        val currentConfig = RMusicServer.configManager.read()
+                                                        val afterConfig =
+                                                            ServerConfig(afterApiHost, currentConfig.qqApi)
+                                                        SetConfigInbound(afterConfig).createActionPacket(IntentAction.SET_CONFIG)
+                                                            .sendToServer()
+                                                    } catch (e: Exception) {
+                                                        e.printStackTrace()
+                                                    }
+                                                    0
+                                                }
+                                        )
                                 )
                         )
                 ).then(

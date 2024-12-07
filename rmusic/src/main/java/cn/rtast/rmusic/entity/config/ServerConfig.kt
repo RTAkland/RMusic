@@ -8,5 +8,6 @@
 package cn.rtast.rmusic.entity.config
 
 data class ServerConfig(
-    val api: String
+    val api: String,
+    val qqApi: String,
 )

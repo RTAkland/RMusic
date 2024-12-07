@@ -7,6 +7,7 @@
 
 package cn.rtast.rmusic.util.music
 
+import cn.rtast.rmusic.RMusicServer
 import cn.rtast.rmusic.entity.SearchResult
 import cn.rtast.rmusic.entity.ncm.SongDetail
 import cn.rtast.rmusic.entity.qq.*
@@ -16,7 +17,7 @@ import cn.rtast.rmusic.util.toMilliseconds
 
 object QQMusic {
 
-    private const val API_HOST = "https://qq-music-api.rtast.cn/"
+    private val API_HOST get() = RMusicServer.configManager.config?.qqApi
     private const val SEARCH_PATH = "getSearchByKey"
     private const val LYRIC_PATH = "getLyric"
     private const val COVER_PATH = "getImageUrl"
@@ -25,11 +26,11 @@ object QQMusic {
 
     fun search(keyword: String): List<SearchResult> {
         return Http.get<RawQQMusicSearch>("$API_HOST/$SEARCH_PATH", mapOf("key" to keyword))
-            .response.data.song.list.map {
+            .response.data.song.list.map { map ->
                 SearchResult(
-                    it.songMid,
-                    it.albumName,
-                    it.singer.joinToString(",") { it.name })
+                    map.songMid,
+                    map.albumName,
+                    map.singer.joinToString(",") { it.name })
             }
     }
 
@@ -39,8 +40,8 @@ object QQMusic {
         return LyricParser.parseQQLyric(result)
     }
 
-    private fun getCover(mid: String): String {
-        val result = Http.get<GetQQCoverImage>("$API_HOST/$COVER_PATH", mapOf("id" to mid))
+    private fun getCover(albumMid: String): String {
+        val result = Http.get<GetQQCoverImage>("$API_HOST/$COVER_PATH", mapOf("id" to albumMid))
             .response.data.imageUrl
         return result
     }
@@ -51,7 +52,7 @@ object QQMusic {
         return SongDetail(
             result.name,
             mid,
-            this.getCover(mid),
+            this.getCover(result.album.mid),
             result.singer.joinToString(",") { it.name },
             result.interval.toMilliseconds()
         )
@@ -66,10 +67,4 @@ object QQMusic {
             return ""
         }
     }
-}
-
-fun main() {
-//    println(QQMusic.search("笼"))
-//    println(QQMusic.getSongInfo("000PCkUC1U48c4"))
-    println(QQMusic.getSongUrl("000PCkUC1U48c4"))
 }

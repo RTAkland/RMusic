@@ -26,9 +26,9 @@ class ServerConfigManager {
         config = this.read()
     }
 
-    fun default() {
+    private fun default() {
         file.writeText(
-            ServerConfig("https://ncm.rtast.cn").toJson()
+            ServerConfig("https://ncm.rtast.cn", "http://127.0.0.1:6868").toJson()
         )
     }
 

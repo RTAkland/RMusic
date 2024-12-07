@@ -131,7 +131,8 @@ fun registerClientReceiver() {
                             )
                             try {
                                 val coverBytes = URI("${playPacket.cover}?param=128x128")
-                                    .toURL().readBytes().toPNG().cropToCircle()
+                                    .toURL().readBytes().toPNG().toBufferedImage()
+                                    .scaleImage(128 to 128).toByteArray().cropToCircle()
                                     .toBufferedImage().createRecordImage().toByteArray()
                                 Renderer.renderCover(coverBytes)
                             } catch (_: FileNotFoundException) {

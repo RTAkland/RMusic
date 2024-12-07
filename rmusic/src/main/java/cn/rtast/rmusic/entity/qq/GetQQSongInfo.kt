@@ -29,10 +29,15 @@ data class GetQQSongInfo(
     data class TrackInfo(
         val name: String,
         val singer: List<Singer>,
-        val interval: Long
+        val interval: Long,
+        val album: Album
     )
 
     data class Singer(
         val name: String,
+    )
+
+    data class Album(
+        val mid: String,
     )
 }
