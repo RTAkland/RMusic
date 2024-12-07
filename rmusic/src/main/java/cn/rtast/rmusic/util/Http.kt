@@ -9,7 +9,6 @@
 package cn.rtast.rmusic.util
 
 
-import cn.rtast.rmusic.RMusicServer
 import cn.rtast.rmusic.RMusicServer.Companion.publicIp
 import cn.rtast.rmusic.util.str.fromJson
 import okhttp3.FormBody
@@ -40,14 +39,10 @@ object Http {
             param.forEach { (key, value) ->
                 paramsUrl.append("$key=$value&")
             }
-            if (!RMusicServer.cookieManager.currentCookie.isNullOrBlank()) {
-                paramsUrl.append("cookie=${RMusicServer.cookieManager.currentCookie}&")
-            }
             paramsUrl.append("timestamp=${Instant.now().epochSecond}&")
             paramsUrl.append("realIp=$publicIp&")
             paramsUrl.dropLast(1)
         }
-        println(paramsUrl)
         return if (params != null) paramsUrl.toString() else url
     }
 
@@ -109,6 +104,7 @@ object Http {
         val request = Request.Builder()
             .post(body.build())
             .url(paramsUrl)
+        println(headers)
         val headerRequest = addHeaders(request, headers)
         return this.executeRequest<T>(headerRequest.build())
     }

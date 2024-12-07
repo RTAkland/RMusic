@@ -26,9 +26,17 @@ object NCMusic {
     private const val USER_ACCOUNT_PATH = "user/account"
     private val NCM_API get() = RMusicServer.configManager.config!!.neteaseMusicAPI
 
+    private inline fun <reified T> post(endpoint: String, params: Map<String, Any>? = null): T {
+        val cookie = RMusicServer.cookieManager.currentCookie
+        val header = cookie?.let {
+            mapOf("cookie" to cookie)
+        } ?: mapOf()
+        return Http.post<T>(endpoint, params, headers = header)
+    }
+
     fun loginByQRCode(): Pair<String, ByteArray> {
-        val key = Http.get<GetQRKey>("$NCM_API/$QRCODE_KEY_PATH").data.uniKey
-        val qrcode = Http.get<CreateQRCodeImage>(
+        val key = this.post<GetQRKey>("$NCM_API/$QRCODE_KEY_PATH").data.uniKey
+        val qrcode = this.post<CreateQRCodeImage>(
             "$NCM_API/$CREATE_QRCODE_PATH",
             mapOf("key" to key, "qrimg" to "1")
         ).data.base64Image.replace("data:image/png;base64,", "").decodeToByteArray()
@@ -36,12 +44,12 @@ object NCMusic {
     }
 
     fun checkQRCodeStatus(key: String): String? {
-        val result = Http.get<CheckQRCodeStatus>("$NCM_API/$CHECK_QRCODE_PATH?key=$key")
+        val result = this.post<CheckQRCodeStatus>("$NCM_API/$CHECK_QRCODE_PATH", mapOf("key" to key))
         return if (result.code == 803) result.cookie else null
     }
 
     fun search(keyword: String): List<SearchResult> {
-        val result = Http.get<RawSearchResult>("$NCM_API/$SEARCH_PATH", mapOf("keywords" to keyword))
+        val result = this.post<RawSearchResult>("$NCM_API/$SEARCH_PATH", mapOf("keywords" to keyword))
         return result.result.songs.map {
             SearchResult(
                 it.id.toString(),
@@ -52,16 +60,16 @@ object NCMusic {
     }
 
     fun getSongUrl(id: Long): String {
-        return Http.get<GetSongUrl>("$NCM_API/$GET_SONG_URL_PATH", mapOf("id" to id)).data.first().url
+        return this.post<GetSongUrl>("$NCM_API/$GET_SONG_URL_PATH", mapOf("id" to id)).data.first().url
     }
 
     fun getLyric(id: Long): MutableMap<Int, String> {
-        val lyric = Http.get<GetLyric>("$NCM_API/$GET_LYRIC_PATH", mapOf("id" to id)).lrc.lyric
+        val lyric = this.post<GetLyric>("$NCM_API/$GET_LYRIC_PATH", mapOf("id" to id)).lrc.lyric
         return LyricParser.parse(lyric)
     }
 
     fun getSongDetail(id: Long): SongDetail {
-        val result = Http.get<GetSongDetail>("$NCM_API/$DETAIL_PATH", mapOf("ids" to id)).songs.first()
+        val result = this.post<GetSongDetail>("$NCM_API/$DETAIL_PATH", mapOf("ids" to id)).songs.first()
         return SongDetail(
             result.name,
             result.id.toString(),
@@ -72,6 +80,6 @@ object NCMusic {
     }
 
     fun getUserAccount(): String {
-        return Http.get<GetUserAccount>("$NCM_API/$USER_ACCOUNT_PATH").account.profile.nickname
+        return this.post<GetUserAccount>("$NCM_API/$USER_ACCOUNT_PATH").account.profile.nickname
     }
 }

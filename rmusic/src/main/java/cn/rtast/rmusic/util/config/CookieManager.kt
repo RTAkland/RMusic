@@ -23,8 +23,8 @@ class CookieManager {
             this.file.createNewFile()
             val defaultEmptyCookie = Cookie("").toJson()
             this.file.writeText(defaultEmptyCookie)
-            this.currentCookie = this.file.readText().fromJson<Cookie>().cookie
         }
+        this.currentCookie = this.file.readText().fromJson<Cookie>().cookie
     }
 
     fun login(cookie: String) {
