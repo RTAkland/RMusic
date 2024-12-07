@@ -13,4 +13,5 @@ import kotlinx.serialization.Serializable
 data class Config(
     val neteaseMusicAPI: String,
     val qqMusicAPI: String,
+    val kugouAPI: String,
 )

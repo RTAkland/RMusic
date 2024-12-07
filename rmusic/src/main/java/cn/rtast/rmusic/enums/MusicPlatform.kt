@@ -8,5 +8,5 @@
 package cn.rtast.rmusic.enums
 
 enum class MusicPlatform(val platform: String) {
-    Netease(""), QQ("qq")
+    Netease("netease"), QQ("qq"), KuGou("kugou")
 }

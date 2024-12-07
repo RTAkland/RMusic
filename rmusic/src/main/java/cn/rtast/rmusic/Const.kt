@@ -30,5 +30,6 @@ val networkingId: Identifier = Identifier.of("rmusic", "networking")
 val cacheDir = File("./config/rmusic/cache").apply { mkdirs() }
 val defaultConfig = Config(
     "https://ncm.rtast.cn",
-    "http://127.0.0.1:6868"
+    "http://127.0.0.1:6868",
+    "https://kugou.rtast.cn"
 )

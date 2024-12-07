@@ -29,7 +29,7 @@ object NCMusic {
     private inline fun <reified T> post(endpoint: String, params: Map<String, Any>? = null): T {
         val cookie = RMusicServer.cookieManager.currentCookie
         val header = cookie?.let {
-            mapOf("cookie" to cookie)
+            mapOf("cookie" to cookie.neteaseCookie)
         } ?: mapOf()
         return Http.post<T>(endpoint, params, headers = header)
     }

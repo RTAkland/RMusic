@@ -55,7 +55,10 @@ fun registerClientReceiver() {
                                             .styled { it.withColor(Formatting.GREEN) }
                                     )
                                 ).withClickEvent(
-                                    ClickEvent(ClickEvent.Action.RUN_COMMAND, "/rm login confirm ${loginPacket.key}")
+                                    ClickEvent(
+                                        ClickEvent.Action.RUN_COMMAND,
+                                        "/rm login ${loginPacket.platform.platform} confirm ${loginPacket.key}"
+                                    )
                                 )
                             }), false
                     )
@@ -84,7 +87,7 @@ fun registerClientReceiver() {
                             ).withClickEvent(
                                 ClickEvent(
                                     ClickEvent.Action.RUN_COMMAND,
-                                    "/rm play${if (sharePacket.platform.platform.isNotEmpty()) " ${sharePacket.platform.platform}" else ""} ${sharePacket.id}"
+                                    "/rm play ${sharePacket.platform.platform} ${sharePacket.id}"
                                 )
                             )
                     }).append(Text.literal("来播放这首歌"))
@@ -132,7 +135,7 @@ fun registerClientReceiver() {
                                     .scaleImage(128 to 128).toByteArray().cropToCircle()
                                     .toBufferedImage().createRecordImage().toByteArray()
                                 Renderer.renderCover(coverBytes)
-                            } catch (_: FileNotFoundException) {
+                            } catch (_: Exception) {
                                 Renderer.renderCover(null)
                             }
                             Renderer.renderSongDetail()

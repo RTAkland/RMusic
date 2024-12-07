@@ -17,6 +17,7 @@ import cn.rtast.rmusic.entity.payload.side.StopPlay2Side
 import cn.rtast.rmusic.enums.IntentAction
 import cn.rtast.rmusic.enums.MusicPlatform
 import cn.rtast.rmusic.util.mc.*
+import cn.rtast.rmusic.util.music.KuGouMusic
 import cn.rtast.rmusic.util.music.NCMusic
 import cn.rtast.rmusic.util.music.QQMusic
 import cn.rtast.rmusic.util.toMinuteSecond
@@ -50,7 +51,7 @@ class RMusicCommand : CommandRegistrationCallback {
                 .then(
                     CommandManager.literal("search")
                         .then(
-                            CommandManager.literal("163")
+                            CommandManager.literal("netease")
                                 .then(
                                     CommandManager.argument("keyword", StringArgumentType.string())
                                         .executes { context ->
@@ -77,59 +78,48 @@ class RMusicCommand : CommandRegistrationCallback {
                                             0
                                         }
                                 )
+                        ).then(
+                            CommandManager.literal("kugou")
+                                .then(
+                                    CommandManager.argument("kugou-keyword", StringArgumentType.string())
+                                        .executes { context ->
+                                            val keyword = context.getArgument("kugou-keyword", String::class.java)
+                                            scope.launch {
+                                                this@RMusicCommand.executeSearch(keyword, MusicPlatform.KuGou, context)
+                                            }
+                                            0
+                                        }
+                                )
                         )
-
                 ).then(
                     CommandManager.literal("play")
                         .then(
-                            CommandManager.argument("songId", StringArgumentType.string()).executes { context ->
-                                val songId = context.getArgument("songId", String::class.java)
-                                context.sendFeedback(Text.literal("正在获取歌曲信息..."))
-                                scope.launch {
-                                    try {
-                                        val songUrl = NCMusic.getSongUrl(songId.toLong())
-                                        val songDetail = NCMusic.getSongDetail(songId.toLong())
-                                        val lyric = NCMusic.getLyric(songId.toLong())
-                                        PlayMusicOutbound(
-                                            songUrl,
-                                            songId,
-                                            songDetail.name,
-                                            songDetail.artists,
-                                            songDetail.cover,
-                                            lyric,
-                                            songDetail.duration.toMinuteSecond()
-                                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
-                                    } catch (e: Exception) {
-                                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
-                                    }
-                                }
-                                0
-                            }
+                            CommandManager.literal("netease")
+                                .then(
+                                    CommandManager.argument("songId", StringArgumentType.string())
+                                        .executes { context ->
+                                            val songId = context.getArgument("songId", String::class.java)
+                                            this.executePlayMusic(songId, MusicPlatform.Netease, context)
+                                            0
+                                        }
+                                )
                         ).then(
                             CommandManager.literal("qq")
                                 .then(
                                     CommandManager.argument("qq-song-id", StringArgumentType.string())
                                         .executes { context ->
                                             val songId = context.getArgument("qq-song-id", String::class.java)
-                                            context.sendFeedback(Text.literal("正在获取歌曲信息..."))
-                                            scope.launch {
-                                                try {
-                                                    val songUrl = QQMusic.getSongUrl(songId)
-                                                    val songDetail = QQMusic.getSongInfo(songId)
-                                                    val lyric = QQMusic.getLyric(songId)
-                                                    PlayMusicOutbound(
-                                                        songUrl,
-                                                        songId,
-                                                        songDetail.name,
-                                                        songDetail.artists,
-                                                        songDetail.cover,
-                                                        lyric,
-                                                        songDetail.duration.toMinuteSecond()
-                                                    ).createActionPacket(IntentAction.PLAY).sendToClient(context)
-                                                } catch (e: Exception) {
-                                                    context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
-                                                }
-                                            }
+                                            this.executePlayMusic(songId, MusicPlatform.QQ, context)
+                                            0
+                                        }
+                                )
+                        ).then(
+                            CommandManager.literal("kugou")
+                                .then(
+                                    CommandManager.argument("kugou-song-id", StringArgumentType.string())
+                                        .executes { context ->
+                                            val songId = context.getArgument("kugou-song-id", String::class.java)
+                                            this.executePlayMusic(songId, MusicPlatform.KuGou, context)
                                             0
                                         }
                                 )
@@ -150,83 +140,51 @@ class RMusicCommand : CommandRegistrationCallback {
                             StopPlay2Side().createActionPacket(IntentAction.STOP).sendToClient(context)
                         }
                 ).then(
-                    CommandManager.literal("login").requires { it.hasPermissionLevel(3) }
-                        .executes { context ->
-                            if (context.source.isExecutedByPlayer) {
-                                openMusicPlatformMenu(context.source.player!!)
-                            }
-                            0
-                        }.then(
-                            CommandManager.literal("confirm")
+                    CommandManager.literal("login")
+                        .then(
+                            CommandManager.literal("netease")
                                 .then(
-                                    CommandManager.argument("qrcodeKey", StringArgumentType.string())
-                                        .executes { context ->
-                                            val key = context.getArgument("qrcodeKey", String::class.java)
-                                            Renderer.loadQRCode = false
-                                            context.sendFeedback(Text.literal("正在检查登录状态中"))
-                                            try {
-                                                val cookie = NCMusic.checkQRCodeStatus(key)
-                                                if (cookie != null) {
-                                                    RMusicServer.cookieManager.login(cookie)
-                                                    val accountInfo = NCMusic.getUserAccount()
-                                                    context.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
-                                                } else {
-                                                    context.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))
+                                    CommandManager.literal("confirm")
+                                        .then(
+                                            CommandManager.argument("netease-qrcode-key", StringArgumentType.string())
+                                                .executes { context ->
+                                                    val key = context.getArgument("qrcodeKey", String::class.java)
+                                                    this.executeCheckQRCodeStatus(key, MusicPlatform.Netease, context)
+                                                    0
                                                 }
-                                            } catch (e: Exception) {
-                                                e.printStackTrace()
-                                                context.sendFeedback(Text.literal("验证失败, 错误原因: ${e.message}"))
-                                            }
-                                            0
-                                        }
-                                )
+                                        )
+                                ).executes { context ->
+                                    context.executeOpenLoginMenu()
+                                    0
+                                }
+                        ).then(
+                            CommandManager.literal("kugou")
+                                .then(
+                                    CommandManager.literal("confirm")
+                                        .then(
+                                            CommandManager.argument("kugou-qrcode-key", StringArgumentType.string())
+                                                .executes { context ->
+                                                    val key =
+                                                        context.getArgument("kugou-qrcode-key", String::class.java)
+                                                    this.executeCheckQRCodeStatus(key, MusicPlatform.KuGou, context)
+                                                    0
+                                                }
+                                        )
+                                ).executes { context ->
+                                    context.executeOpenLoginMenu()
+                                    0
+                                }
                         )
                 ).then(
                     CommandManager.literal("clean-cache")
                         .then(
                             CommandManager.literal("confirm")
                                 .executes { context ->
-                                    scope.launch {
-                                        val files = File("./config/rmusic/cache").listFiles()
-                                            ?.filter { it.isFile } ?: emptyList()
-                                        files.forEach { file -> file.delete() }
-                                        context.sendFeedback(
-                                            Text.literal("已删除").append(
-                                                Text.literal("${files.size}")
-                                                    .styled {
-                                                        it.withColor(Formatting.RED)
-                                                            .withHoverEvent(
-                                                                HoverEvent(
-                                                                    HoverEvent.Action.SHOW_TEXT,
-                                                                    Text.literal(files.joinToString(separator = "\n") { file -> file.name })
-                                                                )
-                                                            )
-                                                    }).append("个文件")
-                                        )
-                                    }
+                                    this.executeCleanCacheConfirm(context)
                                     0
                                 }
-                        )
-                        .executes { context ->
-                            context.sendFeedback(
-                                Text.literal("本操作会清空所有已缓存到本地的音频文件, 点击").append(
-                                    Text.literal("[这里]").styled { style ->
-                                        style.withColor(Formatting.GREEN)
-                                            .withHoverEvent(
-                                                HoverEvent(
-                                                    HoverEvent.Action.SHOW_TEXT,
-                                                    Text.literal("点击确认").styled {
-                                                        it.withColor(Formatting.GREEN)
-                                                    })
-                                            )
-                                            .withClickEvent(
-                                                ClickEvent(
-                                                    ClickEvent.Action.RUN_COMMAND,
-                                                    "/rm clean-cache confirm"
-                                                )
-                                            )
-                                    }).append("来确认操作")
-                            )
+                        ).executes { context ->
+                            this.executeCleanCache(context)
                             0
                         }
                 ).then(
@@ -238,24 +196,12 @@ class RMusicCommand : CommandRegistrationCallback {
                             0
                         }
                 ).then(
-                    CommandManager.literal("share")
+                    CommandManager.literal("netease-share")
                         .then(
                             CommandManager.argument("songId", StringArgumentType.string())
                                 .executes { context ->
                                     val songId = context.getArgument("songId", String::class.java)
-                                    context.sendFeedback(Text.literal("正在获取分享音乐所需的必要信息..."))
-                                    scope.launch {
-                                        val songUrl = NCMusic.getSongUrl(songId.toLong())
-                                        val songDetail = NCMusic.getSongDetail(songId.toLong())
-                                        ShareMusicOutbound(
-                                            songDetail.name,
-                                            songId,
-                                            songDetail.artists,
-                                            songUrl,
-                                            context.source.player!!.name.string,
-                                            MusicPlatform.Netease
-                                        ).createActionPacket(IntentAction.SHARE).sendToClient(context)
-                                    }
+                                    this.executeShareMusic(songId, MusicPlatform.Netease, context)
                                     0
                                 }
                         )
@@ -265,19 +211,17 @@ class RMusicCommand : CommandRegistrationCallback {
                             CommandManager.argument("qq-song-mid", StringArgumentType.string())
                                 .executes { context ->
                                     val songMid = context.getArgument("qq-song-mid", String::class.java)
-                                    context.sendFeedback(Text.literal("正在获取分享音乐所需的必要信息..."))
-                                    scope.launch {
-                                        val songUrl = QQMusic.getSongUrl(songMid)
-                                        val songDetail = QQMusic.getSongInfo(songMid)
-                                        ShareMusicOutbound(
-                                            songDetail.name,
-                                            songMid,
-                                            songDetail.artists,
-                                            songUrl,
-                                            context.source.player!!.name.string,
-                                            MusicPlatform.QQ
-                                        ).createActionPacket(IntentAction.SHARE).sendToClient(context)
-                                    }
+                                    this.executeShareMusic(songMid, MusicPlatform.QQ, context)
+                                    0
+                                }
+                        )
+                ).then(
+                    CommandManager.literal("kugou-share")
+                        .then(
+                            CommandManager.argument("kugou-song-id", StringArgumentType.string())
+                                .executes { context ->
+                                    val songId = context.getArgument("kugou-song-id", String::class.java)
+                                    this.executeShareMusic(songId, MusicPlatform.KuGou, context)
                                     0
                                 }
                         )
@@ -313,6 +257,17 @@ class RMusicCommand : CommandRegistrationCallback {
                         )
                     }
                 }
+
+                MusicPlatform.KuGou -> {
+                    KuGouMusic.search(keyword).take(8).map {
+                        SearchResultOutbound.Result(
+                            it.id,
+                            it.name,
+                            it.artists,
+                            MusicPlatform.KuGou
+                        )
+                    }
+                }
             }
             val text = Text.literal("搜索到如下结果:")
             context.sendFeedback(text)
@@ -336,7 +291,7 @@ class RMusicCommand : CommandRegistrationCallback {
                         ).withClickEvent(
                             ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
-                                "/rm play${if (r.platform == MusicPlatform.QQ) " ${r.platform.platform}" else ""} ${r.id}"
+                                "/rm play ${r.platform.platform} ${r.id.ifEmpty { "000000" }}"
                             )
                         )
                 }
@@ -346,7 +301,7 @@ class RMusicCommand : CommandRegistrationCallback {
                         .withClickEvent(
                             ClickEvent(
                                 ClickEvent.Action.RUN_COMMAND,
-                                "/rm ${if (r.platform == MusicPlatform.QQ) "qq-share" else "share"} ${r.id}"
+                                "/rm ${r.platform.platform}-share ${r.id.ifEmpty { "000000" }}"
                             )
                         ).withHoverEvent(
                             HoverEvent(
@@ -362,7 +317,233 @@ class RMusicCommand : CommandRegistrationCallback {
                 context.sendFeedback(songText)
             }
         } catch (e: Exception) {
+            e.printStackTrace()
             context.sendFeedback(Text.literal("搜索失败: ${e.message}"))
         }
+    }
+
+    private fun CommandContext<ServerCommandSource>.executeOpenLoginMenu() {
+        openMusicPlatformMenu(this.source.player!!)
+    }
+
+    private fun executeCheckQRCodeStatus(
+        key: String,
+        platform: MusicPlatform,
+        context: CommandContext<ServerCommandSource>
+    ) {
+        scope.launch {
+            Renderer.loadQRCode = false
+            context.sendFeedback(Text.literal("正在检查登录状态中"))
+            try {
+                when (platform) {
+                    MusicPlatform.Netease -> {
+                        val cookie = NCMusic.checkQRCodeStatus(key)
+                        if (cookie != null) {
+                            RMusicServer.cookieManager.login(cookie, MusicPlatform.Netease)
+                            val accountInfo = NCMusic.getUserAccount()
+                            context.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
+                        } else {
+                            context.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))
+                        }
+                    }
+
+                    MusicPlatform.QQ -> TODO()
+                    MusicPlatform.KuGou -> {
+                        val cookie = KuGouMusic.checkQRCodeStatus(key)
+                        if (cookie != null) {
+                            RMusicServer.cookieManager.login(cookie.first, MusicPlatform.KuGou)
+                            context.sendFeedback(Text.literal("登陆成功, 用户名: ${cookie.second}"))
+                        } else {
+                            context.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                context.sendFeedback(Text.literal("验证失败, 错误原因: ${e.message}"))
+            }
+        }
+    }
+
+    private fun executeShareMusic(
+        songId: String,
+        platform: MusicPlatform,
+        context: CommandContext<ServerCommandSource>
+    ) {
+        context.sendFeedback(Text.literal("正在获取分享音乐所需的必要信息..."))
+        when (platform) {
+            MusicPlatform.Netease -> {
+                scope.launch {
+                    try {
+                        val songUrl = NCMusic.getSongUrl(songId.toLong())
+                        val songDetail = NCMusic.getSongDetail(songId.toLong())
+                        ShareMusicOutbound(
+                            songDetail.name,
+                            songId,
+                            songDetail.artists,
+                            songUrl,
+                            context.source.player!!.name.string,
+                            MusicPlatform.Netease
+                        ).createActionPacket(IntentAction.SHARE).sendToClient(context)
+                    } catch (e: Exception) {
+                        context.sendFeedback(Text.literal("分享失败, 错误原因: ${e.message}"))
+                    }
+                }
+            }
+
+            MusicPlatform.QQ -> {
+                scope.launch {
+                    try {
+                        val songUrl = QQMusic.getSongUrl(songId)
+                        val songDetail = QQMusic.getSongInfo(songId)
+                        ShareMusicOutbound(
+                            songDetail.name,
+                            songId,
+                            songDetail.artists,
+                            songUrl,
+                            context.source.player!!.name.string,
+                            MusicPlatform.QQ
+                        ).createActionPacket(IntentAction.SHARE).sendToClient(context)
+                    } catch (e: Exception) {
+                        context.sendFeedback(Text.literal("分享失败, 错误原因: ${e.message}"))
+                    }
+                }
+            }
+
+            MusicPlatform.KuGou -> {
+                scope.launch {
+                    try {
+                        val songUrl = KuGouMusic.getSongUrl(songId)
+                        val songDetail = KuGouMusic.getSongInfo(songId)
+                        ShareMusicOutbound(
+                            songDetail.name,
+                            songId,
+                            songDetail.artists,
+                            songUrl,
+                            context.source.player!!.name.string,
+                            MusicPlatform.KuGou
+                        ).createActionPacket(IntentAction.SHARE).sendToClient(context)
+                    } catch (e: Exception) {
+                        context.sendFeedback(Text.literal("分享失败, 错误原因: ${e.message}"))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun executePlayMusic(
+        songId: String,
+        platform: MusicPlatform,
+        context: CommandContext<ServerCommandSource>
+    ) {
+        context.sendFeedback(Text.literal("正在获取歌曲信息..."))
+        when (platform) {
+            MusicPlatform.Netease -> {
+                scope.launch {
+                    try {
+                        val songUrl = NCMusic.getSongUrl(songId.toLong())
+                        val songDetail = NCMusic.getSongDetail(songId.toLong())
+                        val lyric = NCMusic.getLyric(songId.toLong())
+                        PlayMusicOutbound(
+                            songUrl,
+                            songId,
+                            songDetail.name,
+                            songDetail.artists,
+                            songDetail.cover,
+                            lyric,
+                            songDetail.duration.toMinuteSecond()
+                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
+                    }
+                }
+            }
+
+            MusicPlatform.QQ -> {
+                scope.launch {
+                    try {
+                        val songUrl = QQMusic.getSongUrl(songId)
+                        val songDetail = QQMusic.getSongInfo(songId)
+                        val lyric = QQMusic.getLyric(songId)
+                        PlayMusicOutbound(
+                            songUrl,
+                            songId,
+                            songDetail.name,
+                            songDetail.artists,
+                            songDetail.cover,
+                            lyric,
+                            songDetail.duration.toMinuteSecond()
+                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
+                    }
+                }
+            }
+
+            MusicPlatform.KuGou -> {
+                scope.launch {
+                    try {
+                        val songUrl = KuGouMusic.getSongUrl(songId)
+                        val songDetail = KuGouMusic.getSongInfo(songId)
+                        val lyric = mapOf<Int, String>()
+                        PlayMusicOutbound(
+                            songUrl,
+                            songId,
+                            songDetail.name,
+                            songDetail.artists,
+                            songDetail.cover,
+                            lyric,
+                            songDetail.duration.toMinuteSecond()
+                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
+                    }
+                }
+            }
+        }
+    }
+
+    private fun executeCleanCache(context: CommandContext<ServerCommandSource>) {
+        context.sendFeedback(
+            Text.literal("本操作会清空所有已缓存到本地的音频文件, 点击").append(
+                Text.literal("[这里]").styled { style ->
+                    style.withColor(Formatting.GREEN)
+                        .withHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                Text.literal("点击确认").styled {
+                                    it.withColor(Formatting.GREEN)
+                                })
+                        )
+                        .withClickEvent(
+                            ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/rm clean-cache confirm"
+                            )
+                        )
+                }).append("来确认操作")
+        )
+    }
+
+    private fun executeCleanCacheConfirm(context: CommandContext<ServerCommandSource>) {
+        val files = File("./config/rmusic/cache")
+            .listFiles()?.filter { it.isFile } ?: emptyList()
+        files.forEach { file -> file.delete() }
+        context.sendFeedback(
+            Text.literal("已删除").append(
+                Text.literal("${files.size}")
+                    .styled {
+                        it.withColor(Formatting.RED)
+                            .withHoverEvent(
+                                HoverEvent(
+                                    HoverEvent.Action.SHOW_TEXT,
+                                    Text.literal(files.joinToString(separator = "\n") { file -> file.name })
+                                )
+                            )
+                    }).append("个文件")
+        )
     }
 }

@@ -10,6 +10,7 @@ package cn.rtast.rmusic.util.mc
 import cn.rtast.rmusic.entity.KeyboardState
 import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound
 import cn.rtast.rmusic.enums.IntentAction
+import cn.rtast.rmusic.enums.MusicPlatform
 import cn.rtast.rmusic.util.music.NCMusic
 import cn.rtast.rmusic.util.str.encodeToBase64
 import kotlinx.coroutines.CoroutineScope
@@ -89,7 +90,7 @@ fun openNeteaseLoginTypeMenu(player: ServerPlayerEntity) {
                     slateContext.player.sendMessage(Text.literal("正在获取二维码..."))
                     scope.launch {
                         val (key, qrcode) = NCMusic.loginByQRCode()
-                        QRCodeLoginOutbound(key, qrcode.encodeToBase64())
+                        QRCodeLoginOutbound(key, qrcode.encodeToBase64(), MusicPlatform.Netease)
                             .createActionPacket(IntentAction.LOGIN)
                             .sendToClient(player)
                     }

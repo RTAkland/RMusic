@@ -8,6 +8,7 @@
 package cn.rtast.rmusic.util.config
 
 import cn.rtast.rmusic.entity.Cookie
+import cn.rtast.rmusic.enums.MusicPlatform
 import cn.rtast.rmusic.util.str.fromJson
 import cn.rtast.rmusic.util.str.toJson
 import java.io.File
@@ -21,22 +22,29 @@ class CookieManager {
     init {
         if (!this.file.exists()) {
             this.file.createNewFile()
-            val defaultEmptyCookie = Cookie("").toJson()
+            val defaultEmptyCookie = Cookie("", "").toJson()
             this.file.writeText(defaultEmptyCookie)
         }
         this.currentCookie = this.file.readText().fromJson<Cookie>()
     }
 
-    fun login(cookie: String, ) {
-        val state = Cookie(cookie).toJson()
-        file.delete()
-        file.createNewFile()
-        file.writeText(state)
+    fun login(cookie: String, platform: MusicPlatform) {
+        val currentCookies = this.getCookie()
+        val afterCookie = when (platform) {
+            MusicPlatform.QQ -> Cookie("", "")
+            MusicPlatform.Netease -> Cookie(cookie, currentCookies.kugouCookie)
+            MusicPlatform.KuGou -> Cookie(currentCookies.neteaseCookie, cookie)
+        }
+        this.write(afterCookie)
     }
 
-    private fun getCookie(): String {
+    private fun write(cookie: Cookie) {
+        this.file.writeText(cookie.toJson())
+    }
+
+    private fun getCookie(): Cookie {
         file.createNewFile()
-        return file.readText().fromJson<Cookie>().neteaseCookie
+        return file.readText().fromJson<Cookie>()
     }
 
     fun logout() {

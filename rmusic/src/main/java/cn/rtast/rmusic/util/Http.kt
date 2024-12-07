@@ -104,7 +104,6 @@ object Http {
         val request = Request.Builder()
             .post(body.build())
             .url(paramsUrl)
-        println(headers)
         val headerRequest = addHeaders(request, headers)
         return this.executeRequest<T>(headerRequest.build())
     }
