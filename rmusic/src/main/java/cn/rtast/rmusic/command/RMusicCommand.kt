@@ -141,6 +141,10 @@ class RMusicCommand : CommandRegistrationCallback {
                         }
                 ).then(
                     CommandManager.literal("login")
+                        .executes { context ->
+                            context.executeOpenLoginMenu()
+                            0
+                        }
                         .then(
                             CommandManager.literal("netease")
                                 .then(
@@ -148,15 +152,12 @@ class RMusicCommand : CommandRegistrationCallback {
                                         .then(
                                             CommandManager.argument("netease-qrcode-key", StringArgumentType.string())
                                                 .executes { context ->
-                                                    val key = context.getArgument("qrcodeKey", String::class.java)
+                                                    val key = context.getArgument("netease-qrcode-key", String::class.java)
                                                     this.executeCheckQRCodeStatus(key, MusicPlatform.Netease, context)
                                                     0
                                                 }
                                         )
-                                ).executes { context ->
-                                    context.executeOpenLoginMenu()
-                                    0
-                                }
+                                )
                         ).then(
                             CommandManager.literal("kugou")
                                 .then(
@@ -170,10 +171,7 @@ class RMusicCommand : CommandRegistrationCallback {
                                                     0
                                                 }
                                         )
-                                ).executes { context ->
-                                    context.executeOpenLoginMenu()
-                                    0
-                                }
+                                )
                         )
                 ).then(
                     CommandManager.literal("clean-cache")
@@ -323,7 +321,7 @@ class RMusicCommand : CommandRegistrationCallback {
     }
 
     private fun CommandContext<ServerCommandSource>.executeOpenLoginMenu() {
-        openMusicPlatformMenu(this.source.player!!)
+        openMusicPlatformMenu(this)
     }
 
     private fun executeCheckQRCodeStatus(

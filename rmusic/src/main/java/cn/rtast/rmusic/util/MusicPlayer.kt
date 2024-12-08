@@ -19,6 +19,7 @@ package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.cacheDir
 import cn.rtast.rmusic.util.mc.Renderer
+import cn.rtast.rmusic.util.mc.prefixText
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
@@ -83,6 +84,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
         Renderer.currentArtistName = songArtist
         val cachedSongFile = File(cacheDir, songId)
         if (cachedSongFile.exists()) {
+            minecraftClient.player?.sendMessage(prefixText.append("本地已有缓存, 使用本地缓存进行播放"), false)
             this.open(cachedSongFile)
             this.play()
         } else {

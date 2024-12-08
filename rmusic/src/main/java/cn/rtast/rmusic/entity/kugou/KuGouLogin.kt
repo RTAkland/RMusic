@@ -13,6 +13,6 @@ data class KuGouLogin(
 ) {
     data class Data(
         val nickname: String,
-        val token: String,
+        val token: String?,
     )
 }

@@ -16,7 +16,7 @@ import cn.rtast.rmusic.util.str.decodeToByteArray
 
 object KuGouMusic {
 
-    private val API_PATH = "https://kugou.rtast.cn"
+    private val API_PATH = RMusicServer.configManager.config?.qqMusicAPI ?: "https://kugou.rtast.cn"
     private const val QRCODE_KEY_PATH = "login/qr/key"
     private const val CHECK_QRCODE_PATH = "login/qr/check"
     private const val SEARCH_PATH = "search"
@@ -74,7 +74,7 @@ object KuGouMusic {
 
     fun checkQRCodeStatus(key: String): Pair<String, String?>? {
         val result = this.get<KuGouLogin>("$API_PATH/$CHECK_QRCODE_PATH", mutableMapOf("key" to key))
-        return if (result.status == 4) result.data.token to result.data.nickname else null
+        return if (result.data.token != null) result.data.token to result.data.nickname else null
     }
 
     fun getSongInfo(hash: String): SongDetail {

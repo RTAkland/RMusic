@@ -15,7 +15,7 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.Formatting
 
-private val prefixText
+val prefixText
     get() = Text.literal("[RMusic]").styled { style ->
         style.withColor(Formatting.YELLOW)
     }
