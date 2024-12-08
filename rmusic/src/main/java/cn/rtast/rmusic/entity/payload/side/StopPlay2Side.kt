@@ -9,6 +9,6 @@ package cn.rtast.rmusic.entity.payload.side
 
 class StopPlay2Side {
     override fun toString(): String {
-         return "StopPlay2Side"
+        return "StopPlay2Side"
     }
 }

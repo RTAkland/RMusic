@@ -16,6 +16,7 @@ import cn.rtast.rmusic.entity.payload.side.ResumePlay2Side
 import cn.rtast.rmusic.entity.payload.side.StopPlay2Side
 import cn.rtast.rmusic.enums.IntentAction
 import cn.rtast.rmusic.enums.MusicPlatform
+import cn.rtast.rmusic.scope
 import cn.rtast.rmusic.util.mc.*
 import cn.rtast.rmusic.util.music.KuGouMusic
 import cn.rtast.rmusic.util.music.NCMusic
@@ -24,8 +25,6 @@ import cn.rtast.rmusic.util.toMinuteSecond
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.context.CommandContext
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
@@ -38,8 +37,6 @@ import net.minecraft.util.Formatting
 import java.io.File
 
 class RMusicCommand : CommandRegistrationCallback {
-
-    private val scope = CoroutineScope(Dispatchers.IO)
 
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
@@ -152,7 +149,8 @@ class RMusicCommand : CommandRegistrationCallback {
                                         .then(
                                             CommandManager.argument("netease-qrcode-key", StringArgumentType.string())
                                                 .executes { context ->
-                                                    val key = context.getArgument("netease-qrcode-key", String::class.java)
+                                                    val key =
+                                                        context.getArgument("netease-qrcode-key", String::class.java)
                                                     this.executeCheckQRCodeStatus(key, MusicPlatform.Netease, context)
                                                     0
                                                 }

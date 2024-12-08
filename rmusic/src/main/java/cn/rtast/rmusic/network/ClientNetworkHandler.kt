@@ -14,16 +14,14 @@ import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound
 import cn.rtast.rmusic.entity.payload.outbound.ShareMusicOutbound
 import cn.rtast.rmusic.entity.payload.side.Mute2Side
 import cn.rtast.rmusic.enums.IntentAction
+import cn.rtast.rmusic.scope
 import cn.rtast.rmusic.util.*
 import cn.rtast.rmusic.util.mc.Renderer
 import cn.rtast.rmusic.util.mc.decode
 import cn.rtast.rmusic.util.mc.decodeRawPacket
 import cn.rtast.rmusic.util.mc.sendMessage
 import cn.rtast.rmusic.util.str.decodeToByteArray
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.io.files.FileNotFoundException
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.minecraft.client.MinecraftClient
 import net.minecraft.sound.SoundCategory
@@ -35,7 +33,6 @@ import net.minecraft.util.Formatting
 import java.net.URI
 
 private val minecraftClient: MinecraftClient = MinecraftClient.getInstance()
-private val scope = CoroutineScope(Dispatchers.IO)
 
 fun registerClientReceiver() {
     ClientPlayNetworking.registerGlobalReceiver(RMusicCustomPayload.ID) { payload, context ->

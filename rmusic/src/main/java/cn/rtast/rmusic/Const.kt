@@ -20,9 +20,12 @@ package cn.rtast.rmusic
 import cn.rtast.rmusic.entity.Config
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import net.minecraft.util.Identifier
 import java.io.File
 
+val scope = CoroutineScope(Dispatchers.IO)
 val gson: Gson = GsonBuilder().disableHtmlEscaping().create()
 val qrcodeId: Identifier = Identifier.of("rmusic", "qr.code")
 val defaultCoverId: Identifier = Identifier.of("rmusic", "texture/default.png")
