@@ -361,9 +361,10 @@ class RMusicCommand : CommandRegistrationCallback {
         if (platform == null) {
             context.sendFeedback(Text.literal("暂时不支持${rawPlatform}哦"))
         } else {
-            val playList = playerPlayList.getOrElse(context.source.player!!) {
-                mutableListOf()
+            if (playerPlayList[context.source.player!!] == null) {
+                playerPlayList[context.source.player!!] = mutableListOf()
             }
+            val playList = playerPlayList[context.source.player!!]!!
             playList.add(PlayList(songId, platform))
             context.sendFeedback(
                 Text.literal("成功添加歌曲到播放列表,目前播放列表有")

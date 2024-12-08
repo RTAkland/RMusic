@@ -26,11 +26,13 @@ fun registerServerReceiver() {
             IntentAction.RESUME -> TODO()
             IntentAction.MUTE -> TODO()
             IntentAction.END_PLAYING -> {
-                val playList = RMusicCommand.playerPlayList.getOrElse(context.player()) {
-                    mutableListOf()
+                if (RMusicCommand.playerPlayList[context.player()] == null) {
+                    RMusicCommand.playerPlayList[context.player()] = mutableListOf()
                 }
+                val playList = RMusicCommand.playerPlayList[context.player()]!!
                 if (playList.isNotEmpty()) {
                     val latestMusic = playList.first()
+                    println(latestMusic)
                     playList.removeFirst()
                     RMusicCommand.executePlayMusic(latestMusic.id, latestMusic.platform, context.player())
                 }
