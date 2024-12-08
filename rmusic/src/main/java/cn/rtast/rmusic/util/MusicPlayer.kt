@@ -18,8 +18,11 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.cacheDir
+import cn.rtast.rmusic.enums.IntentAction
 import cn.rtast.rmusic.util.mc.Renderer
+import cn.rtast.rmusic.util.mc.createActionPacket
 import cn.rtast.rmusic.util.mc.prefixText
+import cn.rtast.rmusic.util.mc.sendToServer
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
@@ -73,6 +76,7 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
             Renderer.loadLyric = false
             Renderer.loadCurrentLyric = ""
             Renderer.registerLoadingCover()
+            "".createActionPacket(IntentAction.END_PLAYING).sendToServer()
         }
     }
 

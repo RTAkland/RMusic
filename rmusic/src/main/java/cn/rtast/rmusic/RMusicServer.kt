@@ -9,6 +9,7 @@ package cn.rtast.rmusic
 
 import cn.rtast.rmusic.command.RMusicCommand
 import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
+import cn.rtast.rmusic.network.registerServerReceiver
 import cn.rtast.rmusic.util.Http
 import cn.rtast.rmusic.util.config.ConfigManager
 import cn.rtast.rmusic.util.config.CookieManager
@@ -31,6 +32,7 @@ class RMusicServer : ModInitializer {
         PayloadTypeRegistry.playC2S().register(RMusicCustomPayload.ID, RMusicCustomPayload.CODEC)
         PayloadTypeRegistry.playS2C().register(RMusicCustomPayload.ID, RMusicCustomPayload.CODEC)
         CommandRegistrationCallback.EVENT.register(RMusicCommand())
+        registerServerReceiver()
         publicIp = Http.get("https://icanhazip.com/")
         logger.info("RMusic 已加载!")
     }

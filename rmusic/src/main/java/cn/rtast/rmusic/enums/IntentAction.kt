@@ -9,5 +9,5 @@ package cn.rtast.rmusic.enums
 
 enum class IntentAction {
     LOGIN, SHARE, PLAY, STOP,
-    PAUSE, RESUME, MUTE
+    PAUSE, RESUME, MUTE, END_PLAYING
 }

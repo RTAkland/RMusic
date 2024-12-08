@@ -171,6 +171,8 @@ fun registerClientReceiver() {
                 RMusicClient.player.mute = mutePacket.isMuted
                 context.sendMessage(Text.literal("成功设置静音状态为: ${mutePacket.isMuted}"))
             }
+
+            IntentAction.END_PLAYING -> TODO()
         }
     }
 }

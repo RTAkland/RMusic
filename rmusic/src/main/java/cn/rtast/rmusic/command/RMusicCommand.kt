@@ -8,6 +8,7 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusicServer
+import cn.rtast.rmusic.entity.PlayList
 import cn.rtast.rmusic.entity.payload.outbound.PlayMusicOutbound
 import cn.rtast.rmusic.entity.payload.outbound.SearchResultOutbound
 import cn.rtast.rmusic.entity.payload.outbound.ShareMusicOutbound
@@ -30,6 +31,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback
 import net.minecraft.command.CommandRegistryAccess
 import net.minecraft.server.command.CommandManager
 import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.ClickEvent
 import net.minecraft.text.HoverEvent
 import net.minecraft.text.Text
@@ -37,6 +39,86 @@ import net.minecraft.util.Formatting
 import java.io.File
 
 class RMusicCommand : CommandRegistrationCallback {
+
+    companion object {
+        val playerPlayList = mutableMapOf<ServerPlayerEntity, MutableList<PlayList>>()
+
+        fun executePlayMusic(
+            songId: String,
+            platform: MusicPlatform,
+            context: ServerPlayerEntity
+        ) {
+            context.sendFeedback(Text.literal("正在获取歌曲信息..."))
+            when (platform) {
+                MusicPlatform.Netease -> {
+                    scope.launch {
+                        try {
+                            val songUrl = NCMusic.getSongUrl(songId.toLong())
+                            val songDetail = NCMusic.getSongDetail(songId.toLong())
+                            val lyric = NCMusic.getLyric(songId.toLong())
+                            PlayMusicOutbound(
+                                songUrl,
+                                songId,
+                                songDetail.name,
+                                songDetail.artists,
+                                songDetail.cover,
+                                lyric,
+                                songDetail.duration.toMinuteSecond()
+                            ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
+                        }
+                    }
+                }
+
+                MusicPlatform.QQ -> {
+                    scope.launch {
+                        try {
+                            val songUrl = QQMusic.getSongUrl(songId)
+                            val songDetail = QQMusic.getSongInfo(songId)
+                            val lyric = QQMusic.getLyric(songId)
+                            PlayMusicOutbound(
+                                songUrl,
+                                songId,
+                                songDetail.name,
+                                songDetail.artists,
+                                songDetail.cover,
+                                lyric,
+                                songDetail.duration.toMinuteSecond()
+                            ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
+                        }
+                    }
+                }
+
+                MusicPlatform.KuGou -> {
+                    scope.launch {
+                        try {
+                            val songUrl = KuGouMusic.getSongUrl(songId)
+                            val songDetail = KuGouMusic.getSongInfo(songId)
+                            val lyric = mapOf<Int, String>()
+                            PlayMusicOutbound(
+                                songUrl,
+                                songId,
+                                songDetail.name,
+                                songDetail.artists,
+                                songDetail.cover,
+                                lyric,
+                                songDetail.duration.toMinuteSecond()
+                            ).createActionPacket(IntentAction.PLAY).sendToClient(context)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
+                        }
+                    }
+                }
+            }
+        }
+
+    }
 
     override fun register(
         dispatcher: CommandDispatcher<ServerCommandSource>,
@@ -96,7 +178,11 @@ class RMusicCommand : CommandRegistrationCallback {
                                     CommandManager.argument("songId", StringArgumentType.string())
                                         .executes { context ->
                                             val songId = context.getArgument("songId", String::class.java)
-                                            this.executePlayMusic(songId, MusicPlatform.Netease, context)
+                                            executePlayMusic(
+                                                songId,
+                                                MusicPlatform.Netease,
+                                                context.source.player!!
+                                            )
                                             0
                                         }
                                 )
@@ -106,7 +192,7 @@ class RMusicCommand : CommandRegistrationCallback {
                                     CommandManager.argument("qq-song-id", StringArgumentType.string())
                                         .executes { context ->
                                             val songId = context.getArgument("qq-song-id", String::class.java)
-                                            this.executePlayMusic(songId, MusicPlatform.QQ, context)
+                                            executePlayMusic(songId, MusicPlatform.QQ, context.source.player!!)
                                             0
                                         }
                                 )
@@ -116,7 +202,7 @@ class RMusicCommand : CommandRegistrationCallback {
                                     CommandManager.argument("kugou-song-id", StringArgumentType.string())
                                         .executes { context ->
                                             val songId = context.getArgument("kugou-song-id", String::class.java)
-                                            this.executePlayMusic(songId, MusicPlatform.KuGou, context)
+                                            executePlayMusic(songId, MusicPlatform.KuGou, context.source.player!!)
                                             0
                                         }
                                 )
@@ -221,9 +307,71 @@ class RMusicCommand : CommandRegistrationCallback {
                                     0
                                 }
                         )
+                ).then(
+                    CommandManager.literal("playlist")
+                        .executes { context ->
+                            this.executeGetPlayList(context)
+                            0
+                        }
+                        .then(
+                            CommandManager.literal("add")
+                                .then(
+                                    CommandManager.argument("playlist-song-id", StringArgumentType.string())
+                                        .then(
+                                            CommandManager.argument("platform", StringArgumentType.word())
+                                                .suggests { _, builder ->
+                                                    MusicPlatform.entries.forEach {
+                                                        builder.suggest(it.platform)
+                                                    }
+                                                    builder.buildFuture()
+                                                }.executes { context ->
+                                                    val songId =
+                                                        context.getArgument("playlist-song-id", String::class.java)
+                                                    val rawPlatform =
+                                                        context.getArgument("platform", String::class.java)
+                                                    this.executeAddToPlaylist(songId, rawPlatform, context)
+                                                    0
+                                                }
+                                        )
+                                )
+                        )
                 )
         )
         dispatcher.register(CommandManager.literal("rmusic").redirect(shortNode))
+    }
+
+    private fun executeGetPlayList(context: CommandContext<ServerCommandSource>) {
+        val playList = playerPlayList.getOrElse(context.source.player!!) {
+            mutableListOf()
+        }
+        context.sendFeedback(
+            Text.literal("目前播放列表有")
+                .append(Text.literal(playList.size.toString()).styled {
+                    it.withColor(Formatting.GREEN)
+                }).append("首音乐")
+        )
+    }
+
+    private fun executeAddToPlaylist(
+        songId: String,
+        rawPlatform: String,
+        context: CommandContext<ServerCommandSource>
+    ) {
+        val platform = MusicPlatform.forName(rawPlatform)
+        if (platform == null) {
+            context.sendFeedback(Text.literal("暂时不支持${rawPlatform}哦"))
+        } else {
+            val playList = playerPlayList.getOrElse(context.source.player!!) {
+                mutableListOf()
+            }
+            playList.add(PlayList(songId, platform))
+            context.sendFeedback(
+                Text.literal("成功添加歌曲到播放列表,目前播放列表有")
+                    .append(Text.literal(playList.size.toString()).styled {
+                        it.withColor(Formatting.GREEN)
+                    }).append("首音乐")
+            )
+        }
     }
 
     private fun executeSearch(keyword: String, platform: MusicPlatform, context: CommandContext<ServerCommandSource>) {
@@ -291,7 +439,21 @@ class RMusicCommand : CommandRegistrationCallback {
                             )
                         )
                 }
-                songText.append(playButton)
+                val addToPlayListButton = Text.literal(" [+]").styled { style ->
+                    style.withColor(Formatting.GOLD)
+                        .withHoverEvent(
+                            HoverEvent(
+                                HoverEvent.Action.SHOW_TEXT,
+                                Text.literal("点击添加到播放列表中").styled {
+                                    it.withColor(Formatting.YELLOW)
+                                })
+                        ).withClickEvent(
+                            ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/rm playlist add ${r.id.ifEmpty { "000000" }} ${r.platform.platform}"
+                            )
+                        )
+                }
                 val shareButton = Text.literal(" [↗]").styled { style ->
                     style.withColor(Formatting.AQUA)
                         .withClickEvent(
@@ -309,7 +471,9 @@ class RMusicCommand : CommandRegistrationCallback {
                             )
                         )
                 }
+                songText.append(playButton)
                 songText.append(shareButton)
+                songText.append(addToPlayListButton)
                 context.sendFeedback(songText)
             }
         } catch (e: Exception) {
@@ -421,81 +585,6 @@ class RMusicCommand : CommandRegistrationCallback {
                         ).createActionPacket(IntentAction.SHARE).sendToClient(context)
                     } catch (e: Exception) {
                         context.sendFeedback(Text.literal("分享失败, 错误原因: ${e.message}"))
-                    }
-                }
-            }
-        }
-    }
-
-    private fun executePlayMusic(
-        songId: String,
-        platform: MusicPlatform,
-        context: CommandContext<ServerCommandSource>
-    ) {
-        context.sendFeedback(Text.literal("正在获取歌曲信息..."))
-        when (platform) {
-            MusicPlatform.Netease -> {
-                scope.launch {
-                    try {
-                        val songUrl = NCMusic.getSongUrl(songId.toLong())
-                        val songDetail = NCMusic.getSongDetail(songId.toLong())
-                        val lyric = NCMusic.getLyric(songId.toLong())
-                        PlayMusicOutbound(
-                            songUrl,
-                            songId,
-                            songDetail.name,
-                            songDetail.artists,
-                            songDetail.cover,
-                            lyric,
-                            songDetail.duration.toMinuteSecond()
-                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
-                    }
-                }
-            }
-
-            MusicPlatform.QQ -> {
-                scope.launch {
-                    try {
-                        val songUrl = QQMusic.getSongUrl(songId)
-                        val songDetail = QQMusic.getSongInfo(songId)
-                        val lyric = QQMusic.getLyric(songId)
-                        PlayMusicOutbound(
-                            songUrl,
-                            songId,
-                            songDetail.name,
-                            songDetail.artists,
-                            songDetail.cover,
-                            lyric,
-                            songDetail.duration.toMinuteSecond()
-                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
-                    }
-                }
-            }
-
-            MusicPlatform.KuGou -> {
-                scope.launch {
-                    try {
-                        val songUrl = KuGouMusic.getSongUrl(songId)
-                        val songDetail = KuGouMusic.getSongInfo(songId)
-                        val lyric = mapOf<Int, String>()
-                        PlayMusicOutbound(
-                            songUrl,
-                            songId,
-                            songDetail.name,
-                            songDetail.artists,
-                            songDetail.cover,
-                            lyric,
-                            songDetail.duration.toMinuteSecond()
-                        ).createActionPacket(IntentAction.PLAY).sendToClient(context)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        context.sendFeedback(Text.literal("获取歌曲信息失败: ${e.message}"))
                     }
                 }
             }
