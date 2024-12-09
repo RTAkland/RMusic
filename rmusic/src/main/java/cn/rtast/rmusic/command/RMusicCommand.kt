@@ -337,6 +337,7 @@ class RMusicCommand : CommandRegistrationCallback {
                         if (cookie != null) {
                             RMusicServer.cookieManager.login(cookie, MusicPlatform.Netease)
                             val accountInfo = NCMusic.getUserAccount()
+                            context.source.player?.playLoginSuccess()
                             context.sendFeedback(Text.literal("登陆成功, 用户名: $accountInfo"))
                         } else {
                             context.sendFeedback(Text.literal("验证失败, 请检查是否扫码并成功登录"))

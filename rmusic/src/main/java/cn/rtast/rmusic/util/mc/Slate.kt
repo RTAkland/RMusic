@@ -19,31 +19,44 @@ import kotlinx.coroutines.launch
 import net.mcbrawls.slate.Slate
 import net.mcbrawls.slate.Slate.Companion.slate
 import net.mcbrawls.slate.tile.Tile.Companion.tile
+import net.mcbrawls.slate.tile.TileGrid
 import net.minecraft.item.Items
+import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.text.Text
 
 fun openMusicPlatformMenu(context: CommandContext<ServerCommandSource>) {
     val slate = slate {
+        tiles = TileGrid.create(ScreenHandlerType.GENERIC_9X1)
         title = Text.literal("选择需要登陆的平台")
         tiles {
-            this[2, 2] = tile(Items.RED_CONCRETE) {
+            this[0, 0] = tile(Items.RED_CONCRETE) {
                 tooltip("网易云音乐 -> 二维码")
-                onGenericClick { slate, _, _ ->
+                onGenericClick { slate, _, slateContext ->
+                    slateContext.player.playButtonSound()
                     generateQRCode(MusicPlatform.Netease, context, slate)
                 }
             }
-            this[4, 2] = tile(Items.LIME_CONCRETE) {
+            this[1, 0] = tile(Items.LIME_CONCRETE) {
                 tooltip("QQ音乐")
-                onGenericClick { slate, _, _ ->
+                onGenericClick { slate, _, slateContext ->
+                    slateContext.player.playButtonSound()
                     context.sendFeedback(Text.literal("暂不支持QQ音乐登录"))
                     slate.close(context.source.player!!)
                 }
             }
-            this[6, 2] = tile(Items.BLUE_CONCRETE) {
+            this[2, 0] = tile(Items.BLUE_CONCRETE) {
                 tooltip("酷狗音乐 -> 二维码")
-                onGenericClick { slate, _, _ ->
+                onGenericClick { slate, _, slateContext ->
+                    slateContext.player.playButtonSound()
                     generateQRCode(MusicPlatform.KuGou, context, slate)
+                }
+            }
+            this[8, 0] = tile(Items.BARRIER) {
+                tooltip("关闭菜单")
+                onGenericClick { slate, _, slateContext ->
+                    slateContext.player.playButtonSound()
+                    slate.close(context.source.player!!)
                 }
             }
         }

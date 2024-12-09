@@ -2,25 +2,22 @@
 
 > 在我的世界中播放来自网易云音乐的歌曲
 
-# 使用
+# 文档
 
-> 服务器不需要安装任何模组
+[https://rtakland.github.io/RMusic](https://rtakland.github.io/RMusic)
 
-/rm login # 登录
+# 开源
 
-/rm search # 搜索
+- 本项目以[Apache-2.0](./LICENSE)许可开源, 即:
+    - 你可以直接使用该项目提供的功能, 无需任何授权
+    - 你可以在**注明来源版权信息**的情况下对源代码进行任意分发和修改以及衍生
 
-/rm stop # 停止播放音乐
+# 鸣谢
 
-/rm pause # 暂停播放音乐
+<div>
 
-/rm resume # 继续播放音乐
+<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.png" alt="JetBrainsIcon" width="128">
 
-/rm config # 配置
+<a href="https://www.jetbrains.com/opensource/"><code>JetBrains Open Source</code></a> 提供的强大IDE支持
 
-> 在设置中调整`唱片机/音符盒`的音量可以调整音乐的声音大小
-
-> 按下esc会自动暂停音乐播放, 使用`/rm config auto-pause false` 来取消设置自动暂停, 设置成功后
-> 使用`/rm reload`来重新加载配置文件
-
-![showcase](public/showcase.png)
+</div>
