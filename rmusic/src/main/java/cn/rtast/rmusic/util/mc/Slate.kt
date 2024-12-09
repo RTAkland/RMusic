@@ -10,6 +10,8 @@ package cn.rtast.rmusic.util.mc
 import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound
 import cn.rtast.rmusic.enums.IntentAction
 import cn.rtast.rmusic.enums.MusicPlatform
+import cn.rtast.rmusic.enums.PlayerHead
+import cn.rtast.rmusic.enums.PlayerHead.Companion.forItem
 import cn.rtast.rmusic.scope
 import cn.rtast.rmusic.util.music.KuGouMusic
 import cn.rtast.rmusic.util.music.NCMusic
@@ -30,14 +32,14 @@ fun openMusicPlatformMenu(context: CommandContext<ServerCommandSource>) {
         tiles = TileGrid.create(ScreenHandlerType.GENERIC_9X1)
         title = Text.literal("选择需要登陆的平台")
         tiles {
-            this[0, 0] = tile(Items.RED_CONCRETE) {
+            this[0, 0] = tile(PlayerHead.W.forItem()) {
                 tooltip("网易云音乐 -> 二维码")
                 onGenericClick { slate, _, slateContext ->
                     slateContext.player.playButtonSound()
                     generateQRCode(MusicPlatform.Netease, context, slate)
                 }
             }
-            this[1, 0] = tile(Items.LIME_CONCRETE) {
+            this[1, 0] = tile(PlayerHead.Q.forItem()) {
                 tooltip("QQ音乐")
                 onGenericClick { slate, _, slateContext ->
                     slateContext.player.playButtonSound()
@@ -45,7 +47,7 @@ fun openMusicPlatformMenu(context: CommandContext<ServerCommandSource>) {
                     slate.close(context.source.player!!)
                 }
             }
-            this[2, 0] = tile(Items.BLUE_CONCRETE) {
+            this[2, 0] = tile(PlayerHead.K.forItem()) {
                 tooltip("酷狗音乐 -> 二维码")
                 onGenericClick { slate, _, slateContext ->
                     slateContext.player.playButtonSound()
