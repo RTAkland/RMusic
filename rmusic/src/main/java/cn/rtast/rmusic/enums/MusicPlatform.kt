@@ -8,5 +8,16 @@
 package cn.rtast.rmusic.enums
 
 enum class MusicPlatform(val platform: String) {
-    Netease("netease"), QQ("qq"), KuGou("kugou")
+    Netease("netease"), QQ("qq"), KuGou("kugou");
+
+    companion object {
+        fun fromPlatform(platform: String): MusicPlatform {
+            return when (platform) {
+                Netease.platform -> Netease
+                QQ.platform -> QQ
+                KuGou.platform -> KuGou
+                else -> Netease
+            }
+        }
+    }
 }

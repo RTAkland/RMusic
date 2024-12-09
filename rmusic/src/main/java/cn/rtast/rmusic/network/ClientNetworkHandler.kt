@@ -8,6 +8,7 @@
 package cn.rtast.rmusic.network
 
 import cn.rtast.rmusic.RMusicClient
+import cn.rtast.rmusic.entity.PlaylistItem
 import cn.rtast.rmusic.entity.payload.RMusicCustomPayload
 import cn.rtast.rmusic.entity.payload.outbound.PlayMusicOutbound
 import cn.rtast.rmusic.entity.payload.outbound.QRCodeLoginOutbound
@@ -170,6 +171,16 @@ fun registerClientReceiver() {
                 val mutePacket = dispatchPacket.decode<Mute2Side>()
                 RMusicClient.player.mute = mutePacket.isMuted
                 context.sendMessage(Text.literal("成功设置静音状态为: ${mutePacket.isMuted}"))
+            }
+
+            IntentAction.ADD_TO_PLAYLIST -> {
+                val playlistPacket = dispatchPacket.decode<PlaylistItem>()
+                MusicPlayer.playlist.add(playlistPacket)
+                context.sendMessage(
+                    Text.literal(
+                        "成功添加歌曲: 《${playlistPacket.name}》 by: ${playlistPacket.artist}到播放列表中"
+                    ).append(" 当前播放列表中共有${MusicPlayer.playlist.size}首歌曲")
+                )
             }
         }
     }

@@ -18,12 +18,19 @@
 package cn.rtast.rmusic.util
 
 import cn.rtast.rmusic.cacheDir
+import cn.rtast.rmusic.entity.PlaylistItem
+import cn.rtast.rmusic.enums.MusicPlatform
+import cn.rtast.rmusic.scope
 import cn.rtast.rmusic.util.mc.Renderer
 import cn.rtast.rmusic.util.mc.prefixText
+import cn.rtast.rmusic.util.music.KuGouMusic
+import cn.rtast.rmusic.util.music.NCMusic
+import cn.rtast.rmusic.util.music.QQMusic
 import com.goxr3plus.streamplayer.enums.Status
 import com.goxr3plus.streamplayer.stream.StreamPlayer
 import com.goxr3plus.streamplayer.stream.StreamPlayerEvent
 import com.goxr3plus.streamplayer.stream.StreamPlayerListener
+import kotlinx.coroutines.launch
 import net.minecraft.client.MinecraftClient
 import net.minecraft.sound.SoundCategory
 import net.minecraft.text.Text
@@ -40,6 +47,10 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
 
     init {
         this.addStreamPlayerListener(this)
+    }
+
+    companion object {
+        val playlist = mutableListOf<PlaylistItem>()
     }
 
     override fun opened(dataSource: Any, properties: MutableMap<String, Any>) {
@@ -73,6 +84,36 @@ class MusicPlayer : StreamPlayerListener, StreamPlayer() {
             Renderer.loadLyric = false
             Renderer.loadCurrentLyric = ""
             Renderer.registerLoadingCover()
+            if (playlist.isNotEmpty()) {
+                val latestMusic = playlist[0]
+                playlist.removeFirst()
+                val songId = latestMusic.id
+                scope.launch {
+                    val (songUrl, songDetail, lyric) = when (latestMusic.platform) {
+                        MusicPlatform.Netease -> {
+                            val songUrl = NCMusic.getSongUrl(songId.toLong())
+                            val songDetail = NCMusic.getSongDetail(songId.toLong())
+                            val lyric = NCMusic.getLyric(songId.toLong())
+                            Triple(songUrl, songDetail, lyric)
+                        }
+
+                        MusicPlatform.QQ -> {
+                            val songUrl = QQMusic.getSongUrl(songId)
+                            val songDetail = QQMusic.getSongInfo(songId)
+                            val lyric = QQMusic.getLyric(songId)
+                            Triple(songUrl, songDetail, lyric)
+                        }
+
+                        MusicPlatform.KuGou -> {
+                            val songUrl = KuGouMusic.getSongUrl(songId)
+                            val songDetail = KuGouMusic.getSongInfo(songId)
+                            val lyric = mapOf<Int, String>()
+                            Triple(songUrl, songDetail, lyric)
+                        }
+                    }
+                    this@MusicPlayer.playMusic(lyric, songDetail.name, songDetail.artists, songId, songUrl)
+                }
+            }
         }
     }
 

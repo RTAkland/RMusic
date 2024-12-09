@@ -8,6 +8,7 @@
 package cn.rtast.rmusic.command
 
 import cn.rtast.rmusic.RMusicServer
+import cn.rtast.rmusic.entity.PlaylistItem
 import cn.rtast.rmusic.entity.payload.outbound.PlayMusicOutbound
 import cn.rtast.rmusic.entity.payload.outbound.SearchResultOutbound
 import cn.rtast.rmusic.entity.payload.outbound.ShareMusicOutbound
@@ -221,6 +222,57 @@ class RMusicCommand : CommandRegistrationCallback {
                                     0
                                 }
                         )
+                ).then(
+                    CommandManager.literal("playlist")
+                        .executes { context ->
+                            0
+                        }.then(
+                            CommandManager.literal("add")
+                                .then(
+                                    CommandManager.argument("playlist-id", StringArgumentType.string())
+                                        .then(
+                                            CommandManager.argument("playlist-name", StringArgumentType.string())
+                                                .then(
+                                                    CommandManager.argument(
+                                                        "playlist-artist",
+                                                        StringArgumentType.string()
+                                                    )
+                                                        .then(
+                                                            CommandManager.argument(
+                                                                "playlist-platform",
+                                                                StringArgumentType.string()
+                                                            ).executes { context ->
+                                                                val id = context.getArgument(
+                                                                    "playlist-id",
+                                                                    String::class.java
+                                                                )
+                                                                val name = context.getArgument(
+                                                                    "playlist-name",
+                                                                    String::class.java
+                                                                )
+                                                                val artist = context.getArgument(
+                                                                    "playlist-artist",
+                                                                    String::class.java
+                                                                )
+                                                                val platform =
+                                                                    context.getArgument(
+                                                                        "playlist-platform",
+                                                                        String::class.java
+                                                                    )
+                                                                PlaylistItem(
+                                                                    id,
+                                                                    name,
+                                                                    artist,
+                                                                    MusicPlatform.fromPlatform(platform)
+                                                                ).createActionPacket(IntentAction.ADD_TO_PLAYLIST)
+                                                                    .sendToClient(context)
+                                                                0
+                                                            }
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
                 )
         )
         dispatcher.register(CommandManager.literal("rmusic").redirect(shortNode))
@@ -291,7 +343,6 @@ class RMusicCommand : CommandRegistrationCallback {
                             )
                         )
                 }
-                songText.append(playButton)
                 val shareButton = Text.literal(" [↗]").styled { style ->
                     style.withColor(Formatting.AQUA)
                         .withClickEvent(
@@ -309,7 +360,18 @@ class RMusicCommand : CommandRegistrationCallback {
                             )
                         )
                 }
+                val addToPlaylistButton = Text.literal(" [+]").styled { style ->
+                    style.withColor(Formatting.GREEN)
+                        .withClickEvent(
+                            ClickEvent(
+                                ClickEvent.Action.RUN_COMMAND,
+                                "/rm playlist add '${r.id}' '${r.songName}' '${r.artistName}' '${r.platform.platform}'"
+                            )
+                        ).withHoverEvent(HoverEvent(HoverEvent.Action.SHOW_TEXT, Text.literal("点击添加到播放列表中")))
+                }
+                songText.append(playButton)
                 songText.append(shareButton)
+                songText.append(addToPlaylistButton)
                 context.sendFeedback(songText)
             }
         } catch (e: Exception) {
