@@ -24,9 +24,11 @@ dependencies {
     implementation("com.github.goxr3plus:java-stream-player:10.0.2")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11")
     implementation("net.mamoe.yamlkt:yamlkt:0.13.0")
+    implementation("com.github.FANA-Music:Youtube-Music-API:0d126b6318")
     embed(implementation("com.github.goxr3plus:java-stream-player:10.0.2"))
     embed(implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.11"))
     embed(implementation("net.mamoe.yamlkt:yamlkt:0.13.0"))
+    embed(implementation("com.github.FANA-Music:Youtube-Music-API:0d126b6318"))
 }
 
 processResources {
